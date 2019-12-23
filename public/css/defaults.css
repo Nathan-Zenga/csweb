@@ -1,0 +1,117 @@
+@import url('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css');
+@import url('https://use.fontawesome.com/releases/v5.2.0/css/all.css');
+@import url('https://fonts.googleapis.com/css?family=Cutive+Mono');
+
+html, body {
+	font-family: 'Cutive Mono', 'Courier New', monospace;
+	font-feature-settings: 'liga' 0;
+	background-color: black;
+	color: white;
+}
+
+a, a:link, a:visited, a:hover {
+	cursor: pointer;
+	color: inherit;
+	text-decoration: none;
+	transition: .5s opacity;
+}
+
+a:hover {
+	opacity: .5;
+}
+
+::selection {
+	color: black;
+	background: white;
+}
+
+::-webkit-scrollbar {
+	width: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+	background-color: rgb(100, 100, 100);
+	border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+	background-color: transparent;
+}
+
+.dt-view,
+.dt-view-md {
+	display: none;
+}
+
+@media (min-width: 768px) {
+	.mb-view {
+		display: none!important;
+	}
+
+	.dt-view {
+		display: initial;
+	}
+}
+
+@media (min-width: 992px) {
+	.mb-view-md {
+		display: none;
+	}
+
+	.dt-view-md {
+		display: initial;
+	}
+}
+
+.centre, .centreX, .centreY {
+	position: relative;
+}
+
+.centre {
+	top: 50%; left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.centreX {
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+.centreY {
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+.row {
+	margin: 0;
+}
+
+[class*="col-"] {
+	padding: 0;
+}
+
+.btn {
+	border: none;
+}
+
+.cs .hamburger {
+	padding-top: 0;	
+	padding-bottom: 0;	
+}
+
+.cs .hamburger:hover,
+.cs .hamburger.is-active:hover {
+	opacity: 1;
+}
+
+.cs .hamburger-box {
+	width: 24px;
+}
+
+.cs .hamburger-inner:before,
+.cs .hamburger-inner:after,
+.cs .hamburger-inner {
+	background-color: white!important;
+	width: 100%;
+	height: 2px;
+}

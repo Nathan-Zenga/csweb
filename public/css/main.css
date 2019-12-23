@@ -1,0 +1,85 @@
+﻿header *[class*="-container"] {
+	padding: 2em 0;
+}
+
+#nav-icon {
+	margin: 0 auto 1em;
+	display: table;
+}
+
+nav {
+	display: none;
+	font-weight: bold;
+	text-align: center;
+}
+
+@media (min-width: 768px) {
+	header {
+		padding: 2em 0;
+	}
+
+	header *[class*="-container"] {
+		padding: 0;
+	}
+	
+	nav {
+		display: block;
+		text-align: right;
+	}
+}
+
+.content-container {
+	padding: 10px;
+}
+
+.content-container > .content {
+	height: 400px;
+	background-color: white;
+	border-radius: 7px;
+}
+
+.video-container {
+	padding: 0;
+}
+
+.video-container > .video {
+	border-radius: 0;
+}
+
+.merch-highlights-section {
+	padding: 3em 0;
+}
+
+.logo-container {
+	text-align: center;
+}
+
+@media (min-width: 768px) {
+	.logo-container {
+		text-align: left;
+	}
+}
+
+#cs-logo {
+	height: 5em;
+	border-radius: 50%;
+	border: 2px solid;
+	padding: 10px;
+	text-align: center;
+}	
+
+#cs-logo.fixed {
+	position: fixed;
+	height: 300px;
+	left: 50%;
+	-webkit-transform: translateX(-50%);
+	transform: translateX(-50%);
+	border: 0;
+	padding: 0;
+}
+
+footer {
+	padding: 2em 0;
+	text-align: center;
+	font-size: 1.5em;
+}
