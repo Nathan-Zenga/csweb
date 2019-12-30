@@ -1,16 +1,23 @@
-﻿header *[class*="-container"] {
+﻿main {
+	position: relative;
+}
+
+header *[class*="-container"] {
 	padding: 2em 0;
 }
 
+.nav-container {
+	text-align: center;
+}
+
 #nav-icon {
-	margin: 0 auto 1em;
-	display: table;
+	margin-bottom: 1em;
+	padding: 0;
 }
 
 nav {
 	display: none;
 	font-weight: bold;
-	text-align: center;
 }
 
 @media (min-width: 768px) {
@@ -18,10 +25,17 @@ nav {
 		padding: 2em 0;
 	}
 
+	header .container {
+		display: table;
+	}
+
 	header *[class*="-container"] {
+		display: table-cell;
+		vertical-align: middle;
+		float: none;
 		padding: 0;
 	}
-	
+
 	nav {
 		display: block;
 		text-align: right;
@@ -29,13 +43,12 @@ nav {
 }
 
 .content-container {
-	padding: 10px;
+	background-color: white;
+	color: black;
 }
 
 .content-container > .content {
-	height: 400px;
-	background-color: white;
-	border-radius: 7px;
+	min-height: 100px;
 }
 
 .video-container {
@@ -47,7 +60,18 @@ nav {
 }
 
 .merch-highlights-section {
-	padding: 3em 0;
+	padding-top: 3em;
+	padding-bottom: 3em;
+}
+
+.merch-highlights {
+	padding: 10px;
+	background-color: transparent;
+}
+
+.merch-highlights .merch {
+	border-radius: 7px;
+	background-color: white;
 }
 
 .logo-container {
@@ -66,7 +90,7 @@ nav {
 	border: 2px solid;
 	padding: 10px;
 	text-align: center;
-}	
+}
 
 #cs-logo.fixed {
 	position: fixed;
@@ -76,10 +100,110 @@ nav {
 	transform: translateX(-50%);
 	border: 0;
 	padding: 0;
+	animation: fade-in .5s 1 backwards;
 }
+
+@-webkit-keyframes fade-in { from { opacity: 0 } to { opacity: 1; } }
+@keyframes fade-in { from { opacity: 0 } to { opacity: 1; } }
 
 footer {
 	padding: 2em 0;
 	text-align: center;
 	font-size: 1.5em;
+}
+
+article:not(:last-child) {
+	margin-bottom: 20px;
+}
+
+article .article-content > * {
+	padding: 30px;
+	height: 400px;
+}
+
+article .article-content > .img {
+	padding: 0;
+	margin: 0 -15px;
+}
+
+article .article-content h1 {
+	font-weight: bold;
+}
+
+@media (max-width: 767px) {
+	article .article-content > .text {
+		height: auto;
+	}
+}
+
+@media (min-width: 768px) {
+	article .article-content > .img {
+		margin: 0;
+	}
+}
+
+.artist-bio:not(:last-child) {
+	margin-bottom: 20px;
+}
+
+.artist-bio .text {
+	padding: 30px;
+}
+
+.artist-bio .text h1 {
+	font-weight: bold;
+}
+
+.artist-bio .text .socials {
+	font-size: 1.5em;
+}
+
+.artist-bio .text .socials img {
+	height: 1.5em;
+}
+
+.artist-bio .img-wrapper {
+	padding: 0;
+}
+
+.artist-bio .img {
+	padding: 0;
+	margin: 0 -15px;
+	height: 400px;
+	background-color: rgba(0, 0, 0, .2);
+	background-size: cover;
+	background-position: center;
+}
+
+@media (min-width: 768px) {
+	.artist-bio .img {
+		margin: 0;
+	}
+
+	.artist-bio .img::before,
+	.artist-bio .img::after {
+		position: absolute;
+		content: " ";
+		width: 120px;
+		height: 100%;
+		background-color: white;
+		-webkit-transform: skew(-7deg);
+		transform: skew(-7deg);
+	}
+
+	.artist-bio .img::before {
+		left: -95px;
+	}
+
+	.artist-bio .img::after {
+		right: -95px;
+	}
+
+	.artist-bio:nth-child(2n+1) .text {
+		padding-right: 0;
+	}
+
+	.artist-bio:nth-child(2n+2) .text {
+		padding-left: 0;
+	}
 }
