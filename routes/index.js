@@ -7,6 +7,14 @@ router.get('/', (req, res) => {
 	res.render('index', { title: null, pagename: "home" })
 });
 
+router.get('/news', (req, res) => {
+	res.render('news', { title: null, pagename: "news" })
+});
+
+router.get('/artists', (req, res) => {
+	res.render('artists', { title: null, pagename: "artists" })
+});
+
 // router.post('/send/message', (req, res) => {
 // 	let transporter = nodemailer.createTransport({
 // 		service: 'gmail',
