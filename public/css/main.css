@@ -1,5 +1,6 @@
 ﻿main {
 	position: relative;
+	overflow-x: hidden;
 }
 
 header *[class*="-container"] {
@@ -142,8 +143,12 @@ article .article-content h1 {
 	}
 }
 
+.artist-bio {
+	overflow: hidden;
+}
+
 .artist-bio:not(:last-child) {
-	margin-bottom: 20px;
+	margin-bottom: 50px;
 }
 
 .artist-bio .text {
@@ -167,15 +172,27 @@ article .article-content h1 {
 }
 
 .artist-bio .img {
-	padding: 0;
-	margin: 0 -15px;
 	height: 400px;
 	background-color: rgba(0, 0, 0, .2);
 	background-size: cover;
 	background-position: center;
+	padding: 0;
+	margin: 0 -15px;
 }
 
 @media (min-width: 768px) {
+	.artist-bio {
+		background-color: transparent;
+	}
+
+	.artist-bio:nth-child(odd) {
+		background-image: linear-gradient(to left, white 55%, black 55%, black 100%);
+	}
+
+	.artist-bio:nth-child(even) {
+		background-image: linear-gradient(to right, white 55%, black 55%, black 100%);
+	}
+
 	.artist-bio .img {
 		margin: 0;
 	}
@@ -199,11 +216,29 @@ article .article-content h1 {
 		right: -95px;
 	}
 
-	.artist-bio:nth-child(2n+1) .text {
+	.artist-bio:nth-child(odd) .img::before {
+		background-color: black;
+	}
+
+	.artist-bio:nth-child(even) .img::after {
+		background-color: black;
+	}
+
+	.artist-bio .text {
+		max-height: 400px;
+		overflow: auto;
+	}
+
+	.artist-bio:nth-child(odd) .text {
 		padding-right: 0;
 	}
 
-	.artist-bio:nth-child(2n+2) .text {
+	.artist-bio:nth-child(even) .text {
 		padding-left: 0;
+	}
+
+	.artist-bio .text {
+		max-height: 400px;
+		overflow: auto;
 	}
 }

@@ -1,10 +1,11 @@
     <%_ include partials/header _%>
-    <div class="artist-bio content-container" style="overflow: hidden;">
+    <%_ for ( i = 1; i <= 3; i++ ) { _%>
+    <div class="artist-bio content-container">
         <div class="content container">
-            <div class="img-wrapper col-sm-5">
+            <div class="img-wrapper col-sm-5<%= (i % 2 == 0) ? ' col-sm-push-7' : '' %>">
                 <div class="img" style="background-image: url(/img/zaire-profile-pic.jpg)"></div>
             </div>
-            <div class="text col-sm-7">
+            <div class="text col-sm-7<%= (i % 2 == 0) ? ' col-sm-pull-5' : '' %>">
                 <h1>ZAIRE</h1>
                 <p><b>Aliases</b>: Zai, Statik Shock, Jiggy, Jig Khalifa, Jiggy Marley, Motown Mokely, LL Cool Shades, The Velvet Val Venis, Camilius Cobain</p>
                 <p><b>Home</b>: NW London & D.C.</p>
@@ -25,4 +26,5 @@
             </div>
         </div>
     </div>
+    <%_ } _%>
 <%_ include partials/footer _%>
