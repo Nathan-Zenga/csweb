@@ -8,10 +8,9 @@ $(function() {
 	fixLogo();
 	$(window).scroll(fixLogo);
 
-	$("#nav-icon").click(function() {
-		$(this).children().toggleClass("is-active");
-		var navOpen = $(this).children().hasClass("is-active");
-		var slideToggle = navOpen ? "slideDown" : "slideUp";
-		$("nav")[slideToggle](function() { if(!navOpen) $(this).css("display", "") });
+	$("#nav-button").click(function() {
+		$(this).toggleClass("nav-open");
+		var navOpen = $(this).hasClass("nav-open");
+		$("nav").stop().slideToggle(function() { if(!navOpen) $(this).css("display", "") });
 	});
 });

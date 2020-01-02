@@ -11,9 +11,12 @@ header *[class*="-container"] {
 	text-align: center;
 }
 
-#nav-icon {
-	margin-bottom: 1em;
+#nav-button {
+	margin-bottom: 2em;
 	padding: 0;
+	background: none;
+	border: none;
+	font-weight: bold;
 }
 
 nav {
@@ -101,7 +104,7 @@ nav {
 	transform: translateX(-50%);
 	border: 0;
 	padding: 0;
-	animation: fade-in .5s 1 backwards;
+	animation: fade-in .3s 1 backwards;
 }
 
 @-webkit-keyframes fade-in { from { opacity: 0 } to { opacity: 1; } }
