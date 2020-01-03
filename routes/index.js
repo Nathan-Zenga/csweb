@@ -8,11 +8,15 @@ router.get('/', (req, res) => {
 });
 
 router.get('/news', (req, res) => {
-	res.render('news', { title: null, pagename: "news" })
+	res.render('news', { title: "News", pagename: "news" })
 });
 
 router.get('/artists', (req, res) => {
-	res.render('artists', { title: null, pagename: "artists" })
+	res.render('artists', { title: "Artists", pagename: "artists" })
+});
+
+router.get('/discography', (req, res) => {
+	res.render('discography', { title: "Discography", pagename: "discography" })
 });
 
 // router.post('/send/message', (req, res) => {

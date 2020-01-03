@@ -130,10 +130,6 @@ article .article-content > .img {
 	margin: 0 -15px;
 }
 
-article .article-content h1 {
-	font-weight: bold;
-}
-
 @media (max-width: 767px) {
 	article .article-content > .text {
 		height: auto;
@@ -156,10 +152,6 @@ article .article-content h1 {
 
 .artist-bio .text {
 	padding: 30px;
-}
-
-.artist-bio .text h1 {
-	font-weight: bold;
 }
 
 .artist-bio .text .socials {
@@ -244,4 +236,30 @@ article .article-content h1 {
 		max-height: 400px;
 		overflow: auto;
 	}
+}
+
+.project-thumb {
+	padding: 0 10px 10px;
+	background-color: transparent;
+}
+
+.project-thumb .content {
+	border-radius: 7px;
+	background-color: white;
+}
+
+.project-thumb .content > * {
+	padding: 10px;
+}
+
+.project-thumb .img {
+	height: 300px;
+	background-color: rgba(0,0,0,.5);
+	background-size: cover;
+	background-position: center;
+}
+
+.project-thumb .text {
+	padding-left: 20px;
+	padding-right: 20px;
 }
