@@ -1,15 +1,49 @@
 <%_ include partials/header _%>
     <div class="container">
+        <%_
+            var projects = [{
+                title: "The Round Trip",
+                year: 2015,
+                links: ["https://soundcloud.com/zaire_cs/sets/the-round-trip"],
+                all_platforms: false,
+                img: "/img/rt2015.jpg"
+            }, {
+                title: "Abstracterosutopia E.P.",
+                year: 2016,
+                links: ["https://soundcloud.com/zaire_cs/sets/abstracterosutopia-e-p"],
+                all_platforms: false,
+                img: "/img/autpia216.jpg"
+            }, {
+                title: "The Lotus Moonstone E.P.",
+                year: 2019,
+                links: [],
+                all_platforms: true,
+                img: "/img/Zaire_The Lotus Moonstone_Front (2).jpg"
+            }]
+        _%>
+        <%_ projects.forEach(project => { _%>
         <div class="project-thumb content-container col-sm-4">
             <div class="content">
                 <div class="img-wrapper">
-                    <div class="img" style="background-image: url('/img/Zaire_The Lotus Moonstone_Front (2).jpg');"></div>
+                    <div class="img" style="background-image: url('<%= project.img%>');"></div>
                 </div>
                 <div class="text">
-                    <h1>TITLE</h1>
-                    <p>Info</p>
+                    <h2 class="title" title="<%= project.title %>"><%= project.title %></h2>
+                    <p><%= project.year %></p>
+                    <p>
+                        OUT NOW
+                    <%_ if (project.all_platforms && !project.links.length) { _%>
+                        ALL PLATFORMS
+                    <%_ } else { project.links.forEach((link, i) => {
+                        var start = link.indexOf("://") + "://".length;
+                        var end = link.indexOf(".com");
+                        var hostname = link.slice(start, end); _%>
+                        <span class="space" style="margin-right: 15px"></span><a class="socials-icon fab fa-<%= hostname %>" target="_blank" aria-hidden="true" href="<%= link %>"></a>
+                    <%_ })} _%>
+                    </p>
                 </div>
             </div>
         </div>
+        <%_ }) _%>
     </div>
 <%_ include partials/footer _%>
