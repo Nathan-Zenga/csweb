@@ -9,6 +9,11 @@ html, body {
 	color: white;
 }
 
+h1, h2 {
+	font-weight: bold;
+	margin-top: 0;
+}
+
 a, a:link, a:visited, a:hover {
 	cursor: pointer;
 	color: inherit;
