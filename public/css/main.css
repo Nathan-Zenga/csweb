@@ -262,6 +262,25 @@ article .article-content > .img {
 .project-thumb .text {
 	padding-left: 20px;
 	padding-right: 20px;
+	font-weight: bold;
+}
+
+.project-thumb .title {
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow-x: hidden;
+}
+
+.project-thumb .title:hover {
+	white-space: normal;
+	word-wrap: break-word;
+}
+
+.project-thumb .socials-icon {
+	position: relative;
+	top: 3px;
+	font-size: 1.5em;
+	font-weight: normal;
 }
 
 #map {
