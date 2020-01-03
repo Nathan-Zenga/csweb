@@ -263,3 +263,7 @@ article .article-content > .img {
 	padding-left: 20px;
 	padding-right: 20px;
 }
+
+#map {
+	height: 400px;
+}

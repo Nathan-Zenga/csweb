@@ -19,6 +19,10 @@ router.get('/discography', (req, res) => {
 	res.render('discography', { title: "Discography", pagename: "discography" })
 });
 
+router.get('/map', (req, res) => {
+	res.render('map', { title: "Map", pagename: "map" })
+});
+
 // router.post('/send/message', (req, res) => {
 // 	let transporter = nodemailer.createTransport({
 // 		service: 'gmail',
