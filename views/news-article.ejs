@@ -1,0 +1,16 @@
+<%_ include partials/header _%>
+    <article class="full content-container">
+        <h1 style="text-align: center;">HEADLINE</h1>
+        <div class="article-content">
+            <div class="img-reel">
+                <%_ for (i = 0; i < 5; i++) { _%>
+                <img src="https://www.waza.org/wp-content/uploads/2019/02/sumatran-tiger-wz-gsmp-m.jpg" alt="">
+                <%_ } _%>
+            </div>
+            <div class="text">
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis veniam voluptate officia obcaecati fugit tempora magni perspiciatis facere voluptates, id sequi magnam minima suscipit, earum explicabo quasi voluptatibus nam vitae.</p>
+            </div>
+        </div>
+    </article>
+    <script> if (!("object-fit" in document.body.style)) $(".img-reel img").css("width", "auto"); </script>
+<%_ include partials/footer _%>

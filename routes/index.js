@@ -11,6 +11,10 @@ router.get('/news', (req, res) => {
 	res.render('news', { title: "News", pagename: "news" })
 });
 
+router.get('/news/article', (req, res) => {
+	res.render('news-article', { title: "News", pagename: "news" })
+});
+
 router.get('/artists', (req, res) => {
 	res.render('artists', { title: "Artists", pagename: "artists" })
 });
