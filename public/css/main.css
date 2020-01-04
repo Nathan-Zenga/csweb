@@ -116,30 +116,23 @@ footer {
 	font-size: 1.5em;
 }
 
-article:not(:last-child) {
-	margin-bottom: 20px;
+article.content-container {
+	background-color: transparent;
+	padding: 10px 10px 20px;
+}
+
+article .article-content {
+	border-radius: 7px;
+	background-color: white;
 }
 
 article .article-content > * {
 	padding: 30px;
-	height: 400px;
 }
 
 article .article-content > .img {
 	padding: 0;
-	margin: 0 -15px;
-}
-
-@media (max-width: 767px) {
-	article .article-content > .text {
-		height: auto;
-	}
-}
-
-@media (min-width: 768px) {
-	article .article-content > .img {
-		margin: 0;
-	}
+	height: 350px;
 }
 
 .artist-bio {
