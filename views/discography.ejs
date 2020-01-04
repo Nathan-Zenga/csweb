@@ -1,40 +1,43 @@
 <%_ include partials/header _%>
     <div class="container">
         <%_
-            var projects = [{
+            var discography = [{
                 title: "The Round Trip",
+                artist: "Zaire",
                 year: 2015,
                 links: ["https://soundcloud.com/zaire_cs/sets/the-round-trip"],
                 all_platforms: false,
                 img: "/img/rt2015.jpg"
             }, {
                 title: "Abstracterosutopia E.P.",
+                artist: "Zaire",
                 year: 2016,
                 links: ["https://soundcloud.com/zaire_cs/sets/abstracterosutopia-e-p"],
                 all_platforms: false,
                 img: "/img/autpia216.jpg"
             }, {
                 title: "The Lotus Moonstone E.P.",
+                artist: "Zaire",
                 year: 2019,
                 links: [],
                 all_platforms: true,
                 img: "/img/Zaire_The Lotus Moonstone_Front (2).jpg"
             }]
         _%>
-        <%_ projects.forEach(project => { _%>
+        <%_ discography.forEach(project => { _%>
         <div class="project-thumb content-container col-sm-4">
             <div class="content">
                 <div class="img-wrapper">
-                    <div class="img" style="background-image: url('<%= project.img%>');"></div>
+                    <div class="img" style="background-image: url('<%= project.img %>');"></div>
                 </div>
                 <div class="text">
                     <h2 class="title" title="<%= project.title %>"><%= project.title %></h2>
-                    <p><%= project.year %></p>
+                    <p><%= project.artist + " | " + project.year %></p>
                     <p>
                         OUT NOW
                     <%_ if (project.all_platforms && !project.links.length) { _%>
                         ALL PLATFORMS
-                    <%_ } else { project.links.forEach((link, i) => {
+                    <%_ } else if (project.links.length) { project.links.forEach((link, i) => {
                         var start = link.indexOf("://") + "://".length;
                         var end = link.indexOf(".com");
                         var hostname = link.slice(start, end); _%>
