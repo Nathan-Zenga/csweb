@@ -149,9 +149,19 @@ article.full .article-content {
 
 article.full .img-reel {
 	white-space: nowrap;
-	overflow-x: auto;
+	overflow: hidden;
 	padding-left: 0;
 	padding-right: 0;
+}
+
+article.full .img-reel-nav {
+	padding: 0;
+	text-align: center;
+}
+
+article.full .img-reel-nav a {
+	font-size: 1.5em;
+	padding: 0 30px;
 }
 
 @media (max-width: 767px) {

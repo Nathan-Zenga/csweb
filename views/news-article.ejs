@@ -7,10 +7,27 @@
                 <img src="https://www.waza.org/wp-content/uploads/2019/02/sumatran-tiger-wz-gsmp-m.jpg" alt="">
                 <%_ } _%>
             </div>
+            <div class="img-reel-nav">
+                <a class="left fas fa-chevron-left"></a>
+                <a class="right fas fa-chevron-right"></a>
+            </div>
             <div class="text">
                 <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis veniam voluptate officia obcaecati fugit tempora magni perspiciatis facere voluptates, id sequi magnam minima suscipit, earum explicabo quasi voluptatibus nam vitae.</p>
             </div>
         </div>
     </article>
-    <script> if (!("object-fit" in document.body.style)) $(".img-reel img").css("width", "auto"); </script>
+    <script>
+        if (!("object-fit" in document.body.style)) $(".img-reel img").css("width", "auto");
+        if ($(".img-reel img").length > 1) {
+            var $img = $(".img-reel img:first");
+            $(".img-reel-nav a").click(function() {
+                var left = $(this).hasClass("left");
+                var right = $(this).hasClass("right");
+                var direction = left ? "-=" : "+=";
+                $img = left ? $img.prev() : $img.next();
+                $img = left && !$img.length ? $(".img-reel img:first") : right && !$img.length ? $(".img-reel img:last") : $img;
+                $(".img-reel").stop().animate({ scrollLeft: direction + (Math.abs($img.offset().left - $(".img-reel").offset().left)) });
+            });
+        }
+    </script>
 <%_ include partials/footer _%>
