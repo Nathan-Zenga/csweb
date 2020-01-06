@@ -1,0 +1,23 @@
+<%_ include partials/header _%>
+    <div class="content-container" style="padding-top: 2em;">
+        <ul class="nav nav-pills">
+            <li class="active"><a data-toggle="pill" href="#articles">ARTICLES</a></li>
+        </ul>
+        <div class="tab-content container">
+            <div id="articles" class="tab-pane fade in active">
+                <form method="post" action="/news-article">
+                    <label>HEADLINE</label>
+                    <input type="text" name="headline">
+                    <div class="input-group" style="display: block">
+                        <div class="col-sm-3"><label>MAIN IMAGE(S):</label></div>
+                        <div class="col-sm-9"><input type="file" multiple></div>
+                    </div>
+                    <label>TEXT BODY <br><span>To insert additional images/videos, place each link inside [[ ]] on a separate line - e.g. [[url]].</span></label>
+                    <textarea name="" id="" rows="10"></textarea>
+                    <input type="submit" value="Send">
+                </form>
+            </div>
+            <div id="" class="tab-pane fade"></div>
+        </div>
+    </div>
+<%_ include partials/footer _%>

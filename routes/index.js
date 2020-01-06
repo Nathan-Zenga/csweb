@@ -27,6 +27,10 @@ router.get('/map', (req, res) => {
 	res.render('map', { title: "Map", pagename: "map" })
 });
 
+router.get('/admin', (req, res) => {
+	res.render('admin', { title: "Admin", pagename: "admin" })
+});
+
 // router.post('/send/message', (req, res) => {
 // 	let transporter = nodemailer.createTransport({
 // 		service: 'gmail',

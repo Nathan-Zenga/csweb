@@ -46,6 +46,64 @@ nav {
 	}
 }
 
+.tab-content {
+	padding-top: 2em;
+	padding-bottom: 2em;
+}
+
+.nav.nav-pills {
+	display: table;
+	margin: 0 auto;
+	font-weight: bold;
+}
+
+.nav.nav-pills > .active > a,
+.nav.nav-pills > .active > a:focus,
+.nav.nav-pills > .active > a:hover {
+	background-color: black;
+	color: white;
+	opacity: 1;
+}
+
+form {
+	max-width: 600px;
+	margin: 0 auto;
+}
+
+input {
+	display: table;
+	border: none;
+}
+
+input, textarea {
+	width: 100%;
+	margin-bottom: 2em;
+}
+
+input[type="text"] {
+	border-bottom: 1px solid black;
+}
+
+input[type="text"], textarea {
+	padding: 10px;
+}
+
+input[type="submit"] {
+	width: auto;
+	padding: 10px 30px;
+	margin-left: auto;
+	margin-right: auto;
+	font-weight: bold;
+}
+
+input[type="file"] {
+	font-weight: bold;
+}
+
+label span {
+	font-weight: normal;
+}
+
 .content-container {
 	background-color: white;
 	color: black;
