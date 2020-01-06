@@ -31,6 +31,11 @@ router.get('/admin', (req, res) => {
 	res.render('admin', { title: "Admin", pagename: "admin" })
 });
 
+router.post('/news/article/new', (req, res) => {
+	console.log(req.body);
+	res.send("done!!!");
+});
+
 // router.post('/send/message', (req, res) => {
 // 	let transporter = nodemailer.createTransport({
 // 		service: 'gmail',

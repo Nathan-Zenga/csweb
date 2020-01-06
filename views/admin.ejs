@@ -5,19 +5,39 @@
         </ul>
         <div class="tab-content container">
             <div id="articles" class="tab-pane fade in active">
-                <form method="post" action="/news-article">
+                <form method="post" action="/news/article/new">
                     <label>HEADLINE</label>
                     <input type="text" name="headline">
                     <div class="input-group" style="display: block">
                         <div class="col-sm-3"><label>MAIN IMAGE(S):</label></div>
-                        <div class="col-sm-9"><input type="file" multiple></div>
+                        <div class="col-sm-9"><input type="file" name="headline_images" id="headline_images" accept="image/*" multiple></div>
                     </div>
-                    <label>TEXT BODY <br><span>To insert additional images/videos, place each link inside [[ ]] on a separate line - e.g. [[url]].</span></label>
-                    <textarea name="" id="" rows="10"></textarea>
+                    <label>ARTICLE BODY <br><span>To insert additional images/videos, place each link inside [[ ]] on a separate line - e.g. [[url]].</span></label>
+                    <textarea name="textbody" rows="10"></textarea>
                     <input type="submit" value="Send">
                 </form>
             </div>
             <div id="" class="tab-pane fade"></div>
         </div>
     </div>
+    <script>
+        $("#articles form").submit(function(e) {
+            e.preventDefault();
+            var tempURLs = [];
+            var data = { headline_images: [] };
+            $(this).serializeArray().forEach(function(field) {
+                var name = field.name;
+                data[name] = field.value;
+            });
+            $.each($("#headline_images").get(0).files, function(i, file) {
+                var url = URL.createObjectURL(file);
+                data.headline_images.push(url);
+                tempURLs.push(url);
+            });
+            $.post(this.action, data, function(result) {
+                console.log(result);
+                tempURLs.forEach(function(url) { URL.revokeObjectURL(url) });
+            });
+        });
+    </script>
 <%_ include partials/footer _%>
