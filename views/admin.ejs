@@ -7,13 +7,13 @@
             <div id="articles" class="tab-pane fade in active">
                 <form method="post" action="/news/article/new">
                     <label>HEADLINE</label>
-                    <input type="text" name="headline">
+                    <input type="text" name="headline" id="headline" required>
                     <div class="input-group" style="display: block">
                         <div class="col-sm-3"><label>MAIN IMAGE(S):</label></div>
                         <div class="col-sm-9"><input type="file" name="headline_images" id="headline_images" accept="image/*" multiple></div>
                     </div>
-                    <label>ARTICLE BODY <br><span>To insert additional images/videos, place each link inside [[ ]] on a separate line - e.g. [[url]].</span></label>
-                    <textarea name="textbody" rows="10"></textarea>
+                    <label>ARTICLE BODY <br><span>To insert additional images/videos, place each embed code (for videos) or image URL on a separate line.</span></label>
+                    <textarea name="textbody" id="textbody" rows="10" required></textarea>
                     <input type="submit" value="Send">
                 </form>
             </div>
@@ -23,20 +23,20 @@
     <script>
         $("#articles form").submit(function(e) {
             e.preventDefault();
-            var tempURLs = [];
-            var data = { headline_images: [] };
+            var textbody = document.getElementById("textbody");
+            textbody.value = textbody.value.replace(/(width|height|style)=\"(.*?)\"/gi, "").replace(/<iframe /gi, '<iframe style="height: 350px; width: 100%"');
+            var data = { headline_images: [], textbody_media: textbody.value.match(/(.*?).(png|jpg|jpeg|gif)|<iframe(.*?)<\/iframe>/gi) || [] };
             $(this).serializeArray().forEach(function(field) {
                 var name = field.name;
                 data[name] = field.value;
             });
-            $.each($("#headline_images").get(0).files, function(i, file) {
-                var url = URL.createObjectURL(file);
-                data.headline_images.push(url);
-                tempURLs.push(url);
+            $.each(document.getElementById("headline_images").files, function(i, file) {
+                data.headline_images.push(URL.createObjectURL(file));
             });
             $.post(this.action, data, function(result) {
                 console.log(result);
-                tempURLs.forEach(function(url) { URL.revokeObjectURL(url) });
+                data.headline_images.forEach(function(url) { URL.revokeObjectURL(url) });
+                e.target.reset();
             });
         });
     </script>
