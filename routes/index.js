@@ -50,13 +50,17 @@ router.post('/news/article/new', (req, res) => {
 			if (req.body[field]) {
 				doc[field] = [];
 				req.body[field] = typeof req.body[field] === "string" ? [req.body[field]] : req.body[field];
-				req.body[field].forEach((image, i) => {
+				req.body[field].forEach((imageStr, i) => {
 					var f = field.replace("[]", "");
-					cloud.v2.uploader.upload(image, { public_id: ("article/"+ doc.id +"/"+ f + i+1) }, (err, result) => {
-						if (err) console.log(err);
-						doc[f].push(result.url);
+					if (!/<iframe(.*?)<\/iframe>/.test(imageStr)) {
+						cloud.v2.uploader.upload(imageStr, { public_id: ("article/"+ doc.id +"/"+ f + (i+1)) }, (err, result) => {
+							if (!err) doc[f].push(result.url);
+							doc.save();
+						});
+					} else {
+						doc[f].push(imageStr);
 						doc.save();
-					});
+					}
 				})
 			}
 		});
