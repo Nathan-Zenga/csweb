@@ -1,18 +1,30 @@
 <%_ include partials/header _%>
     <article class="full content-container">
-        <h1 style="text-align: center;">HEADLINE</h1>
+        <h1 style="text-align: center;"><%= article.headline %></h1>
         <div class="article-content">
-            <div class="img-reel">
-                <%_ for (i = 0; i < 5; i++) { _%>
-                <img src="https://www.waza.org/wp-content/uploads/2019/02/sumatran-tiger-wz-gsmp-m.jpg" alt="">
-                <%_ } _%>
+            <%_ if (article.headline_images.length) { _%>
+            <div class="headline-images img-reel">
+                <%_ article.headline_images.forEach(image => { _%>
+                <img src="<%= image %>" alt="">
+                <%_ }) _%>
             </div>
+            <%_ }
+            if (article.headline_images.length) { _%>
             <div class="img-reel-nav">
                 <a class="left fas fa-chevron-left"></a>
                 <a class="right fas fa-chevron-right"></a>
             </div>
+            <%_ } _%>
             <div class="text">
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis veniam voluptate officia obcaecati fugit tempora magni perspiciatis facere voluptates, id sequi magnam minima suscipit, earum explicabo quasi voluptatibus nam vitae.</p>
+                <%_
+                    var textbody = "<p>" + article.textbody.replace("\n", "</p>\n<p>") + "</p>";
+                    article.textbody_media.forEach(media => {
+                        var imgRegX = /(.*?).(png|jpg|jpeg|gif)/gi;
+                        var formattedMedia = imgRegX.test(media) ? '<div style="height: 350px; margin: 0 auto;" src="'+ media +'">' : media;
+                        textbody.replace(media, formattedMedia);
+                    });
+                _%>
+                <%- textbody %>
             </div>
         </div>
     </article>

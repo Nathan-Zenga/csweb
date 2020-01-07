@@ -9,11 +9,16 @@ router.get('/', (req, res) => {
 });
 
 router.get('/news', (req, res) => {
-	res.render('news', { title: "News", pagename: "news" })
+	Article.find().sort({ created_at: -1 }).exec((err, articles) => {
+		res.render('news', { title: "News", pagename: "news", articles })
+	})
 });
 
-router.get('/news/article', (req, res) => {
-	res.render('news-article', { title: "News", pagename: "news" })
+router.get('/news/article/:id', (req, res, next) => {
+	Article.findById(req.params.id, (err, article) => {
+		if (!article) return next();
+		res.render('news-article', { title: article.headline + " | News", pagename: "news", article })
+	})
 });
 
 router.get('/artists', (req, res) => {
