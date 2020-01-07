@@ -70,8 +70,11 @@ form {
 	margin: 0 auto;
 }
 
+form label {
+	display: block;
+}
+
 input {
-	display: table;
 	border: none;
 }
 
@@ -80,15 +83,20 @@ input, textarea {
 	margin-bottom: 2em;
 }
 
-input[type="text"] {
+input[type="text"], input[type="number"] {
 	border-bottom: 1px solid black;
 }
 
-input[type="text"], textarea {
+input[type="text"], input[type="number"], textarea {
 	padding: 10px;
 }
 
+input[type="checkbox"] {
+	width: auto;
+}
+
 input[type="submit"] {
+	display: table;
 	width: auto;
 	padding: 10px 30px;
 	margin-left: auto;
