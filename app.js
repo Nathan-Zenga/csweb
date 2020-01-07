@@ -3,16 +3,11 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var http = require('http'); // core module
 var path = require('path'); // core module
-var ejs = require('ejs');
 var mongoose = require('mongoose');
 var session = require('express-session');
 
-// mongoose.connect(process.env.DB, { useNewUrlParser: true, useUnifiedTopology: true });
-
-// let conn = mongoose.connection;
-// conn.once('open', () => {
-// 	console.log("Connected to DB")
-// });
+mongoose.connect(process.env.CSDB, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connection.once('open', () => { console.log("Connected to DB") });
 
 var app = express();
 
@@ -20,8 +15,8 @@ var app = express();
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: false }));
 app.use(cookieParser());
 
 // Set static folder
