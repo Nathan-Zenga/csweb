@@ -180,18 +180,49 @@ article.content-container {
 }
 
 article .article-content {
+	position: relative;
 	border-radius: 7px;
 	background-color: white;
+	overflow: hidden;
 }
 
 article .article-content > * {
 	padding: 30px;
 }
 
+article:not(.full) .article-content .text {
+	max-height: 600px;
+}
+
+article:not(.full) .article-content img + .text,
+article:not(.full) .article-content .img + .text {
+	max-height: 250px;
+}
+
 article .article-content img,
 article .article-content .img {
 	padding: 0;
 	height: 350px;
+}
+
+article:not(.full) .article-content img,
+article:not(.full) .article-content .img {
+	display: block;
+	background-size: cover;
+	background-color: rgba(0, 0, 0, .2);
+}
+
+.overflow-fade-sheet {
+	position: absolute;
+	display: table;
+	width: 100%;
+	height: 30px;
+	bottom: 0;
+	left: 0;
+	box-shadow: 0 0 10px 20px white;
+	padding: 0!important;
+	text-align: center;
+	font-weight: bold;
 }
 
 article.full {
