@@ -21,21 +21,35 @@
         </div>
     </div>
     <script>
+        var headline_images = [];
+        $("#headline_images").change(function() {
+            var files = this.files;
+            var submitInput = $(this).closest("form").children("input:submit");
+            var counter = 0;
+            var reader = new FileReader();
+            headline_images = [];
+            reader.onload = function() {
+                counter += 1;
+                headline_images.push(reader.result);
+                if (counter === files.length) submitInput.attr("disabled", false);
+            };
+            $.each(files, function(i, file) {
+                setTimeout(function() {
+                    submitInput.attr("disabled", true);
+                    reader.readAsDataURL(file)
+                }, i * 200);
+            });
+        });
         $("#articles form").submit(function(e) {
             e.preventDefault();
             var textbody = document.getElementById("textbody");
             textbody.value = textbody.value.replace(/(width|height|style)=\"(.*?)\"/gi, "").replace(/<iframe /gi, '<iframe style="height: 350px; width: 100%"');
-            var data = { headline_images: [], textbody_media: textbody.value.match(/(.*?).(png|jpg|jpeg|gif)|<iframe(.*?)<\/iframe>/gi) || [] };
+            var data = { headline_images, textbody_media: textbody.value.match(/(.*?).(png|jpg|jpeg|gif)|<iframe(.*?)<\/iframe>/gi) || [] };
             $(this).serializeArray().forEach(function(field) {
                 var name = field.name;
                 data[name] = field.value;
             });
-            $.each(document.getElementById("headline_images").files, function(i, file) {
-                data.headline_images.push(URL.createObjectURL(file));
-            });
             $.post(this.action, data, function(result) {
-                console.log(result);
-                data.headline_images.forEach(function(url) { URL.revokeObjectURL(url) });
                 e.target.reset();
             });
         });
