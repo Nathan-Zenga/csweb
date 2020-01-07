@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var cloud = require('cloudinary');
-var Article = require('../models/models').article;
+var { Article, Project } = require('../models/models');
 // var nodemailer = require('nodemailer');
 
 router.get('/', (req, res) => {
@@ -26,7 +26,9 @@ router.get('/artists', (req, res) => {
 });
 
 router.get('/discography', (req, res) => {
-	res.render('discography', { title: "Discography", pagename: "discography" })
+	Project.find().sort({ year: -1, created_at: -1 }).exec(function(err, projects) {
+		res.render('discography', { title: "Discography", pagename: "discography", projects })
+	})
 });
 
 router.get('/map', (req, res) => {
@@ -65,7 +67,7 @@ router.post('/news/article/new', (req, res) => {
 router.post('/news/article/delete/:id', (req, res) => {
 	Article.findByIdAndDelete(req.params.id, function(err, doc) {
 		if (err || !doc) return res.send(err || "Article not found");
-		cloud.v2.api.delete_resources_by_prefix('article/'+doc.id, (err, result) => { console.log(result, err) });
+		cloud.v2.api.delete_resources_by_prefix("article/" + doc.id, (err, result) => { console.log(result, err) });
 		res.redirect(req.get("referrer"))
 	})
 });
