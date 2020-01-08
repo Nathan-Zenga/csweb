@@ -8,11 +8,11 @@
                 </div>
                 <div class="text">
                     <h2 class="title" title="<%= project.title %>"><%= project.title %></h2>
-                    <p><%= project.artist + " | " + project.release_date.getFullYear() %></p>
+                    <p><%= project.artist + " | " + project.year %></p>
                     <p>
                         OUT NOW
                     <%_ if (project.all_platforms && !project.links.length) { _%>
-                        ALL PLATFORMS
+                        ON ALL PLATFORMS
                     <%_ } else if (project.links.length) { project.links.forEach(link => {
                         var start = link.indexOf("://") + "://".length;
                         var end = link.indexOf(".com");
