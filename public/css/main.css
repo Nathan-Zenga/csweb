@@ -102,11 +102,11 @@ input, textarea {
 	margin-bottom: 2em;
 }
 
-input[type="text"], input[type="number"] {
+input[type="text"], input[type="number"], input[type="url"] {
 	border-bottom: 1px solid black;
 }
 
-input[type="text"], input[type="number"], textarea {
+input[type="text"], input[type="number"], input[type="url"], textarea {
 	padding: 10px;
 }
 
@@ -313,7 +313,7 @@ article.full .img-reel-nav a {
 
 .artist-bio .img {
 	height: 400px;
-	background-color: rgba(0, 0, 0, .2);
+	background-color: rgba(180, 180, 180);
 	background-size: cover;
 	background-position: center;
 	padding: 0;
