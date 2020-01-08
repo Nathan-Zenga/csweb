@@ -83,12 +83,18 @@ router.post('/news/article/new', (req, res) => {
 	});
 });
 
-router.post('/news/article/delete/:id', (req, res) => {
-	Article.findByIdAndDelete(req.params.id, (err, doc) => {
-		if (err || !doc) return res.send(err || "Article not found");
-		cloud.v2.api.delete_resources_by_prefix("articles/" + doc.id, (err, result) => { console.log(result, err) });
-		res.send("ARTICLE DELETED SUCCESSFULLY")
-	})
+router.post('/news/article/delete', (req, res) => {
+	var keys = Object.keys(req.body);
+	if (keys.length) {
+		keys.forEach((k, i) => {
+			var id = req.body[k];
+			Article.findByIdAndDelete(id, (err, doc) => {
+				if (err || !doc) return res.send(err || "Article not found");
+				cloud.v2.api.delete_resources_by_prefix("articles/" + id, (err, result) => { console.log(result, "\n\nError: " + err) });
+				if (i === keys.length-1) res.send("ARTICLE DELETED SUCCESSFULLY")
+			})
+		});
+	} else { res.send("NOTHING SELECTED") }
 });
 
 router.post('/discography/project/new', (req, res) => {
@@ -116,12 +122,18 @@ router.post('/discography/project/new', (req, res) => {
 	});
 });
 
-router.post('/discography/project/delete/:id', (req, res) => {
-	Project.findByIdAndDelete(req.params.id, (err, doc) => {
-		if (err || !doc) return res.send(err || "Project not found");
-		cloud.v2.api.delete_resources_by_prefix("discography/" + doc.id, (err, result) => { console.log(result, err) });
-		res.send("PROJECT DELETED SUCCESSFULLY")
-	})
+router.post('/discography/project/delete', (req, res) => {
+	var keys = Object.keys(req.body);
+	if (keys.length) {
+		keys.forEach((k, i) => {
+			var id = req.body[k];
+			Project.findByIdAndDelete(id, (err, doc) => {
+				if (err || !doc) return res.send(err || "Project not found");
+				cloud.v2.api.delete_resources_by_prefix("discography/" + id, (err, result) => { console.log(result, "\n\nError: " + err) });
+				if (i === keys.length-1) res.send("PROJECT DELETED SUCCESSFULLY")
+			})
+		});
+	} else { res.send("NOTHING SELECTED") }
 });
 
 router.post('/artists/new', (req, res) => {
@@ -255,6 +267,20 @@ router.post('/discography/project/edit', (req, res) => {
 			res.send("DONE" + message_update);
 		});
 	})
+});
+
+router.post('/artists/delete', (req, res) => {
+	var keys = Object.keys(req.body);
+	if (keys.length) {
+		keys.forEach((k, i) => {
+			var id = req.body[k];
+			Artist.findByIdAndDelete(id, (err, doc) => {
+				if (err || !doc) return res.send(err || "Artist not found");
+				cloud.v2.api.delete_resources_by_prefix("artists/" + id, (err, result) => { console.log(result, "\n\nError: " + err) });
+				if (i === keys.length-1) res.send("ARTISTS REMOVED SUCCESSFULLY")
+			})
+		})
+	} else { res.send("NOTHING SELECTED") }
 });
 
 module.exports = router;
