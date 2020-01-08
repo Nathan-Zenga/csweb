@@ -76,7 +76,7 @@ router.post('/news/article/delete/:id', (req, res) => {
 	Article.findByIdAndDelete(req.params.id, function(err, doc) {
 		if (err || !doc) return res.send(err || "Article not found");
 		cloud.v2.api.delete_resources_by_prefix("articles/" + doc.id, (err, result) => { console.log(result, err) });
-		res.redirect(req.get("referrer"))
+		res.send("ARTICLE DELETED SUCCESSFULLY")
 	})
 });
 
@@ -94,7 +94,7 @@ router.post('/discography/project/new', (req, res) => {
 		var message_update = "";
 		if (req.body.artwork_file) {
 			message_update = " - All uploaded images will be available very shortly";
-			var public_id = "projects/"+ doc.id +"/"+ doc.title.replace(/ /g, "-");
+			var public_id = "discography/"+ doc.id +"/"+ doc.title.replace(/ /g, "-");
 			cloud.v2.uploader.upload(req.body.artwork_file, { public_id }, (err, result) => {
 				if (err) return res.send(err);
 				doc.artwork = result.url;
@@ -103,6 +103,14 @@ router.post('/discography/project/new', (req, res) => {
 		}
 		res.send("DONE" + message_update);
 	});
+});
+
+router.post('/discography/project/delete/:id', (req, res) => {
+	Project.findByIdAndDelete(req.params.id, function(err, doc) {
+		if (err || !doc) return res.send(err || "Project not found");
+		cloud.v2.api.delete_resources_by_prefix("discography/" + doc.id, (err, result) => { console.log(result, err) });
+		res.send("PROJECT DELETED SUCCESSFULLY")
+	})
 });
 
 // router.post('/send/message', (req, res) => {
