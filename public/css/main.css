@@ -47,12 +47,12 @@ nav {
 }
 
 .msg {
-	position: absolute;
+	position: fixed;
 	display: table;
 	top: 0; left: 0;
 	width: 100%;
 	height: 100%;
-	background-color: rgba(255, 255, 255, .75);
+	background-color: rgba(255, 255, 255, .85);
 	color: black;
 	font-size: 2em;
 	font-weight: bold;
@@ -74,6 +74,8 @@ nav {
 	display: table;
 	margin: 0 auto;
 	font-weight: bold;
+	padding: 0 15px;
+	text-align: center;
 }
 
 .nav.nav-pills > .active > a,
@@ -86,7 +88,7 @@ nav {
 
 form {
 	max-width: 600px;
-	margin: 0 auto;
+	margin: 0 auto 2em;
 }
 
 form label {
@@ -97,7 +99,7 @@ input {
 	border: none;
 }
 
-input, textarea {
+input, textarea, select {
 	width: 100%;
 	margin-bottom: 2em;
 }
@@ -106,7 +108,7 @@ input[type="text"], input[type="number"], input[type="url"] {
 	border-bottom: 1px solid black;
 }
 
-input[type="text"], input[type="number"], input[type="url"], textarea {
+input[type="text"], input[type="number"], input[type="url"], textarea, select {
 	padding: 10px;
 }
 
@@ -129,6 +131,20 @@ input[type="file"] {
 
 label span {
 	font-weight: normal;
+}
+
+@media (min-width: 768px) {
+	.input-group > *[class*=col-] {
+		padding: 0 10px;
+	}
+
+	.input-group > *[class*=col-]:nth-child(odd) {
+		padding-left: 0;
+	}
+
+	.input-group > *[class*=col-]:nth-child(even) {
+		padding-right: 0;
+	}
 }
 
 .content-container {
