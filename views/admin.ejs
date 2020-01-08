@@ -67,13 +67,14 @@
                         <ul class="nav nav-pills nav-stacked">
                             <li class="active"><a data-toggle="pill" href="#edit-artist">EDIT ARTIST</a></li>
                             <li><a data-toggle="pill" href="#edit-article">EDIT ARTICLE</a></li>
+                            <li><a data-toggle="pill" href="#edit-project">EDIT PROJECT</a></li>
                         </ul>
                     </div>
                     <div class="col-sm-9">
                         <div class="tab-content" style="padding-top: 0;">
                             <div id="edit-artist" class="tab-pane fade in active">
                                 <form method="post" action="/artists/edit">
-                                    <label>EDIT ARTIST</label>
+                                    <label>CHOOSE ARTIST</label>
                                     <select name="artist_id" id="artist_id" required>
                                         <option value=""></option>
                                         <%_ db.artists.forEach(artist => { _%>
@@ -91,12 +92,12 @@
                                     <%_ social = social.toLowerCase().replace(/ /g, '_'); _%>
                                     <input type="url" name="social_<%= social %>" id="social_<%= social %>_edit" placeholder="Enter URL">
                                     <%_ }) _%>
-                                    <input type="submit" value="SAVE">
+                                    <input type="submit" value="UPDATE ARTIST">
                                 </form>
                             </div>
                             <div id="edit-article" class="tab-pane fade">
                                 <form method="post" action="/news/article/edit">
-                                    <label>EDIT ARTICLE</label>
+                                    <label>CHOOSE ARTICLE</label>
                                     <select name="article_id" id="article_id" required>
                                         <option value=""></option>
                                         <%_ db.articles.forEach(article => { _%>
@@ -109,9 +110,36 @@
                                         <div class="col-sm-3"><label>MAIN IMAGE(S):</label></div>
                                         <div class="col-sm-9"><input type="file" name="headline_images_change" id="headline_images_change" accept="image/*" multiple></div>
                                     </div>
-                                    <label>ARTICLE BODY</label>
+                                    <label>ARTICLE BODY <br><span>To insert additional images/videos, place each embed code (for videos) or image URL on a separate line.</span></label>
                                     <textarea name="textbody_edit" id="textbody_edit" rows="10"></textarea>
-                                    <input type="submit" value="POST">
+                                    <input type="submit" value="UPDATE ARTICLE">
+                                </form>
+                            </div>
+                            <div id="edit-project" class="tab-pane fade">
+                                <form action="/discography/project/edit">
+                                    <label>CHOOSE PROJECT</label>
+                                    <select name="project_id" id="project_id" required>
+                                        <option value=""></option>
+                                        <%_ db.projects.forEach(project => { _%>
+                                        <option value="<%= project._id %>"><%= project.title %></option>
+                                        <%_ }) _%>
+                                    </select>
+                                    <label>ARTWORK</label>
+                                    <div class="input-group" style="display: block">
+                                        <div class="col-sm-6"><input type="file" name="artwork_file_change" id="artwork_file_change" accept=".jpg,.png,.bmp"></div>
+                                        <div class="col-sm-6"><input type="text" name="artwork_url_edit" id="artwork_url_edit" placeholder="Or enter the image URL"></div>
+                                    </div>
+                                    <label>TITLE</label>
+                                    <input type="text" name="title_edit" id="title_edit">
+                                    <label>ARTIST</label>
+                                    <input type="text" name="artist_edit" id="artist_edit">
+                                    <label>YEAR</label>
+                                    <input type="number" name="year_edit" id="year_edit" min="2000" max="<%= new Date().getFullYear() %>">
+                                    <label>LINKS <span>place each URL on a new line</span></label>
+                                    <textarea type="text" name="links_edit" id="links_edit" rows="5"></textarea>
+                                    <label><span>In case you think entering every link is unnecessary</span></label>
+                                    <input type="checkbox" name="all_platforms_change" id="all_platforms_change"> <b>ALL PLATFORMS?</b> <br>
+                                    <input type="submit" value="UPDATE PROJECT">
                                 </form>
                             </div>
                         </div>
@@ -166,14 +194,15 @@
         });
 
         var artwork_file = "";
-        $("#all_platforms").change(function() {
-            $("#links").val("").attr({ required: !this.checked, disabled: this.checked });
+        $(":input[id*=all_platforms]").change(function() {
+            $(this).closest("form").find(":input[id*=links]").val("").attr({ required: !this.checked, disabled: this.checked });
         });
-        $("#artwork_file, #artwork_url").change(function() {
-            var id = this.id === "artwork_url" ? "#artwork_file" : "#artwork_url";
-            $(id).val("").attr({ required: !this.value });
+        $(":input[id*=artwork_file], :input[id*=artwork_url]").change(function() {
+            var id = this.id.includes("artwork_url") ? "artwork_file" : "artwork_url";
+            var required = /edit|change/.test(this.id) ? false : !this.value;
+            $(this).closest("form").find(":input[id*="+ id +"]").val("").attr({ required });
         });
-        $("#artwork_file").change(function() {
+        $("#artwork_file, #artwork_file_change").change(function() {
             var files = this.files;
             artwork_file = "";
             if (files.length) {
@@ -269,6 +298,24 @@
                 var name = field.name;
                 data[name] = field.value;
             });
+            $.post(this.action, data, function(result) {
+                e.target.reset();
+                showMessage(result, e.target);
+            });
+        });
+
+        $("#edit-project form").submit(function(e) {
+            e.preventDefault();
+            var data = {};
+            $(this).serializeArray().forEach(function(field) {
+                var name = field.name;
+                data[name] = field.value;
+            });
+
+            var url_format = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/gim;
+            if (data.links_edit) data.links_edit = data.links_edit.match(url_format);
+            if (artwork_file) data.artwork_file_change = artwork_file;
+
             $.post(this.action, data, function(result) {
                 e.target.reset();
                 showMessage(result, e.target);
