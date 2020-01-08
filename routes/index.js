@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var cloud = require('cloudinary');
-var { Article, Project } = require('../models/models');
+var { Article, Project, Artist } = require('../models/models');
 // var nodemailer = require('nodemailer');
 
 router.get('/', (req, res) => {
@@ -22,11 +22,13 @@ router.get('/news/article/:id', (req, res, next) => {
 });
 
 router.get('/artists', (req, res) => {
-	res.render('artists', { title: "Artists", pagename: "artists" })
+	Artist.find(function(err, artists) {
+		res.render('artists', { title: "Artists", pagename: "artists", artists })
+	})
 });
 
 router.get('/discography', (req, res) => {
-	Project.find().sort({ year: -1, created_at: -1 }).exec(function(err, projects) {
+	Project.find().sort({ year: -1 }).exec(function(err, projects) {
 		res.render('discography', { title: "Discography", pagename: "discography", projects })
 	})
 });
@@ -49,7 +51,7 @@ router.post('/news/article/new', (req, res) => {
 		var message_update = "";
 		["headline_images", "textbody_media", "headline_images[]", "textbody_media[]"].forEach(field => {
 			if (req.body[field]) {
-				message_update = " - All uploaded images will be available very shortly";
+				message_update = ": saving images";
 				doc[field] = [];
 				req.body[field] = typeof req.body[field] === "string" ? [req.body[field]] : req.body[field];
 				req.body[field].forEach((imageStr, i) => {
@@ -93,7 +95,7 @@ router.post('/discography/project/new', (req, res) => {
 	project.save((err, doc) => {
 		var message_update = "";
 		if (req.body.artwork_file) {
-			message_update = " - All uploaded images will be available very shortly";
+			message_update = ": saving image";
 			var public_id = "discography/"+ doc.id +"/"+ doc.title.replace(/ /g, "-");
 			cloud.v2.uploader.upload(req.body.artwork_file, { public_id }, (err, result) => {
 				if (err) return res.send(err);
