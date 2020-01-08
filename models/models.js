@@ -11,7 +11,7 @@ module.exports.Article = mongoose.model('Article', Schema({
 module.exports.Project = mongoose.model('Project', Schema({
 	title: String,
 	artist: String,
-	release_date: Date,
+	year: Number,
 	artwork: String,
 	links: [String],
 	all_platforms: { type: Boolean, default: false }
