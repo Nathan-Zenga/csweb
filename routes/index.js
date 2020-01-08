@@ -121,7 +121,10 @@ router.post('/artists/new', (req, res) => {
 		bio: req.body.bio
 	});
 
-	for (k in req.body) if (k.includes("socials")) artist.socials[k.replace(/socials\[|\]/g, "")] = req.body[k];
+	for (k in req.body) if (k.includes("socials")) {
+		if (!artist.socials) artist.socials = {};
+		artist.socials[k.replace(/socials\[|\]/g, "")] = req.body[k];
+	}
 
 	artist.markModified("socials");
 	artist.save((err, doc) => {
