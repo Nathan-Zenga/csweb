@@ -16,3 +16,10 @@ module.exports.Project = mongoose.model('Project', Schema({
 	links: [String],
 	all_platforms: { type: Boolean, default: false }
 }));
+
+module.exports.Artist = mongoose.model('Artist', Schema({
+	name: String,
+	bio: String,
+	socials: Schema.Types.Mixed,
+	profile_image: String
+}));
