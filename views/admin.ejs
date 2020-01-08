@@ -4,6 +4,7 @@
             <li class="active"><a data-toggle="pill" href="#articles">ARTICLES</a></li>
             <li><a data-toggle="pill" href="#discography">DISCOGRAPHY</a></li>
             <li><a data-toggle="pill" href="#artists">ARTISTS</a></li>
+            <li><a data-toggle="pill" href="#edit-remove">EDIT / REMOVE</a></li>
         </ul>
         <div class="tab-content container">
             <div id="articles" class="tab-pane fade in active">
@@ -19,6 +20,7 @@
                     <input type="submit" value="POST">
                 </form>
             </div>
+
             <div id="discography" class="tab-pane fade">
                 <form method="post" action="/discography/project/new">
                     <label>ARTWORK</label>
@@ -39,6 +41,7 @@
                     <input type="submit" value="SAVE">
                 </form>
             </div>
+
             <div id="artists" class="tab-pane fade">
                 <form method="post" action="/artists/new">
                     <label>NAME</label>
@@ -57,6 +60,64 @@
                     <input type="submit" value="SAVE">
                 </form>
             </div>
+
+            <div id="edit-remove" class="tab-pane fade">
+                <div class="input-group" style="display: block">
+                    <div class="col-sm-3">
+                        <ul class="nav nav-pills nav-stacked">
+                            <li class="active"><a data-toggle="pill" href="#edit-artist">EDIT ARTIST</a></li>
+                            <li><a data-toggle="pill" href="#edit-article">EDIT ARTICLE</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-sm-9">
+                        <div class="tab-content" style="padding-top: 0;">
+                            <div id="edit-artist" class="tab-pane fade in active">
+                                <form method="post" action="/artists/edit">
+                                    <label>EDIT ARTIST</label>
+                                    <select name="artist_id" id="artist_id" required>
+                                        <option value=""></option>
+                                        <%_ db.artists.forEach(artist => { _%>
+                                        <option value="<%= artist._id %>"><%= artist.name %></option>
+                                        <%_ }) _%>
+                                    </select>
+                                    <label>NAME</label>
+                                    <input type="text" name="artist_name_edit" id="artist_name_edit">
+                                    <label>BIO</label>
+                                    <textarea type="text" name="artist_bio_edit" id="artist_bio_edit" rows="5"></textarea>
+                                    <label>PROFILE PICTURE</label>
+                                    <input type="file" name="profile_image_change" id="profile_image_change" accept="image/*">
+                                    <%_ ["SoundCloud", "Spotify", "Tidal", "Apple Music", "Deezer", "Google Play", "Twitter", "Instagram", "Facebook", "Linktree"].forEach(social => { _%>
+                                    <label><%= social.toUpperCase() %>:</label>
+                                    <%_ social = social.toLowerCase().replace(/ /g, '_'); _%>
+                                    <input type="url" name="social_<%= social %>" id="social_<%= social %>_edit" placeholder="Enter URL">
+                                    <%_ }) _%>
+                                    <input type="submit" value="SAVE">
+                                </form>
+                            </div>
+                            <div id="edit-article" class="tab-pane fade">
+                                <form method="post" action="/news/article/edit">
+                                    <label>EDIT ARTICLE</label>
+                                    <select name="article_id" id="article_id" required>
+                                        <option value=""></option>
+                                        <%_ db.articles.forEach(article => { _%>
+                                        <option value="<%= article._id %>"><%= article.headline %></option>
+                                        <%_ }) _%>
+                                    </select>
+                                    <label>HEADLINE</label>
+                                    <input type="text" name="headline_edit" id="headline_edit">
+                                    <div class="input-group" style="display: block">
+                                        <div class="col-sm-3"><label>MAIN IMAGE(S):</label></div>
+                                        <div class="col-sm-9"><input type="file" name="headline_images_change" id="headline_images_change" accept="image/*" multiple></div>
+                                    </div>
+                                    <label>ARTICLE BODY</label>
+                                    <textarea name="textbody_edit" id="textbody_edit" rows="10"></textarea>
+                                    <input type="submit" value="POST">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <script>
@@ -72,8 +133,9 @@
             var $msg = $('<div class="msg" style><div class="text">'+ result +'</div></div>');
             $msg.css("display", "none").appendTo(container).fadeIn().delay(2000).fadeOut(function(){ $(this).remove() });
         };
+
         var headline_images = [];
-        $("#headline_images").change(function() {
+        $("#headline_images, #headline_images_change").change(function() {
             var files = this.files;
             headline_images = [];
             if (files.length) {
@@ -145,7 +207,7 @@
         });
 
         var profile_image = "";
-        $("#profile_image").change(function() {
+        $("#profile_image, #profile_image_change").change(function() {
             var files = this.files;
             profile_image = "";
             if (files.length) {
@@ -171,6 +233,42 @@
 
             if (profile_image) data.profile_image = profile_image;
 
+            $.post(this.action, data, function(result) {
+                e.target.reset();
+                showMessage(result, e.target);
+            });
+        });
+
+        var action = "";
+        $("#edit-remove select[name*=_id]").change(function(e) {
+            $(this).closest("form").find(":input:not(:submit)").not(this).val("");
+        });
+        $("#edit-artist form").submit(function(e) {
+            e.preventDefault();
+            var data = { socials: {} };
+            $(this).serializeArray().filter(function(field) { return field.value }).forEach(function(field) {
+                var name = field.name;
+                var social = name.replace("social_", "");
+                !name.includes("social_") ? data[name] = field.value : data.socials[social] = field.value;
+            });
+
+            if (profile_image) data.profile_image_change = profile_image;
+
+            $.post(this.action, data, function(result) {
+                e.target.reset();
+                showMessage(result, e.target);
+            });
+        });
+
+        $("#edit-article form").submit(function(e) {
+            e.preventDefault();
+            var textbody = document.getElementById("textbody_edit");
+            textbody.value = textbody.value.replace(/(width|height|style)=\"(.*?)\"/gi, "").replace(/<iframe /gi, '<iframe style="height: 350px; width: 100%"');
+            var data = { headline_images_change: headline_images, textbody_media_change: textbody.value.match(/(.*?).(png|jpg|jpeg|gif)|<iframe(.*?)<\/iframe>/gi) || [] };
+            $(this).serializeArray().forEach(function(field) {
+                var name = field.name;
+                data[name] = field.value;
+            });
             $.post(this.action, data, function(result) {
                 e.target.reset();
                 showMessage(result, e.target);
