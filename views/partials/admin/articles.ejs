@@ -1,0 +1,11 @@
+<form method="post" action="/news/article/new">
+    <label>HEADLINE</label>
+    <input type="text" name="headline" id="headline" required>
+    <div class="input-group" style="display: block">
+        <div class="col-sm-3"><label>MAIN IMAGE(S):</label></div>
+        <div class="col-sm-9"><input type="file" name="headline_images" id="headline_images" accept="image/*" multiple></div>
+    </div>
+    <label>ARTICLE BODY <br><span>To insert additional images/videos, place each embed code (for videos) or image URL on a separate line.</span></label>
+    <textarea name="textbody" id="textbody" rows="10" required></textarea>
+    <input type="submit" value="POST">
+</form>

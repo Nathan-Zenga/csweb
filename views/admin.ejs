@@ -8,178 +8,19 @@
         </ul>
         <div class="tab-content container">
             <div id="articles" class="tab-pane fade in active">
-                <form method="post" action="/news/article/new">
-                    <label>HEADLINE</label>
-                    <input type="text" name="headline" id="headline" required>
-                    <div class="input-group" style="display: block">
-                        <div class="col-sm-3"><label>MAIN IMAGE(S):</label></div>
-                        <div class="col-sm-9"><input type="file" name="headline_images" id="headline_images" accept="image/*" multiple></div>
-                    </div>
-                    <label>ARTICLE BODY <br><span>To insert additional images/videos, place each embed code (for videos) or image URL on a separate line.</span></label>
-                    <textarea name="textbody" id="textbody" rows="10" required></textarea>
-                    <input type="submit" value="POST">
-                </form>
+            <%_ include partials/admin/articles _%>
             </div>
 
             <div id="discography" class="tab-pane fade">
-                <form method="post" action="/discography/project/new">
-                    <label>ARTWORK</label>
-                    <div class="input-group" style="display: block">
-                        <div class="col-sm-6"><input type="file" name="artwork_file" id="artwork_file" accept=".jpg,.png,.bmp" required></div>
-                        <div class="col-sm-6"><input type="text" name="artwork_url" id="artwork_url" placeholder="Or enter the image URL"></div>
-                    </div>
-                    <label>TITLE</label>
-                    <input type="text" name="title" id="title" required>
-                    <label>ARTIST</label>
-                    <input type="text" name="artist" id="artist" required>
-                    <label>YEAR</label>
-                    <input type="number" name="year" id="year" min="2000" max="<%= new Date().getFullYear() %>" required>
-                    <label>LINKS <span>(OPTIONAL) - place each URL on a new line</span></label>
-                    <textarea type="text" name="links" id="links" rows="5" required></textarea>
-                    <label><span>In case you think entering every link is unnecessary</span></label>
-                    <input type="checkbox" name="all_platforms" id="all_platforms"> <b>ALL PLATFORMS?</b> <br>
-                    <input type="submit" value="SAVE">
-                </form>
+            <%_ include partials/admin/discography _%>
             </div>
 
             <div id="artists" class="tab-pane fade">
-                <form method="post" action="/artists/new">
-                    <label>NAME</label>
-                    <input type="text" name="name" id="name" required>
-                    <label>BIO</label>
-                    <textarea type="text" name="bio" id="bio" rows="5" required></textarea>
-                    <label>PROFILE PICTURE</label>
-                    <input type="file" name="profile_image" id="profile_image" accept="image/*">
-                    <div class="input-group" style="display: block">
-                        <%_ ["SoundCloud", "Spotify", "Tidal", "Apple Music", "Deezer", "Google Play", "Twitter", "Instagram", "Facebook", "Linktree"].forEach(social => { _%>
-                        <div class="col-sm-3"><label><%= social.toUpperCase() %>:</label></div>
-                        <%_ social = social.toLowerCase().replace(/ /g, '_'); _%>
-                        <div class="col-sm-9"><input type="url" name="social_<%= social %>" id="social_<%= social %>" placeholder="Enter URL (optional)"></div>
-                        <%_ }) _%>
-                    </div>
-                    <input type="submit" value="SAVE">
-                </form>
+            <%_ include partials/admin/artists _%>
             </div>
 
             <div id="edit-remove" class="tab-pane fade">
-                <div class="col-sm-3">
-                    <ul class="nav nav-pills nav-stacked">
-                        <li class="active"><a data-toggle="pill" href="#edit-artist">EDIT ARTIST</a></li>
-                        <li><a data-toggle="pill" href="#edit-article">EDIT ARTICLE</a></li>
-                        <li><a data-toggle="pill" href="#edit-project">EDIT PROJECT</a></li>
-                        <li><a data-toggle="pill" href="#remove">REMOVE</a></li>
-                    </ul>
-                </div>
-                <div class="col-sm-9">
-                    <div class="tab-content" style="padding-top: 10px;">
-                        <div id="edit-artist" class="tab-pane fade in active">
-                            <form method="post" action="/artists/edit">
-                                <label>CHOOSE ARTIST</label>
-                                <select name="artist_id" id="artist_id" required>
-                                    <option value=""></option>
-                                    <%_ db.artists.forEach(artist => { _%>
-                                    <option value="<%= artist._id %>"><%= artist.name %></option>
-                                    <%_ }) _%>
-                                </select>
-                                <label>NAME</label>
-                                <input type="text" name="artist_name_edit" id="artist_name_edit">
-                                <label>BIO</label>
-                                <textarea type="text" name="artist_bio_edit" id="artist_bio_edit" rows="5"></textarea>
-                                <label>PROFILE PICTURE</label>
-                                <input type="file" name="profile_image_change" id="profile_image_change" accept="image/*">
-                                <%_ ["SoundCloud", "Spotify", "Tidal", "Apple Music", "Deezer", "Google Play", "Twitter", "Instagram", "Facebook", "Linktree"].forEach(social => { _%>
-                                <label><%= social.toUpperCase() %>:</label>
-                                <%_ social = social.toLowerCase().replace(/ /g, '_'); _%>
-                                <input type="url" name="social_<%= social %>" id="social_<%= social %>_edit" placeholder="Enter URL">
-                                <%_ }) _%>
-                                <input type="submit" value="UPDATE ARTIST">
-                            </form>
-                        </div>
-                        <div id="edit-article" class="tab-pane fade">
-                            <form method="post" action="/news/article/edit">
-                                <label>CHOOSE ARTICLE</label>
-                                <select name="article_id" id="article_id" required>
-                                    <option value=""></option>
-                                    <%_ db.articles.forEach(article => { _%>
-                                    <option value="<%= article._id %>"><%= article.headline %></option>
-                                    <%_ }) _%>
-                                </select>
-                                <label>HEADLINE</label>
-                                <input type="text" name="headline_edit" id="headline_edit">
-                                <div class="input-group" style="display: block">
-                                    <div class="col-sm-3"><label>MAIN IMAGE(S):</label></div>
-                                    <div class="col-sm-9"><input type="file" name="headline_images_change" id="headline_images_change" accept="image/*" multiple></div>
-                                </div>
-                                <label>ARTICLE BODY <br><span>To insert additional images/videos, place each embed code (for videos) or image URL on a separate line.</span></label>
-                                <textarea name="textbody_edit" id="textbody_edit" rows="10"></textarea>
-                                <input type="submit" value="UPDATE ARTICLE">
-                            </form>
-                        </div>
-                        <div id="edit-project" class="tab-pane fade">
-                            <form action="/discography/project/edit">
-                                <label>CHOOSE PROJECT</label>
-                                <select name="project_id" id="project_id" required>
-                                    <option value=""></option>
-                                    <%_ db.projects.forEach(project => { _%>
-                                    <option value="<%= project._id %>"><%= project.title %></option>
-                                    <%_ }) _%>
-                                </select>
-                                <label>ARTWORK</label>
-                                <div class="input-group" style="display: block">
-                                    <div class="col-sm-6"><input type="file" name="artwork_file_change" id="artwork_file_change" accept=".jpg,.png,.bmp"></div>
-                                    <div class="col-sm-6"><input type="text" name="artwork_url_edit" id="artwork_url_edit" placeholder="Or enter the image URL"></div>
-                                </div>
-                                <label>TITLE</label>
-                                <input type="text" name="title_edit" id="title_edit">
-                                <label>ARTIST</label>
-                                <input type="text" name="artist_edit" id="artist_edit">
-                                <label>YEAR</label>
-                                <input type="number" name="year_edit" id="year_edit" min="2000" max="<%= new Date().getFullYear() %>">
-                                <label>LINKS <span>place each URL on a new line</span></label>
-                                <textarea type="text" name="links_edit" id="links_edit" rows="5"></textarea>
-                                <label><span>In case you think entering every link is unnecessary</span></label>
-                                <input type="checkbox" name="all_platforms_change" id="all_platforms_change"> <b>ALL PLATFORMS?</b> <br>
-                                <input type="submit" value="UPDATE PROJECT">
-                            </form>
-                        </div>
-                        <div id="remove" class="tab-pane fade">
-                            <%_ if (db.artists.length) { _%>
-                            <div class="col-sm-6">
-                                <form action="artists/delete" method="post">
-                                    <label>ARTISTS</label>
-                                    <%_ db.artists.forEach((artist, i) => { _%>
-                                    <input type="checkbox" name="artist<%= i %>" value="<%= artist._id %>"> <%= artist.name %><br>
-                                    <%_ }) _%>
-                                    <br>
-                                    <input type="submit" value="DELETE ARTISTS">
-                                </form>
-                            </div>
-                            <%_ } if (db.projects.length) { _%>
-                            <div class="col-sm-6">
-                                <form action="discography/project/delete" method="post">
-                                    <label>PROJECTS</label>
-                                    <%_ db.projects.forEach((project, i) => { _%>
-                                    <input type="checkbox" name="project<%= i %>" value="<%= project._id %>"> <%= project.title %><br>
-                                    <%_ }) _%>
-                                    <br>
-                                    <input type="submit" value="DELETE PROJECTS">
-                                </form>
-                            </div>
-                            <%_ } if (db.articles.length) { _%>
-                            <div class="col-sm-6">
-                                <form action="news/article/delete" method="post">
-                                    <label>ARTICLES</label>
-                                    <%_ db.articles.forEach((article, i) => { _%>
-                                    <input type="checkbox" name="article<%= i %>" value="<%= article._id %>"> <%= article.headline %><br>
-                                    <%_ }) _%>
-                                    <br>
-                                    <input type="submit" value="DELETE ARTICLES">
-                                </form>
-                            </div>
-                            <%_ } _%>
-                        </div>
-                    </div>
-                </div>
+            <%_ include partials/admin/edit-remove _%>
             </div>
         </div>
     </div>

@@ -1,0 +1,16 @@
+<form method="post" action="/artists/new">
+    <label>NAME</label>
+    <input type="text" name="name" id="name" required>
+    <label>BIO</label>
+    <textarea type="text" name="bio" id="bio" rows="5" required></textarea>
+    <label>PROFILE PICTURE</label>
+    <input type="file" name="profile_image" id="profile_image" accept="image/*">
+    <div class="input-group" style="display: block">
+        <%_ ["SoundCloud", "Spotify", "Tidal", "Apple Music", "Deezer", "Google Play", "Twitter", "Instagram", "Facebook", "Linktree"].forEach(social => { _%>
+        <div class="col-sm-3"><label><%= social.toUpperCase() %>:</label></div>
+        <%_ social = social.toLowerCase().replace(/ /g, '_'); _%>
+        <div class="col-sm-9"><input type="url" name="social_<%= social %>" id="social_<%= social %>" placeholder="Enter URL (optional)"></div>
+        <%_ }) _%>
+    </div>
+    <input type="submit" value="SAVE">
+</form>
