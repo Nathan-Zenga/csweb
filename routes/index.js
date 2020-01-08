@@ -115,6 +115,30 @@ router.post('/discography/project/delete/:id', (req, res) => {
 	})
 });
 
+router.post('/artists/new', (req, res) => {
+	var artist = new Artist({
+		name: req.body.name,
+		bio: req.body.bio
+	});
+
+	for (k in req.body) if (k.includes("socials")) artist.socials[k.replace(/socials\[|\]/g, "")] = req.body[k];
+
+	artist.markModified("socials");
+	artist.save((err, doc) => {
+		var message_update = "";
+		if (req.body.profile_image) {
+			message_update = ": saving image";
+			var public_id = "artists/"+ doc.id +"/"+ doc.name.replace(/ /g, "-");
+			cloud.v2.uploader.upload(req.body.profile_image, { public_id }, (err, result) => {
+				if (err) return res.send(err);
+				doc.profile_image = result.url;
+				doc.save();
+			});
+		}
+		res.send("DONE" + message_update);
+	});
+});
+
 // router.post('/send/message', (req, res) => {
 // 	let transporter = nodemailer.createTransport({
 // 		service: 'gmail',

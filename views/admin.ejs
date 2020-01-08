@@ -3,6 +3,7 @@
         <ul class="nav nav-pills">
             <li class="active"><a data-toggle="pill" href="#articles">ARTICLES</a></li>
             <li><a data-toggle="pill" href="#discography">DISCOGRAPHY</a></li>
+            <li><a data-toggle="pill" href="#artists">ARTISTS</a></li>
         </ul>
         <div class="tab-content container">
             <div id="articles" class="tab-pane fade in active">
@@ -38,6 +39,24 @@
                     <input type="submit" value="SAVE">
                 </form>
             </div>
+            <div id="artists" class="tab-pane fade">
+                <form method="post" action="/artists/new">
+                    <label>NAME</label>
+                    <input type="text" name="name" id="name" required>
+                    <label>BIO</label>
+                    <textarea type="text" name="bio" id="bio" rows="5" required></textarea>
+                    <label>PROFILE PICTURE</label>
+                    <input type="file" name="profile_image" id="profile_image" accept="image/*">
+                    <div class="input-group" style="display: block">
+                        <%_ ["SoundCloud", "Spotify", "Tidal", "Apple Music", "Deezer", "Google Play", "Twitter", "Instagram", "Facebook", "Linktree"].forEach(social => { _%>
+                        <div class="col-sm-3"><label><%= social.toUpperCase() %>:</label></div>
+                        <%_ social = social.toLowerCase().replace(/ /g, '_'); _%>
+                        <div class="col-sm-9"><input type="url" name="social_<%= social %>" id="social_<%= social %>" placeholder="Enter URL (optional)"></div>
+                        <%_ }) _%>
+                    </div>
+                    <input type="submit" value="SAVE">
+                </form>
+            </div>
         </div>
     </div>
     <script>
@@ -56,11 +75,11 @@
         var headline_images = [];
         $("#headline_images").change(function() {
             var files = this.files;
+            headline_images = [];
             if (files.length) {
                 var submitInput = $(this).closest("form").children("input:submit");
                 var counter = 0;
                 var reader = new FileReader();
-                headline_images = [];
                 reader.onload = function() {
                     counter += 1;
                     headline_images.push(reader.result);
@@ -94,11 +113,11 @@
         });
         $("#artwork_file").change(function() {
             var files = this.files;
+            artwork_file = "";
             if (files.length) {
                 var submitInput = $(this).closest("form").children("input:submit");
                 var counter = 0;
                 var reader = new FileReader();
-                artwork_file = "";
                 reader.onload = function() {
                     counter += 1;
                     artwork_file = reader.result;
@@ -118,6 +137,39 @@
             var url_format = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/gim;
             if (data.links) data.links = data.links.match(url_format);
             if (artwork_file) data.artwork_file = artwork_file;
+
+            $.post(this.action, data, function(result) {
+                e.target.reset();
+                showMessage(result, e.target);
+            });
+        });
+
+        var profile_image = "";
+        $("#profile_image").change(function() {
+            var files = this.files;
+            profile_image = "";
+            if (files.length) {
+                var submitInput = $(this).closest("form").children("input:submit");
+                var counter = 0;
+                var reader = new FileReader();
+                reader.onload = function() {
+                    counter += 1;
+                    profile_image = reader.result;
+                    if (counter === files.length) submitInput.attr("disabled", false);
+                };
+                readAsDataURL(files, reader, submitInput);
+            }
+        });
+        $("#artists form").submit(function(e) {
+            e.preventDefault();
+            var data = { socials: {} };
+            $(this).serializeArray().filter(function(field) { return field.value }).forEach(function(field) {
+                var name = field.name;
+                var social = name.replace("social_", "");
+                !name.includes("social_") ? data[name] = field.value : data.socials[social] = field.value;
+            });
+
+            if (profile_image) data.profile_image = profile_image;
 
             $.post(this.action, data, function(result) {
                 e.target.reset();
