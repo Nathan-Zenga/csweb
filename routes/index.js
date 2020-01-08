@@ -46,15 +46,19 @@ router.post('/news/article/new', (req, res) => {
 	});
 
 	article.save((err, doc) => {
+		var message_update = "";
 		["headline_images", "textbody_media", "headline_images[]", "textbody_media[]"].forEach(field => {
 			if (req.body[field]) {
+				message_update = " - All uploaded images will be available very shortly";
 				doc[field] = [];
 				req.body[field] = typeof req.body[field] === "string" ? [req.body[field]] : req.body[field];
 				req.body[field].forEach((imageStr, i) => {
 					var f = field.replace("[]", "");
 					if (!/<iframe(.*?)<\/iframe>/.test(imageStr)) {
-						cloud.v2.uploader.upload(imageStr, { public_id: ("article/"+ doc.id +"/"+ f + (i+1)) }, (err, result) => {
-							if (!err) doc[f].push(result.url);
+						var public_id = "article/"+ doc.id +"/"+ f + (i+1);
+						cloud.v2.uploader.upload(imageStr, { public_id }, (err, result) => {
+							if (err) return res.send(err);
+							doc[f].push(result.url);
 							doc.save();
 						});
 					} else {
@@ -64,16 +68,41 @@ router.post('/news/article/new', (req, res) => {
 				})
 			}
 		});
-		res.send("DONE")
+		res.send("DONE" + message_update)
 	});
 });
 
 router.post('/news/article/delete/:id', (req, res) => {
 	Article.findByIdAndDelete(req.params.id, function(err, doc) {
 		if (err || !doc) return res.send(err || "Article not found");
-		cloud.v2.api.delete_resources_by_prefix("article/" + doc.id, (err, result) => { console.log(result, err) });
+		cloud.v2.api.delete_resources_by_prefix("articles/" + doc.id, (err, result) => { console.log(result, err) });
 		res.redirect(req.get("referrer"))
 	})
+});
+
+router.post('/discography/project/new', (req, res) => {
+	var project = new Project({
+		title: req.body.title,
+		artist: req.body.artist,
+		year: req.body.year,
+		artwork: req.body.artwork_url,
+		links: req.body.links || req.body["links[]"],
+		all_platforms: !!req.body.all_platforms
+	});
+
+	project.save((err, doc) => {
+		var message_update = "";
+		if (req.body.artwork_file) {
+			message_update = " - All uploaded images will be available very shortly";
+			var public_id = "projects/"+ doc.id +"/"+ doc.title.replace(/ /g, "-");
+			cloud.v2.uploader.upload(req.body.artwork_file, { public_id }, (err, result) => {
+				if (err) return res.send(err);
+				doc.artwork = result.url;
+				doc.save();
+			});
+		}
+		res.send("DONE" + message_update);
+	});
 });
 
 // router.post('/send/message', (req, res) => {

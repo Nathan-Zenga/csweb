@@ -2,6 +2,7 @@
     <div class="content-container" style="padding-top: 2em;">
         <ul class="nav nav-pills">
             <li class="active"><a data-toggle="pill" href="#articles">ARTICLES</a></li>
+            <li><a data-toggle="pill" href="#discography">DISCOGRAPHY</a></li>
         </ul>
         <div class="tab-content container">
             <div id="articles" class="tab-pane fade in active">
@@ -14,31 +15,59 @@
                     </div>
                     <label>ARTICLE BODY <br><span>To insert additional images/videos, place each embed code (for videos) or image URL on a separate line.</span></label>
                     <textarea name="textbody" id="textbody" rows="10" required></textarea>
-                    <input type="submit" value="Send">
+                    <input type="submit" value="POST">
                 </form>
             </div>
-            <div id="" class="tab-pane fade"></div>
+            <div id="discography" class="tab-pane fade">
+                <form method="post" action="/discography/project/new">
+                    <label>ARTWORK</label>
+                    <div class="input-group" style="display: block">
+                        <div class="col-sm-6"><input type="file" name="artwork_file" id="artwork_file" accept=".jpg,.png,.bmp" required></div>
+                        <div class="col-sm-6"><input type="text" name="artwork_url" id="artwork_url" placeholder="Or enter the image URL"></div>
+                    </div>
+                    <label>TITLE</label>
+                    <input type="text" name="title" id="title" required>
+                    <label>ARTIST</label>
+                    <input type="text" name="artist" id="artist" required>
+                    <label>YEAR</label>
+                    <input type="number" name="year" id="year" min="2000" max="<%= new Date().getFullYear() %>" required>
+                    <label>LINKS <span>(OPTIONAL) - place each URL on a new line</span></label>
+                    <textarea type="text" name="links" id="links" rows="5" required></textarea>
+                    <label><span>In case you think entering every link is unnecessary</span></label>
+                    <input type="checkbox" name="all_platforms" id="all_platforms"> <b>ALL PLATFORMS?</b> <br>
+                    <input type="submit" value="SAVE">
+                </form>
+            </div>
         </div>
     </div>
     <script>
-        var headline_images = [];
-        $("#headline_images").change(function() {
-            var files = this.files;
-            var submitInput = $(this).closest("form").children("input:submit");
-            var counter = 0;
-            var reader = new FileReader();
-            headline_images = [];
-            reader.onload = function() {
-                counter += 1;
-                headline_images.push(reader.result);
-                if (counter === files.length) submitInput.attr("disabled", false);
-            };
+        var readAsDataURL = function(files, reader, submitInput) {
             $.each(files, function(i, file) {
                 setTimeout(function() {
-                    submitInput.attr("disabled", true);
+                    if (submitInput) submitInput.attr("disabled", true);
                     reader.readAsDataURL(file)
                 }, i * 200);
             });
+        };
+        var showMessage = function(result, container) {
+            var $msg = $('<div class="msg" style><div class="text">'+ result +'</div></div>');
+            $msg.css("display", "none").appendTo(container).fadeIn().delay(2000).fadeOut(function(){ $(this).remove() });
+        };
+        var headline_images = [];
+        $("#headline_images").change(function() {
+            var files = this.files;
+            if (files.length) {
+                var submitInput = $(this).closest("form").children("input:submit");
+                var counter = 0;
+                var reader = new FileReader();
+                headline_images = [];
+                reader.onload = function() {
+                    counter += 1;
+                    headline_images.push(reader.result);
+                    if (counter === files.length) submitInput.attr("disabled", false);
+                };
+                readAsDataURL(files, reader, submitInput);
+            }
         });
         $("#articles form").submit(function(e) {
             e.preventDefault();
@@ -51,6 +80,48 @@
             });
             $.post(this.action, data, function(result) {
                 e.target.reset();
+                showMessage(result, e.target);
+            });
+        });
+
+        var artwork_file = "";
+        $("#all_platforms").change(function() {
+            $("#links").val("").attr({ required: !this.checked, disabled: this.checked });
+        });
+        $("#artwork_file, #artwork_url").change(function() {
+            var id = this.id === "artwork_url" ? "#artwork_file" : "#artwork_url";
+            $(id).val("").attr({ required: !this.value });
+        });
+        $("#artwork_file").change(function() {
+            var files = this.files;
+            if (files.length) {
+                var submitInput = $(this).closest("form").children("input:submit");
+                var counter = 0;
+                var reader = new FileReader();
+                artwork_file = "";
+                reader.onload = function() {
+                    counter += 1;
+                    artwork_file = reader.result;
+                    if (counter === files.length) submitInput.attr("disabled", false);
+                };
+                readAsDataURL(files, reader, submitInput);
+            }
+        });
+        $("#discography form").submit(function(e) {
+            e.preventDefault();
+            var data = {};
+            $(this).serializeArray().forEach(function(field) {
+                var name = field.name;
+                data[name] = field.value;
+            });
+
+            var url_format = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/gim;
+            if (data.links) data.links = data.links.match(url_format);
+            if (artwork_file) data.artwork_file = artwork_file;
+
+            $.post(this.action, data, function(result) {
+                e.target.reset();
+                showMessage(result, e.target);
             });
         });
     </script>
