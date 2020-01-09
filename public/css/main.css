@@ -123,6 +123,7 @@ input[type="submit"] {
 	margin-left: auto;
 	margin-right: auto;
 	font-weight: bold;
+	background-color: rgb(220, 220, 220);
 }
 
 input[type="file"] {
@@ -266,6 +267,7 @@ article:not(.full) .article-content .img {
 	padding: 0!important;
 	text-align: center;
 	font-weight: bold;
+	background-color: white;
 }
 
 article.full {
