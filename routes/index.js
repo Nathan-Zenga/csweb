@@ -65,15 +65,17 @@ router.post('/news/article/new', (req, res) => {
 				req.body[field] = typeof req.body[field] === "string" ? [req.body[field]] : req.body[field];
 				req.body[field].forEach((imageStr, i) => {
 					var f = field.replace("[]", "");
-					if (!/<iframe(.*?)<\/iframe>/.test(imageStr)) {
+					if (!/youtu.?be(.*?)(embed)?|<iframe(.*?)<\/iframe>/.test(imageStr)) {
 						var public_id = "article/"+ doc.id +"/"+ f + (i+1);
 						cloud.v2.uploader.upload(imageStr, { public_id }, (err, result) => {
-							if (err) return res.send(err);
+							if (err) console.log(err);
 							doc[f].push(result.url);
 							doc.save();
 						});
 					} else {
-						doc[f].push(imageStr);
+						var yt_regExp = /^.*(youtu.?be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)/i;
+						var yt_iframe = '<iframe width="560" height="315" src="' + imageStr.replace(yt_regExp, "https://youtube.com/embed/") + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+						doc[f].push( yt_regExp.test(imageStr) ? yt_iframe : imageStr );
 						doc.save();
 					}
 				})
