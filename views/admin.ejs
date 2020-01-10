@@ -33,9 +33,12 @@
                 }, i * 200);
             });
         };
-        var showMessage = function(result, container) {
-            var $msg = $('<div class="msg" style><div class="text">'+ result +'</div></div>');
-            $msg.css("display", "none").appendTo(container).fadeIn().delay(2000).fadeOut(function(){ $(this).remove() });
+        var showMessage = function(result, container, error) {
+            var $msg = $('<div class="msg" style><div class="text">'+ result.replace(/\n/g, "<br>") +'</div></div>');
+            $msg.css("display", "none").appendTo(container).fadeIn().delay(2000).fadeOut(function(){
+                $(this).remove();
+                if (error) location.reload();
+            });
         };
 
         var headline_images = [];
@@ -54,18 +57,79 @@
                 readAsDataURL(files, reader, submitInput);
             }
         });
+        var textbody_media = [];
+        var spots = [];
+        $("#textbody").change(function() {
+            var textbody = this;
+            textbody_media = [];
+            spots = textbody.value.split("\n").filter(function(x) { return x.trim().toLowerCase() === "x" });
+            $("#textbody_media input").off("change");
+            if ($("#textbody_media").html()) $("#textbody_media").empty();
+            if (spots.length) {
+                spots.forEach(function(spot, i) {
+                    var $fileInput = $("<input>").attr({ type: "file", required: true });
+                    var $textInput = $("<input>").attr({ type: "text", placeholder: "...or enter URL or embed code"});
+                    var $set = $fileInput.add($textInput);
+                    $("#textbody_media").append($set);
+                });
+
+                $("#textbody_media input:text").change(function() {
+                    var $fileInput = $(this).prev("input:file");
+                    var pos = $("#textbody_media input:text").index(this);
+                    var length = $("#textbody_media input:text").length;
+                    var $submitInput = $(this).closest("form").children("input:submit");
+                    $fileInput.val("").attr("required", !this.value);
+                    if (textbody_media.length <= 1) {
+                        if (pos == 0) {
+                            textbody_media.unshift(this.value);
+                        } else {
+                            textbody_media.push(this.value);
+                        }
+                    } else if (pos == 0) {
+                        textbody_media.shift();
+                        textbody_media.unshift(this.value);
+                    } else if (pos == length-1) {
+                        textbody_media.pop();
+                        textbody_media.push(this.value);
+                    } else {
+                        textbody_media.splice(post, 1, this.value);
+                    }
+                    $submitInput.attr("disabled", false);
+                });
+                $("#textbody_media input:file").change(function() {
+                    var files = this.files;
+                    var $textInput = $(this).next("input:text");
+                    $textInput.val("").attr("required", !this.value);
+                    if (files && files.length) {
+                        var $submitInput = $(this).closest("form").children("input:submit");
+                        var counter = 0;
+                        var reader = new FileReader();
+                        $textInput.attr("disabled", true);
+                        reader.onload = function() {
+                            counter += 1;
+                            $textInput.attr("disabled", false).val(reader.result).change();
+                            if (counter === files.length) $submitInput.attr("disabled", false);
+                        };
+                        readAsDataURL(files, reader, $submitInput);
+                    }
+                })
+            }
+        });
         $("#articles form").submit(function(e) {
             e.preventDefault();
-            var textbody = document.getElementById("textbody");
-            textbody.value = textbody.value.replace(/(width|height|style)=\"(.*?)\"/gi, "").replace(/<iframe /gi, '<iframe style="height: 350px; width: 100%"');
-            var data = { headline_images, textbody_media: textbody.value.match(/(.*?).(png|jpg|jpeg|gif)|<iframe(.*?)<\/iframe>/gi) || [] };
+            var invalidURL = textbody_media.filter(function(media) {
+                var url_format = /^.*(youtu.?be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*|<iframe(.*?)<\/iframe>|^(data:)|^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+(.jpe?g|.png|.gif|.mp(3|4)|.mov|.m4a|.wav)$/gi;
+                return !url_format.test(media);
+            }).length;
+            if (invalidURL) { showMessage("Invalid URL", this, true); return false }
+            var data = { headline_images, textbody_media };
             $(this).serializeArray().forEach(function(field) {
                 var name = field.name;
                 data[name] = field.value;
             });
             $.post(this.action, data, function(result) {
                 e.target.reset();
-                showMessage(result, e.target);
+                showMessage(result, e.target, true);
             });
         });
 
@@ -107,7 +171,7 @@
 
             $.post(this.action, data, function(result) {
                 e.target.reset();
-                showMessage(result, e.target);
+                showMessage(result, e.target, true);
             });
         });
 
@@ -140,7 +204,7 @@
 
             $.post(this.action, data, function(result) {
                 e.target.reset();
-                showMessage(result, e.target);
+                showMessage(result, e.target, true);
             });
         });
 
@@ -161,7 +225,7 @@
 
             $.post(this.action, data, function(result) {
                 e.target.reset();
-                showMessage(result, e.target);
+                showMessage(result, e.target, true);
             });
         });
 
@@ -176,7 +240,7 @@
             });
             $.post(this.action, data, function(result) {
                 e.target.reset();
-                showMessage(result, e.target);
+                showMessage(result, e.target, true);
             });
         });
 
@@ -202,7 +266,7 @@
             });
             $.post(this.action, data, function(result) {
                 e.target.reset();
-                showMessage(result, e.target);
+                showMessage(result, e.target, true);
             });
         });
     </script>
