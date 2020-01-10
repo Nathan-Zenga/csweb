@@ -95,7 +95,7 @@ form label {
 	display: block;
 }
 
-input {
+input, button {
 	border: none;
 }
 
@@ -116,14 +116,26 @@ input[type="checkbox"] {
 	width: auto;
 }
 
+input[type="submit"], button {
+	width: auto;
+	background-color: rgb(220, 220, 220);
+}
+
 input[type="submit"] {
 	display: table;
-	width: auto;
 	padding: 10px 30px;
 	margin-left: auto;
 	margin-right: auto;
 	font-weight: bold;
-	background-color: rgb(220, 220, 220);
+}
+
+button {
+	padding: 5px 12px;
+	margin-bottom: 1em;
+}
+
+button + button {
+	margin-left: 10px;
 }
 
 input[type="file"] {
