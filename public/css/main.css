@@ -191,7 +191,7 @@ label span {
 }
 
 #cs-logo {
-	height: 5em;
+	height: 70px;
 	border-radius: 50%;
 	border: 2px solid;
 	padding: 10px;
@@ -254,6 +254,7 @@ article:not(.full) .article-content .img {
 	display: block;
 	background-size: cover;
 	background-color: rgba(0, 0, 0, .2);
+	background-position: center;
 }
 
 .overflow-fade-sheet {
@@ -286,6 +287,7 @@ article.full .img-reel {
 	overflow: hidden;
 	padding-left: 0;
 	padding-right: 0;
+	text-align: center;
 }
 
 article.full .img-reel-nav {
@@ -296,6 +298,22 @@ article.full .img-reel-nav {
 article.full .img-reel-nav a {
 	font-size: 1.5em;
 	padding: 0 30px;
+}
+
+article.full .textbody-media {
+	height: 400px;
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+
+article.full .textbody-media > * {
+	display: block;
+	height: 100%;
+	margin: 0 auto;
+}
+
+article.full .textbody-media iframe:not([src*=youtu]) {
+	width: 100%;
 }
 
 @media (max-width: 767px) {
