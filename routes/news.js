@@ -33,7 +33,7 @@ router.post('/article/new', (req, res) => {
 					var f = field.replace("[]", "");
 					if (!/youtu.?be(.*?)(embed)?|<iframe(.*?)<\/iframe>/.test(imageStr)) {
 						var public_id = "article/"+ doc.id +"/"+ f + (i+1);
-						cloud.v2.uploader.upload(imageStr, { public_id }, (err, result) => {
+						cloud.v2.uploader.upload(imageStr, { public_id, resource_type: "auto" }, (err, result) => {
 							if (err) console.log(err);
 							doc[f].push(result.url);
 							doc.save();
