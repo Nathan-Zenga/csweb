@@ -9,8 +9,7 @@
                 <div class="text">
                     <h1><a href="/news/article/<%= article._id %>"><%= article.headline %></a></h1>
                     <%_
-                        var textbody = "<p>" + article.textbody.replace(/\r?\n/g, "</p>\n<p>") + "</p>";
-                        article.textbody_media.forEach(media => { textbody.replace(media, "") });
+                        var textbody = "<p>" + article.textbody.replace(/\r?\n/g, "</p>\n<p>").replace(/<p><\/p>/g, "<br>").replace(/<p>x<\/p>/gi, "") + "</p>";
                     _%>
                     <%- textbody %>
                 </div>
