@@ -1,3 +1,4 @@
+<%_ var { artists, projects, articles } = db; _%>
 <div class="col-sm-3">
     <ul class="nav nav-pills nav-stacked">
         <li class="active"><a data-toggle="pill" href="#edit-artist">EDIT ARTIST</a></li>
@@ -13,13 +14,16 @@
                 <label>CHOOSE ARTIST</label>
                 <select name="artist_id" id="artist_id" required>
                     <option value=""></option>
-                    <%_ db.artists.forEach(artist => { _%>
+                    <%_ artists.forEach(artist => { _%>
                     <option value="<%= artist._id %>"><%= artist.name %></option>
                     <%_ }) _%>
                 </select>
                 <label>NAME</label>
                 <input type="text" name="artist_name_edit" id="artist_name_edit">
                 <label>BIO</label>
+                <div class="text-emphasis-styles" data-id="artist_bio_edit">
+                    <button><b>B</b></button><button><i>I</i></button><button><u>U</u></button>
+                </div>
                 <textarea type="text" name="artist_bio_edit" id="artist_bio_edit" rows="5"></textarea>
                 <label>PROFILE PICTURE</label>
                 <input type="file" name="profile_image_change" id="profile_image_change" accept="image/*">
@@ -36,17 +40,23 @@
                 <label>CHOOSE ARTICLE</label>
                 <select name="article_id" id="article_id" required>
                     <option value=""></option>
-                    <%_ db.articles.forEach(article => { _%>
+                    <%_ articles.forEach(article => { _%>
                     <option value="<%= article._id %>"><%= article.headline %></option>
                     <%_ }) _%>
                 </select>
                 <label>HEADLINE</label>
+                <div class="text-emphasis-styles" data-id="headline_edit">
+                    <button><i>I</i></button><button><u>U</u></button>
+                </div>
                 <input type="text" name="headline_edit" id="headline_edit">
                 <div class="input-group" style="display: block">
                     <div class="col-sm-3"><label>MAIN IMAGE(S):</label></div>
                     <div class="col-sm-9"><input type="file" name="headline_images_change" id="headline_images_change" accept="image/*" multiple></div>
                 </div>
                 <label>ARTICLE BODY <br><span>To insert additional images/videos, place each embed code (for videos) or image URL on a separate line.</span></label>
+                <div class="text-emphasis-styles" data-id="textbody_edit">
+                    <button><b>B</b></button><button><i>I</i></button><button><u>U</u></button>
+                </div>
                 <textarea name="textbody_edit" id="textbody_edit" rows="10"></textarea>
                 <input type="submit" value="UPDATE ARTICLE">
             </form>
@@ -56,7 +66,7 @@
                 <label>CHOOSE PROJECT</label>
                 <select name="project_id" id="project_id" required>
                     <option value=""></option>
-                    <%_ db.projects.forEach(project => { _%>
+                    <%_ projects.forEach(project => { _%>
                     <option value="<%= project._id %>"><%= project.title %></option>
                     <%_ }) _%>
                 </select>
@@ -79,33 +89,33 @@
             </form>
         </div>
         <div id="remove" class="tab-pane fade">
-            <%_ if (db.artists.length) { _%>
+            <%_ if (artists.length) { _%>
             <div class="col-sm-6">
                 <form action="artists/delete" method="post">
                     <label>ARTISTS</label>
-                    <%_ db.artists.forEach((artist, i) => { _%>
+                    <%_ artists.forEach((artist, i) => { _%>
                     <input type="checkbox" name="artist<%= i %>" value="<%= artist._id %>"> <%= artist.name %><br>
                     <%_ }) _%>
                     <br>
                     <input type="submit" value="DELETE ARTISTS">
                 </form>
             </div>
-            <%_ } if (db.projects.length) { _%>
+            <%_ } if (projects.length) { _%>
             <div class="col-sm-6">
                 <form action="discography/project/delete" method="post">
                     <label>PROJECTS</label>
-                    <%_ db.projects.forEach((project, i) => { _%>
+                    <%_ projects.forEach((project, i) => { _%>
                     <input type="checkbox" name="project<%= i %>" value="<%= project._id %>"> <%= project.title %><br>
                     <%_ }) _%>
                     <br>
                     <input type="submit" value="DELETE PROJECTS">
                 </form>
             </div>
-            <%_ } if (db.articles.length) { _%>
-            <div class="col-sm-6">
-                <form action="news/article/delete" method="post">
+            <%_ } if (articles.length) { _%>
+            <div class="col-sm-12">
+                <form action="news/article/delete" method="post" style="max-width: none;">
                     <label>ARTICLES</label>
-                    <%_ db.articles.forEach((article, i) => { _%>
+                    <%_ articles.forEach((article, i) => { _%>
                     <input type="checkbox" name="article<%= i %>" value="<%= article._id %>"> <%= article.headline %><br>
                     <%_ }) _%>
                     <br>

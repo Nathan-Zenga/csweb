@@ -269,5 +269,18 @@
                 showMessage(result, e.target, true);
             });
         });
+
+        $(".text-emphasis-styles > button").click(function(e) {
+            e.preventDefault();
+            var $textarea = $("#"+this.parentNode.dataset.id);
+            var value = $textarea.val();
+            var selectionStart = $textarea.prop("selectionStart");
+            var selectionEnd = $textarea.prop("selectionEnd");
+            var selection = value.slice(selectionStart, selectionEnd);
+            var before = value.slice(0, selectionStart);
+            var after = value.slice(selectionEnd, value.length);
+            var em = this.firstChild.tagName.toLowerCase();
+            if (selection.length) $textarea.val( before + "<"+em+">" + selection +"</"+em+">" + after );
+        });
     </script>
 <%_ include partials/footer _%>
