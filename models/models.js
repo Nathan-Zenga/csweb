@@ -4,6 +4,7 @@ var Schema = mongoose.Schema;
 module.exports.Article = mongoose.model('Article', Schema({
 	headline: String,
 	headline_images: [String],
+	headline_image_thumb: String,
 	textbody: String,
 	textbody_media: [String]
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } }));

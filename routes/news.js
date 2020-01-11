@@ -35,6 +35,7 @@ router.post('/article/new', (req, res) => {
 						var public_id = "article/"+ doc.id +"/"+ f + (i+1);
 						cloud.v2.uploader.upload(imageStr, { public_id, resource_type: "auto" }, (err, result) => {
 							if (err) console.log(err);
+							if (req.body.headline_image_thumb === imageStr) doc.headline_image_thumb = result.url;
 							doc[f].push(result.url);
 							doc.save();
 						});
@@ -89,6 +90,7 @@ router.post('/article/edit', (req, res) => {
 										var public_id = "article/"+ id +"/"+ f + (i+1);
 										cloud.v2.uploader.upload(imageStr, { public_id }, (err, result) => {
 											if (err) return res.send(err);
+											if (article.headline_image_thumb === imageStr) article.headline_image_thumb = result.url;
 											article[f].push(result.url);
 											article.save();
 										});
