@@ -59,7 +59,7 @@
                     headline_images.push(reader.result);
                     var edit = /_change|_edit/i.test($form.get(0).id);
                     var name = "headline_image_thumb" + (edit ? "_change" : "");
-                    var $input = $("<input>").attr({ type: "radio", name, value: reader.result });
+                    var $input = $("<input>").attr({ type: "radio", name, value: reader.result, required: true });
                     var $img = $("<img>").attr({ src: reader.result });
                     $thumb_choice.append($input.add($img));
                     if (counter === files.length) $submitInput.attr("disabled", false);
