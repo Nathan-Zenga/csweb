@@ -7,7 +7,7 @@
                 <a class="img" href="/news/article/<%= article._id %>" style="background-image: url('<%= article.headline_images[0] %>')"></a>
                 <%_ } _%>
                 <div class="text">
-                    <h1><a href="/news/article/<%= article._id %>"><%= article.headline %></a></h1>
+                    <h1><a href="/news/article/<%= article._id %>"><%- article.headline %></a></h1>
                     <%_
                         var textbody = "<p>" + article.textbody.replace(/\r?\n/g, "</p>\n<p>").replace(/<p><\/p>/g, "<br>").replace(/<p>x<\/p>/gi, "") + "</p>";
                     _%>
