@@ -480,3 +480,23 @@ article.full .textbody-media iframe:not([src*=youtu]) {
 #map {
 	height: 400px;
 }
+
+.headline-image-thumb-choice {
+	margin-bottom: 2em;
+	white-space: nowrap;
+	overflow-x: scroll;
+	display: inline-block;
+	width: 100%;
+	padding-bottom: 1em;
+}
+
+.headline-image-thumb-choice input[type=radio] {
+	width: auto;
+	margin-top: 0;
+}
+
+.headline-image-thumb-choice input[type=radio] + img {
+	height: 100px;
+	margin: 0 10px 0 5px;
+	box-shadow: 5px 5px 5px rgb(0, 0, 0, 0.5);
+}
