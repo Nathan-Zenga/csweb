@@ -53,16 +53,15 @@ router.post('/article/new', (req, res) => {
 });
 
 router.post('/article/delete', (req, res) => {
-	var keys = Object.keys(req.body);
-	if (keys.length) {
-		keys.forEach((k, i) => {
-			var id = req.body[k];
-			Article.findByIdAndDelete(id, (err, doc) => {
-				if (err || !doc) return res.send(err || "Article not found");
-				cloud.v2.api.delete_resources_by_prefix("articles/" + id, (err, result) => { console.log(result, "\n\nError: " + err) });
-				if (i === keys.length-1) res.send("ARTICLE DELETED SUCCESSFULLY")
+	var ids = Object.values(req.body);
+	if (ids.length) {
+		Article.deleteMany({_id : { $in: ids }}, (err, result) => {
+			if (err || !result.deletedCount) return res.send(err || "Article(s) not found");
+			ids.forEach(id => {
+				cloud.v2.api.delete_resources_by_prefix("article/" + id, (err, result) => { console.log(result, "\n\nError: " + err) });
 			})
-		});
+			res.send("ARTICLE"+ (ids.length > 1 ? "S" : "") +" DELETED SUCCESSFULLY")
+		})
 	} else { res.send("NOTHING SELECTED") }
 });
 

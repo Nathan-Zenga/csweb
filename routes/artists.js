@@ -70,15 +70,14 @@ router.post('/edit', (req, res) => {
 });
 
 router.post('/delete', (req, res) => {
-	var keys = Object.keys(req.body);
-	if (keys.length) {
-		keys.forEach((k, i) => {
-			var id = req.body[k];
-			Artist.findByIdAndDelete(id, (err, doc) => {
-				if (err || !doc) return res.send(err || "Artist not found");
+	var ids = Object.values(req.body);
+	if (ids.length) {
+		Artist.deleteMany({_id : { $in: ids }}, (err, result) => {
+			if (err || !result.deletedCount) return res.send(err || "Artist(s) not found");
+			ids.forEach(id => {
 				cloud.v2.api.delete_resources_by_prefix("artists/" + id, (err, result) => { console.log(result, "\n\nError: " + err) });
-				if (i === keys.length-1) res.send("ARTISTS REMOVED SUCCESSFULLY")
 			})
+			res.send("ARTIST"+ (ids.length > 1 ? "S" : "") +" REMOVED SUCCESSFULLY")
 		})
 	} else { res.send("NOTHING SELECTED") }
 });
