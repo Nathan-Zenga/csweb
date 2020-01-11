@@ -26,7 +26,10 @@
                 </div>
                 <textarea type="text" name="artist_bio_edit" id="artist_bio_edit" rows="5"></textarea>
                 <label>PROFILE PICTURE</label>
-                <input type="file" name="profile_image_change" id="profile_image_change" accept="image/*">
+                <div class="input-group row" style="display: block">
+                    <div class="col-sm-6"><input type="file" name="profile_image_change" id="profile_image_change" accept="image/*"></div>
+                    <div class="col-sm-6"><button class="clear-uploads" data-id="profile_image_change">CLEAR</button></div>
+                </div>
                 <%_ ["SoundCloud", "Spotify", "Tidal", "Apple Music", "Deezer", "Google Play", "Twitter", "Instagram", "Facebook", "Linktree"].forEach(social => { _%>
                 <label><%= social.toUpperCase() %>:</label>
                 <%_ social = social.toLowerCase().replace(/ /g, '_'); _%>
@@ -49,9 +52,10 @@
                     <button><i>I</i></button><button><u>U</u></button>
                 </div>
                 <input type="text" name="headline_edit" id="headline_edit">
-                <div class="input-group" style="display: block">
+                <div class="input-group row" style="display: block">
                     <div class="col-sm-3"><label>MAIN IMAGE(S):</label></div>
-                    <div class="col-sm-9"><input type="file" name="headline_images_change" id="headline_images_change" accept="image/*" multiple></div>
+                    <div class="col-sm-6"><input type="file" name="headline_images_change" id="headline_images_change" accept="image/*" multiple></div>
+                    <div class="col-sm-3"><button class="clear-uploads" data-id="headline_images_change">CLEAR</button></div>
                 </div>
                 <div class="input-group headline-image-thumb-choice" style="display: none"></div>
                 <label>ARTICLE BODY <br><span>To insert additional images/videos, place each embed code (for videos) or image URL on a separate line.</span></label>
@@ -72,9 +76,10 @@
                     <%_ }) _%>
                 </select>
                 <label>ARTWORK</label>
-                <div class="input-group" style="display: block">
+                <div class="input-group row" style="display: block">
                     <div class="col-sm-6"><input type="file" name="artwork_file_change" id="artwork_file_change" accept=".jpg,.png,.bmp"></div>
-                    <div class="col-sm-6"><input type="text" name="artwork_url_edit" id="artwork_url_edit" placeholder="Or enter the image URL"></div>
+                    <div class="col-sm-6"><button class="clear-uploads" data-id="artwork_file_change">CLEAR</button></div>
+                    <div class="col-sm-12"><input type="text" name="artwork_url_edit" id="artwork_url_edit" placeholder="Or enter the image URL"></div>
                 </div>
                 <label>TITLE</label>
                 <input type="text" name="title_edit" id="title_edit">

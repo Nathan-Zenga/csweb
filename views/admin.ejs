@@ -125,6 +125,10 @@
                 })
             }
         });
+        $(".clear-uploads").click(function(e) {
+            e.preventDefault();
+            $("#"+this.dataset.id).val("").change();
+        });
         $("#articles form").submit(function(e) {
             e.preventDefault();
             var invalidURL = textbody_media.filter(function(media) {
