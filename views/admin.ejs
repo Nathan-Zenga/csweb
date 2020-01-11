@@ -37,7 +37,7 @@
             var $msg = $('<div class="msg" style><div class="text">'+ result.replace(/\n/g, "<br>") +'</div></div>');
             $msg.css("display", "none").appendTo(container).fadeIn().delay(2000).fadeOut(function(){
                 $(this).remove();
-                if (error) location.reload();
+                if (!error) location.reload();
             });
         };
 
@@ -140,7 +140,7 @@
             });
             $.post(this.action, data, function(result) {
                 e.target.reset();
-                showMessage(result, e.target, true);
+                showMessage(result, e.target);
             });
         });
 
@@ -182,7 +182,7 @@
 
             $.post(this.action, data, function(result) {
                 e.target.reset();
-                showMessage(result, e.target, true);
+                showMessage(result, e.target);
             });
         });
 
@@ -215,11 +215,10 @@
 
             $.post(this.action, data, function(result) {
                 e.target.reset();
-                showMessage(result, e.target, true);
+                showMessage(result, e.target);
             });
         });
 
-        var action = "";
         $("#edit-remove select[name*=_id]").change(function(e) {
             var $form = $(this).closest("form");
             $form.find(":input:not(:submit)").not(this).val("");
@@ -238,16 +237,20 @@
 
             $.post(this.action, data, function(result) {
                 e.target.reset();
-                showMessage(result, e.target, true);
+                showMessage(result, e.target);
             });
         });
 
         $("#edit-article form").submit(function(e) {
             e.preventDefault();
-            var textbody = document.getElementById("textbody_edit");
-            textbody.value = textbody.value.replace(/(width|height|style)=\"(.*?)\"/gi, "").replace(/<iframe /gi, '<iframe style="height: 350px; width: 100%"');
+            var invalidURL = textbody_media.filter(function(media) {
+                var url_format = /^.*(youtu.?be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*|<iframe(.*?)<\/iframe>|^(data:)|^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+(.jpe?g|.png|.gif|.mp(3|4)|.mov|.m4a|.wav)$/gi;
+                return !url_format.test(media);
+            }).length;
+            if (invalidURL) { showMessage("Invalid URL", this, true); return false }
+
             var headline_images_change = headline_images;
-            var textbody_media_change = textbody.value.match(/(.*?).(png|jpg|jpeg|gif)|<iframe(.*?)<\/iframe>/gi) || [];
+            var textbody_media_change = textbody_media;
             var headline_image_thumb_change = headline_image_thumb;
             var data = { headline_images_change, textbody_media_change, headline_image_thumb_change };
             $(this).serializeArray().forEach(function(field) {
@@ -256,7 +259,7 @@
             });
             $.post(this.action, data, function(result) {
                 e.target.reset();
-                showMessage(result, e.target, true);
+                showMessage(result, e.target);
             });
         });
 
@@ -282,7 +285,7 @@
             });
             $.post(this.action, data, function(result) {
                 e.target.reset();
-                showMessage(result, e.target, true);
+                showMessage(result, e.target);
             });
         });
 
