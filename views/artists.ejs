@@ -10,7 +10,12 @@
                 <h1><%= artist.name.toUpperCase() %></h1>
                 <%- "<p>" + artist.bio.replace(/\r?\n/g, "</p>\n<p>").replace(/<p><\/p>/g, "<br>") + "</p>" %>
                 <%_
-                    var keys = Object.keys(artist.socials);
+                    var keys;
+                    try {
+                        keys = Object.keys(artist.socials);
+                    } catch(e) {
+                        keys = [];
+                    }
                     if (keys.length) {
                 _%>
                 <br>
