@@ -45,22 +45,20 @@ router.post('/edit', (req, res) => {
 		artist.bio = req.body.artist_bio_edit || artist.bio;
 
 		for (k in req.body) {
-			if (req.body[k] && k !== "artist_id") {
-				if (k.includes("socials")) {
-					artist.socials[k.replace(/socials\[|\]/g, "")] = req.body[k];
-				} else if (k === "profile_image_change") {
-					cloud.v2.api.delete_resources_by_prefix("artists/" + id, (err, result) => {
-						console.log(err || result);
-						var public_id = "artists/"+ id +"/"+ artist.name.replace(/ /g, "-");
-						cloud.v2.uploader.upload(req.body.profile_image_change, { public_id }, (err, result) => {
-							if (err) return res.send(err);
-							artist.profile_image = result.url;
-							artist.save();
-						});
+			if (k.includes("socials") && req.body[k]) {
+				artist.socials[k.replace(/socials\[|\]/g, "")] = req.body[k];
+			} else if (k === "profile_image_change" && req.body.profile_image_change) {
+				cloud.v2.api.delete_resources_by_prefix("artists/" + id, (err, result) => {
+					console.log(err || result);
+					var public_id = "artists/"+ id +"/"+ artist.name.replace(/ /g, "-");
+					cloud.v2.uploader.upload(req.body.profile_image_change, { public_id }, (err, result) => {
+						if (err) return res.send(err);
+						artist.profile_image = result.url;
+						artist.save();
 					});
-				} else {
-					artist[k] = req.body[k];
-				}
+				});
+			} else if (req.body[k] && k !== "artist_id") {
+				artist[k] = req.body[k];
 			}
 		}
 
