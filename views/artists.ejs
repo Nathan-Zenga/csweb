@@ -4,7 +4,7 @@
     <div class="artist-bio content-container">
         <div class="content container">
             <div class="img-wrapper col-sm-5<%= (!isEven) ? ' col-sm-push-7' : '' %>">
-                <div class="img" style="<%= artist.profile_image ? 'background-image: url('+ artist.profile_image +')' : '' %>"></div>
+                <div class="img" style="background-image: url(<%= artist.profile_image || '/img/cs-logo.png' %>)"></div>
             </div>
             <div class="text col-sm-7<%= (!isEven) ? ' col-sm-pull-5' : '' %>">
                 <h1><%= artist.name.toUpperCase() %></h1>
