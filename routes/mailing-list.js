@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var nodemailer = require('nodemailer');
 var { MailingList } = require('../models/models');
 
 router.get('/sign-up', (req, res) => {
@@ -17,6 +18,38 @@ router.post('/new', (req, res) => {
 
 	MailingList.findOne({email: req.body.email}, (err, member) => {
 		!member ? newMember.save(err => { res.send("YOU ARE NOW REGISTERED") }) : res.send("ALREADY REGISTERED")
+	})
+});
+
+router.post('/send/email', (req, res) => {
+	MailingList.find((err, members) => {
+		var transporter = nodemailer.createTransport({
+			service: 'gmail',
+			port: 465,
+			secure: true,
+			auth: {
+				user: NODEMAILER_AUTH_USER,
+				pass: NODEMAILER_AUTH_PASS
+			},
+			tls: {
+				rejectUnauthorized: true
+			}
+		});
+
+		var emails = members.map(member => member.email);
+
+		var mailOptions = {
+			from: { name: req.body.name, address: req.body.email },
+			to: emails,
+			subject: req.body.subject,
+			html: `From ${req.body.name} (${req.body.email}):\n\n${req.body.message}`
+		};
+
+		transporter.sendMail(mailOptions, err => {
+			if (err) return console.log(err), res.send("COULD NOT SEND MESSAGE");
+			transporter.close();
+			res.send('MESSAGE SENT');
+		});
 	})
 });
 
