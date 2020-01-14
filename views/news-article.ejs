@@ -30,7 +30,7 @@
                         } else if (audio) {
                             media = '<div class="textbody-media audio"><audio src="'+ media +'" controls><source src="'+ media +'"></audio></div>';
                         } else if (iframeElm) {
-                            media = '<div class="textbody-media iframe">'+ media +'</audio></div>';
+                            media = '<div class="textbody-media iframe">'+ media +'</div>';
                         }
                         textbody = textbody.replace(/<p>x<\/p>/i, "<p>"+ media +"</p>");
                     });
@@ -49,7 +49,8 @@
                 var direction = left ? "-=" : "+=";
                 $img = left ? $img.prev() : $img.next();
                 $img = left && !$img.length ? $(".img-reel img:first") : right && !$img.length ? $(".img-reel img:last") : $img;
-                $(".img-reel").stop().animate({ scrollLeft: direction + (Math.abs($img.offset().left - $(".img-reel").offset().left)) });
+                var centeredPos = ($(".img-reel").width() - $img.width()) / 2;
+                $(".img-reel").stop().animate({ scrollLeft: direction + (Math.abs($img.offset().left - $(".img-reel").offset().left - centeredPos)) });
             });
         }
     </script>
