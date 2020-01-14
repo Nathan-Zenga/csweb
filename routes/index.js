@@ -11,14 +11,10 @@ router.get('/map', (req, res) => {
 });
 
 router.get('/admin', (req, res) => {
-	db = {};
 	Article.find().sort({ created_at: -1 }).exec((err, articles) => {
-		db.articles = articles;
 		Artist.find((err, artists) => {
-			db.artists = artists;
 			Project.find().sort({ year: -1 }).exec((err, projects) => {
-				db.projects = projects;
-				res.render('admin', { title: "Admin", pagename: "admin", db })
+				res.render('admin', { title: "Admin", pagename: "admin", db: {articles, artists, projects} })
 			})
 		})
 	})
