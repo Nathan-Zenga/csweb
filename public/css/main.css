@@ -104,11 +104,11 @@ input, textarea, select {
 	margin-bottom: 2em;
 }
 
-input[type="text"], input[type="number"], input[type="url"] {
+input[type="text"], input[type="number"], input[type="url"], input[type="email"] {
 	border-bottom: 1px solid black;
 }
 
-input[type="text"], input[type="number"], input[type="url"], textarea, select {
+input[type="text"], input[type="number"], input[type="url"], input[type="email"], textarea, select {
 	padding: 10px;
 }
 
@@ -499,4 +499,12 @@ article.full .textbody-media iframe:not([src*=youtu]) {
 	height: 100px;
 	margin: 0 10px 0 5px;
 	box-shadow: 5px 5px 5px rgb(0, 0, 0, 0.5);
+}
+
+#sign-up form {
+	color: black;
+}
+
+#sign-up label {
+	color: white;
 }

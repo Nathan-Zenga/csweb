@@ -24,3 +24,11 @@ module.exports.Artist = mongoose.model('Artist', Schema({
 	socials: Schema.Types.Mixed,
 	profile_image: String
 }));
+
+module.exports.MailingList = mongoose.model('MailingList', Schema({
+	fistname: String,
+	lastname: String,
+	email: String,
+	size_top: String,
+	size_bottom: String
+}));

@@ -1,0 +1,61 @@
+<%_ include partials/header _%>
+    <div class="container">
+        <form method="POST" action="/mailing-list/new" id="sign-up-form">
+            <div class="input-group" style="display: block">
+                <div class="col-sm-6">
+                    <label>FIRST NAME</label>
+                    <input type="text" name="firstname" id="firstname" required>
+                </div>
+                <div class="col-sm-6">
+                    <label>LAST NAME</label>
+                    <input type="text" name="lastname" id="lastname" required>
+                </div>
+            </div>
+            <label>EMAIL</label>
+            <input type="email" name="email" id="email" required>
+            <div class="input-group" style="display: block">
+                <%_ var sizes = ["XS", "S", "M", "L", "XL"]; _%>
+                <div class="col-sm-6">
+                    <label>SIZE (TOP)</label>
+                    <select name="size_top" id="size_top" required>
+                        <option value="">Select size</option>
+                        <%_ sizes.forEach(size => { _%>
+                        <option value="<%= size %>"><%= size %></option>
+                        <%_ }) _%>
+                    </select>
+                </div>
+                <div class="col-sm-6">
+                    <label>SIZE (BOTTOMS)</label>
+                    <select name="size_bottom" id="size_bottom" required>
+                        <option value="">Select size</option>
+                        <%_ sizes.forEach(size => { _%>
+                        <option value="<%= size %>"><%= size %></option>
+                        <%_ }) _%>
+                    </select>
+                </div>
+            </div>
+            <input type="submit" value="SIGN UP">
+        </form>
+    </div>
+    <script>
+        var showMessage = function(result, container, error) {
+            var $msg = $('<div class="msg" style><div class="text">'+ result.replace(/\n/g, "<br>") +'</div></div>');
+            $msg.css("display", "none").appendTo(container).fadeIn().delay(2000).fadeOut(function(){
+                $(this).remove();
+                if (!error) location.reload();
+            });
+        };
+        $("form").submit(function() {
+            e.preventDefault();
+            var data = {};
+            $(this).serializeArray().forEach(function(field) {
+                var name = field.name;
+                data[name] = field.value;
+            });
+            $.post(this.action, data, function(result) {
+                e.target.reset();
+                showMessage(result, e.target);
+            });
+        })
+    </script>
+<%_ include partials/footer _%>
