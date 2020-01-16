@@ -247,12 +247,12 @@ article .article-content > * {
 }
 
 article:not(.full) .article-content .text {
-	max-height: 600px;
+	height: 600px;
 }
 
 article:not(.full) .article-content img + .text,
 article:not(.full) .article-content .img + .text {
-	max-height: 250px;
+	height: 250px;
 }
 
 article .article-content img,
