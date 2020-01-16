@@ -74,6 +74,7 @@ router.post('/article/edit', (req, res) => {
 
 		article.headline = req.body.headline_edit || article.headline;
 		article.textbody = req.body.textbody_edit || article.textbody;
+		article.headline_image_thumb = req.body.headline_image_thumb_change || article.headline_image_thumb;
 
 		for (k in req.body) {
 			if (req.body[k] && k !== "article_id") {
