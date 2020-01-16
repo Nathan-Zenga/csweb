@@ -76,24 +76,25 @@
         });
         var textbody_media = [];
         var spots = [];
-        $("#textbody").change(function() {
+        $("#textbody, #textbody_edit").change(function() {
             var textbody = this;
+            var tbm_container = $(this).closest("form").find(".textbody_media");
             textbody_media = [];
             spots = textbody.value.split("\n").filter(function(x) { return x.trim().toLowerCase() === "x" });
-            $("#textbody_media input").off("change");
-            if ($("#textbody_media").html()) $("#textbody_media").empty();
+            $(tbm_container).find("input").off("change");
+            if ($(tbm_container).html()) $(tbm_container).empty();
             if (spots.length) {
                 spots.forEach(function(spot, i) {
                     var $fileInput = $("<input>").attr({ type: "file", required: true });
                     var $textInput = $("<input>").attr({ type: "text", placeholder: "...or enter image URL or embed code"});
                     var $set = $fileInput.add($textInput);
-                    $("#textbody_media").append($set);
+                    $(tbm_container).append($set);
                 });
 
-                $("#textbody_media input:text").change(function() {
+                $(tbm_container).find("input:text").change(function() {
                     var $fileInput = $(this).prev("input:file");
-                    var pos = $("#textbody_media input:text").index(this);
-                    var length = $("#textbody_media input:text").length;
+                    var pos = $(tbm_container).find("input:text").index(this);
+                    var length = $(tbm_container).find("input:text").length;
                     var $submitInput = $(this).closest("form").children("input:submit");
                     $fileInput.val("").attr("required", !this.value);
                     if (textbody_media.length <= 1) {
@@ -113,7 +114,7 @@
                     }
                     $submitInput.attr("disabled", false);
                 });
-                $("#textbody_media input:file").change(function() {
+                $(tbm_container).find("input:file").change(function() {
                     var files = this.files;
                     var $textInput = $(this).next("input:text");
                     $textInput.val("").attr("required", !this.value);
