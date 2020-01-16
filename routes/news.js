@@ -31,7 +31,8 @@ router.post('/article/new', (req, res) => {
 				req.body[field] = typeof req.body[field] === "string" ? [req.body[field]] : req.body[field];
 				req.body[field].forEach((imageStr, i) => {
 					var f = field.replace("[]", "");
-					if (!/youtu.?be(.*?)(embed)?|<iframe(.*?)<\/iframe>/.test(imageStr)) {
+					var notIframe = "(?=.*(^((?!<\/?iframe>?).)*$))(?=.*(^((?!embed).)*$)).*";
+					if (RegExp(notIframe, "i").test(imageStr)) {
 						var public_id = "article/"+ doc.id +"/"+ f + (i+1);
 						cloud.v2.uploader.upload(imageStr, { public_id, resource_type: "auto" }, (err, result) => {
 							if (err) console.log(err);
@@ -40,9 +41,10 @@ router.post('/article/new', (req, res) => {
 							doc.save();
 						});
 					} else {
-						var yt_regExp = /^.*(youtu.?be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)/i;
-						var yt_iframe = '<iframe width="560" height="315" src="' + imageStr.replace(yt_regExp, "https://youtube.com/embed/") + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
-						doc[f].push( yt_regExp.test(imageStr) ? yt_iframe : imageStr );
+						var ytUrl = RegExp("(?=.*youtu.?be)" + notIframe, "i");
+						var toReplace = /^.*(youtu.?be\/|v\/|u\/\w\/|watch\?v=|\&v=|\?v=)/i;
+						var ytIframe = '<iframe width="560" height="315" src="' + imageStr.replace(toReplace, "https://youtube.com/embed/") + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+						doc[f].push( ytUrl.test(imageStr) ? ytIframe : imageStr );
 						doc.save();
 					}
 				})
@@ -85,7 +87,7 @@ router.post('/article/edit', (req, res) => {
 								req.body[field] = typeof req.body[field] === "string" ? [req.body[field]] : req.body[field];
 								req.body[field].forEach((imageStr, i) => {
 									var f = field.replace("[]", "");
-									if (!/<iframe(.*?)<\/iframe>/.test(imageStr)) {
+									if (!/<iframe(.*?)><\/iframe>/.test(imageStr)) {
 										var public_id = "article/"+ id +"/"+ f + (i+1);
 										cloud.v2.uploader.upload(imageStr, { public_id }, (err, result) => {
 											if (err) return res.send(err);
