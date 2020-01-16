@@ -20,4 +20,14 @@ router.get('/admin', (req, res) => {
 	})
 });
 
+router.post('/search', (req, res) => {
+	Article.find().sort({ created_at: -1 }).exec((err, articles) => {
+		Artist.find((err, artists) => {
+			Project.find().sort({ year: -1 }).exec((err, projects) => {
+				res.send([...articles, ...artists, ...projects]);
+			})
+		})
+	})
+});
+
 module.exports = router;

@@ -305,5 +305,37 @@
             var em = this.firstChild.tagName.toLowerCase();
             if (selection.length) $textarea.val( before + "<"+em+">" + selection +"</"+em+">" + after );
         });
+
+        $.post("/search", function(docs) {
+            $("#edit-remove form select[id*='_id']").change(function() {
+                var $form = $(this).closest("form");
+                var id = this.value;
+                var result = docs.filter(function(item) { return id == item._id })[0] || {};
+                var socials_keys;
+                try {
+                    socials_keys = Object.keys(result.socials);
+                } catch (e) {
+                    socials_keys = [];
+                }
+
+                $form.find("#artist_name_edit").val(result.name);
+                $form.find("#artist_bio_edit").val(result.bio);
+                socials_keys.forEach(function(k) {
+                    $form.find("#social_"+ k +"_edit").val(result.socials[k]);
+                });
+
+                $form.find("#headline_edit").val(result.headline);
+                $form.find("#textbody_edit").val(result.textbody).change().parent("form").find(".textbody_media input:text").each(function(i) {
+                    this.value = result.textbody_media[i];
+                });
+
+                $form.find("#artwork_url_edit").val(result.artwork);
+                $form.find("#title_edit").val(result.title);
+                $form.find("#artist_edit").val(result.artist);
+                $form.find("#year_edit").val(result.year);
+                $form.find("#links_edit").val(result.links ? result.links.join("\n") : "");
+                $form.find("#all_platforms_change").attr("checked", result.all_platforms);
+            });
+        });
     </script>
 <%_ include partials/footer _%>
