@@ -8,10 +8,14 @@
                 <%_ } _%>
                 <div class="text">
                     <h1><a href="/news/article/<%= article._id %>"><%- article.headline %></a></h1>
-                    <%_
-                        var textbody = "<p>" + article.textbody.replace(/\r?\n/g, "</p>\n<p>").replace(/<p><\/p>/g, "<br>").replace(/<p>x<\/p>/gi, "") + "</p>";
-                    _%>
-                    <%- textbody %>
+                    <%-
+                        "<p>" +
+                        article.textbody.split(/\r?\n/gi)
+                        .map(x => x.toLowerCase() === "x" ? "<p></p>" : "<p>"+ x +"</p>")
+                        .map(x => x === "<p></p>" ? "<br>" : x)
+                        .join("\n") +
+                        "</p>"
+                    %>
                 </div>
                 <div class="overflow-fade-sheet"><a href="/news/article/<%= article._id %>">READ MORE</a></div>
             </div>
