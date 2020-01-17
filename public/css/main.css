@@ -322,6 +322,7 @@ article.full .textbody-media > * {
 	display: block;
 	height: 100%;
 	margin: 0 auto;
+	background-color: rgb(180, 180, 180);
 }
 
 article.full .textbody-media iframe:not([src*=youtu]) {
@@ -361,7 +362,7 @@ article.full .textbody-media iframe:not([src*=youtu]) {
 
 .artist-bio .img {
 	height: 400px;
-	background-color: rgba(180, 180, 180);
+	background-color: rgb(180, 180, 180);
 	background-size: cover;
 	background-position: center;
 	padding: 0;
