@@ -43,8 +43,9 @@ router.post('/article/new', (req, res) => {
 					} else {
 						var ytUrl = RegExp("(?=.*youtu.?be)" + notIframe, "i");
 						var toReplace = /^.*(youtu.?be\/|v\/|u\/\w\/|watch\?v=|\&v=|\?v=)/i;
-						var ytIframe = '<iframe width="560" height="315" src="' + imageStr.replace(toReplace, "https://youtube.com/embed/") + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
-						doc[f].push( ytUrl.test(imageStr) ? ytIframe : imageStr );
+						var ytIframe = '<iframe src="' + imageStr.replace(toReplace, "https://youtube.com/embed/") + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+						imageStr = ytUrl.test(imageStr) ? ytIframe : imageStr;
+						doc[f].push( imageStr.replace(/(width|height|style)\=\"?\'?(.*?)\"?\'? /gi, "") );
 						doc.save();
 					}
 				})
@@ -88,16 +89,21 @@ router.post('/article/edit', (req, res) => {
 								req.body[field] = typeof req.body[field] === "string" ? [req.body[field]] : req.body[field];
 								req.body[field].forEach((imageStr, i) => {
 									var f = field.replace("[]", "");
-									if (!/<iframe(.*?)><\/iframe>/.test(imageStr)) {
+									var notIframe = "(?=.*(^((?!<\/?iframe>?).)*$))(?=.*(^((?!embed).)*$)).*";
+									if (RegExp(notIframe, "i").test(imageStr)) {
 										var public_id = "article/"+ id +"/"+ f + (i+1);
-										cloud.v2.uploader.upload(imageStr, { public_id }, (err, result) => {
+										cloud.v2.uploader.upload(imageStr, { public_id, resource_type: "auto" }, (err, result) => {
 											if (err) return res.send(err);
 											if (article.headline_image_thumb === imageStr) article.headline_image_thumb = result.url;
 											article[f].push(result.url);
 											article.save();
 										});
 									} else {
-										article[f].push(imageStr);
+										var ytUrl = RegExp("(?=.*youtu.?be)" + notIframe, "i");
+										var toReplace = /^.*(youtu.?be\/|v\/|u\/\w\/|watch\?v=|\&v=|\?v=)/i;
+										var ytIframe = '<iframe src="' + imageStr.replace(toReplace, "https://youtube.com/embed/") + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+										imageStr = ytUrl.test(imageStr) ? ytIframe : imageStr;
+										article[f].push( imageStr.replace(/(width|height|style)\=\"?\'?(.*?)\"?\'? /gi, "") );
 										article.save();
 									}
 								})

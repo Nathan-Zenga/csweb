@@ -320,6 +320,7 @@ article.full .textbody-media {
 
 article.full .textbody-media > * {
 	display: block;
+	width: 600px;
 	height: 100%;
 	margin: 0 auto;
 	background-color: rgb(180, 180, 180);
