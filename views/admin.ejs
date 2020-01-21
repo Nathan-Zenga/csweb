@@ -242,6 +242,7 @@
 
                 $form.find("#artist_name_edit").val(result.name);
                 $form.find("#artist_bio_edit").val(result.bio);
+                $form.find("*[id*=social_]").val("");
                 socials_keys.forEach(function(k) {
                     $form.find("#social_"+ k +"_edit").val(result.socials[k]);
                 });
@@ -259,7 +260,7 @@
                         $thumb_choice.append($input.add($img));
                     })
                 }
-                $form.find("#textbody_edit").val(result.textbody).change().parent("form").find(".textbody_media input:text").each(function(i) {
+                $form.find("#textbody_edit").val(result.textbody).change().end().find(".textbody_media input:text").each(function(i) {
                     this.value = result.textbody_media[i];
                 });
 
