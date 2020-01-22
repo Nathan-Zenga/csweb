@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title></title>
+	<title><%= title ? title + " | " : "" %>CREATIVESOULS</title>
 	<meta name="keywords" content="">
 	<meta name="description" content="">
 	<meta name="robots" content="index, follow">
@@ -16,7 +16,7 @@
 	<script src="/js/main.js"></script>
 </head>
 
-<body id="<%= pagename %>">
+<body id="<%= pagename ? pagename+'-page' : '' %>">
 	<header>
 		<div class="container">
 			<div class="logo-container col-sm-2">
