@@ -25,12 +25,11 @@
         </div>
     </div>
     <script>
-        var readAsDataURL = function(files, reader, submitInput) {
+        var readDataURLs = function(files, cb) {
             $.each(files, function(i, file) {
-                setTimeout(function() {
-                    if (submitInput) submitInput.attr("disabled", true);
-                    reader.readAsDataURL(file)
-                }, i * 200);
+                var reader = new FileReader();
+                reader.onload = cb;
+                reader.readAsDataURL(file)
             });
         };
         var showMessage = function(result, container, reload) {
@@ -58,20 +57,19 @@
             if (files.length) {
                 var $submitInput = $form.children("input:submit");
                 var counter = 0;
-                var reader = new FileReader();
                 var label = "<label>CHOOSE ARTICLE THUMBNAIL</label>";
                 $thumb_choice.show().append(label);
-                reader.onload = function() {
-                    counter += 1;
-                    headline_images.push(reader.result);
+                readDataURLs(files, function(e) {
+                    var url = e.target.result;
                     var edit = /_change|_edit/i.test($form.get(0).id);
                     var name = "headline_image_thumb" + (edit ? "_change" : "");
-                    var $input = $("<input>").attr({ type: "radio", name, value: reader.result, required: true });
-                    var $img = $("<img>").attr({ src: reader.result });
+                    var $input = $("<input>").attr({ type: "radio", name, value: url, required: true });
+                    var $img = $("<img>").attr({ src: url });
+                    headline_images.push(url);
                     $thumb_choice.append($input.add($img));
+                    counter += 1;
                     if (counter === files.length) $submitInput.attr("disabled", false);
-                };
-                readAsDataURL(files, reader, $submitInput);
+                });
             }
         });
 
@@ -86,19 +84,19 @@
             if ($(tbm_container).html()) $(tbm_container).empty();
             if (spots.length) {
                 spots.forEach(function(spot, i) {
-                    var $fileInput = $("<input>").attr({ type: "file", required: true });
-                    var $textInput = $("<input>").attr({ type: "text", placeholder: "...or enter image URL or embed code"});
+                    var $fileInput = $("<input>").attr({ type: "file"});
+                    var $textInput = $("<input>").attr({ type: "text", required: true, placeholder: "...or enter image URL or embed code"});
                     var $set = $fileInput.add($textInput);
                     $(tbm_container).append($set);
                 });
 
                 $(tbm_container).find("input:text").change(function() {
-                    var $fileInput = $(this).prev("input:file");
                     var pos = $(tbm_container).find("input:text").index(this);
                     var length = $(tbm_container).find("input:text").length;
                     var $submitInput = $(this).closest("form").children("input:submit");
-                    $fileInput.val("").attr("required", !this.value);
-                    if (textbody_media.length <= 1) {
+                    if (!this.value) {
+                        textbody_media.splice(pos, 1);
+                    } else if (textbody_media.length <= 1) {
                         if (pos == 0) {
                             textbody_media.unshift(this.value);
                         } else {
@@ -111,25 +109,24 @@
                         textbody_media.pop();
                         textbody_media.push(this.value);
                     } else {
-                        textbody_media.splice(post, 1, this.value);
+                        textbody_media.splice(pos, 1, this.value);
                     }
                     $submitInput.attr("disabled", false);
                 });
+
                 $(tbm_container).find("input:file").change(function() {
                     var files = this.files;
                     var $textInput = $(this).next("input:text");
-                    $textInput.val("").attr("required", !this.value);
+                    $textInput.val("");
                     if (files && files.length) {
                         var $submitInput = $(this).closest("form").children("input:submit");
                         var counter = 0;
-                        var reader = new FileReader();
-                        $textInput.attr("disabled", true);
-                        reader.onload = function() {
+                        $textInput.val("LOADING...").attr("disabled", true);
+                        readDataURLs(files, function(e) {
                             counter += 1;
-                            $textInput.attr("disabled", false).val(reader.result).change();
+                            $textInput.attr("disabled", false).val(e.target.result).change();
                             if (counter === files.length) $submitInput.attr("disabled", false);
-                        };
-                        readAsDataURL(files, reader, $submitInput);
+                        });
                     }
                 })
             }
@@ -140,6 +137,7 @@
         });
         $("#articles form").submit(function(e) {
             e.preventDefault();
+            console.log(textbody_media);
             if (invalidURLs(textbody_media).length) { showMessage("Invalid URL", this); return false }
 
             var data = { headline_images, textbody_media };
@@ -166,15 +164,13 @@
             var files = this.files;
             artwork_file = "";
             if (files.length) {
-                var submitInput = $(this).closest("form").children("input:submit");
+                var $submitInput = $(this).closest("form").children("input:submit");
                 var counter = 0;
-                var reader = new FileReader();
-                reader.onload = function() {
+                readDataURLs(files, function(e) {
                     counter += 1;
-                    artwork_file = reader.result;
-                    if (counter === files.length) submitInput.attr("disabled", false);
-                };
-                readAsDataURL(files, reader, submitInput);
+                    artwork_file = e.target.result;
+                    if (counter === files.length) $submitInput.attr("disabled", false);
+                });
             }
         });
         $("#discography form").submit(function(e) {
@@ -200,15 +196,13 @@
             var files = this.files;
             profile_image = "";
             if (files.length) {
-                var submitInput = $(this).closest("form").children("input:submit");
+                var $submitInput = $(this).closest("form").children("input:submit");
                 var counter = 0;
-                var reader = new FileReader();
-                reader.onload = function() {
+                readDataURLs(files, function(e) {
                     counter += 1;
-                    profile_image = reader.result;
-                    if (counter === files.length) submitInput.attr("disabled", false);
-                };
-                readAsDataURL(files, reader, submitInput);
+                    profile_image = e.target.result;
+                    if (counter === files.length) $submitInput.attr("disabled", false);
+                });
             }
         });
         $("#artists form").submit(function(e) {
@@ -291,6 +285,7 @@
 
         $("#edit-article form").submit(function(e) {
             e.preventDefault();
+            console.log(textbody_media);
             if (invalidURLs(textbody_media).length) { showMessage("Invalid URL", this); return false }
 
             var headline_images_change = headline_images;
