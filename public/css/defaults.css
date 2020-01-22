@@ -42,28 +42,27 @@ a:hover {
 	background-color: transparent;
 }
 
-.dt-view,
-.dt-view-md {
-	display: none;
-}
-
 @media (min-width: 768px) {
 	.mb-view {
 		display: none!important;
 	}
+}
 
+@media (max-width: 767px) {
 	.dt-view {
-		display: initial;
+		display: none!important;
 	}
 }
 
 @media (min-width: 992px) {
 	.mb-view-md {
-		display: none;
+		display: none!important;
 	}
+}
 
+@media (max-width: 991px) {
 	.dt-view-md {
-		display: initial;
+		display: none!important;
 	}
 }
 
