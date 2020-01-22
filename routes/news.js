@@ -45,7 +45,8 @@ router.get('/', (req, res) => {
 router.get('/article/:id', (req, res, next) => {
     Article.findById(req.params.id, (err, article) => {
         if (!article) return next();
-        res.render('news-article', { title: article.headline + " | News", pagename: "news", article })
+        var headline = article.headline.length > 25 ? article.headline.slice(0, 25).trim() + "..." : article.headline;
+        res.render('news-article', { title: headline + " | News", pagename: "news", article })
     })
 });
 
