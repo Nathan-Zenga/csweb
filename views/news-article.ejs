@@ -10,7 +10,7 @@
             </div>
             <%_ }
             if (article.headline_images.length) { _%>
-            <div class="img-reel-nav">
+            <div class="img-reel-nav" style="display: none">
                 <a class="left fas fa-chevron-left"></a>
                 <a class="right fas fa-chevron-right"></a>
             </div>
@@ -55,5 +55,11 @@
                 $(".img-reel").stop().animate({ scrollLeft: direction + (Math.abs($img.offset().left - $(".img-reel").offset().left - centeredPos)) });
             });
         }
+        $(window).on("load resize", function() {
+            var lastImgOffsetRight = $(".img-reel img:last").offset().left + $(".img-reel img:last").width();
+            var imgReelOffsetRight = $(".img-reel").offset().left + $(".img-reel").width();
+            var overflowing = lastImgOffsetRight > imgReelOffsetRight;
+            $(".img-reel-nav")[overflowing ? "slideDown" : "slideUp"]();
+        });
     </script>
 <%_ include partials/footer _%>
