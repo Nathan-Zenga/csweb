@@ -5,35 +5,34 @@ var { Article } = require('../models/models');
 var saveMedia = (body, doc, cb) => {
     var msg = "";
     var fields = ["headline_images", "textbody_media", "headline_images[]", "textbody_media[]",
-                  "headline_images_change", "textbody_media_change", "headline_images_change[]", "textbody_media_change[]"];
-    fields.forEach((field, i) => {
-        if (body[field]) {
-            doc[field] = [];
-            body[field] = typeof body[field] === "string" ? [body[field]] : body[field];
-            body[field].forEach((imageStr, i) => {
-                var f = field.replace(/_change|\[\]/g, "");
-                var notIframe = "(?=.*(^((?!<\/?iframe>?).)*$))(?=.*(^((?!embed).)*$)).*";
-                if (RegExp(notIframe, "i").test(imageStr)) {
-                    var public_id = "article/"+ doc.id +"/"+ f + (i+1);
-                    cloud.v2.uploader.upload(imageStr, { public_id, resource_type: "auto" }, (err, result) => {
-                        if (err) console.log(err);
-                        if (body.headline_image_thumb === imageStr) doc.headline_image_thumb = result.url;
-                        doc[f].push(result.url);
-                        doc.save();
-                    });
-                } else {
-                    var ytUrl = RegExp("(?=.*youtu.?be)" + notIframe, "i");
-                    var toReplace = /^.*(youtu.?be\/|v\/|u\/\w\/|watch\?v=|\&v=|\?v=)/i;
-                    var ytIframe = '<iframe src="' + imageStr.replace(toReplace, "https://youtube.com/embed/") + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
-                    imageStr = ytUrl.test(imageStr) ? ytIframe : imageStr;
-                    doc[f].push( imageStr.replace(/(width|height|style)\=\"?\'?(.*?)\"?\'? /gi, "") );
+                  "headline_images_change", "textbody_media_change", "headline_images_change[]", "textbody_media_change[]"]
+                  .filter(f => body[f]);
+    fields.forEach(field => {
+        var f = field.replace(/_change|\[\]/g, "");
+        doc[f] = [];
+        body[field] = typeof body[field] === "string" ? [body[field]] : body[field];
+        body[field].forEach((mediaStr, i) => {
+            var notIframe = !["<iframe", "embed"].filter(x => mediaStr.includes(x)).length;
+            if (notIframe) {
+                var public_id = "article/"+ doc.id +"/"+ f + (i+1);
+                cloud.v2.uploader.upload(mediaStr, { public_id, resource_type: "auto" }, (err, result) => {
+                    if (err) console.log(err);
+                    if (body.headline_image_thumb === mediaStr) doc.headline_image_thumb = result.secure_url;
+                    doc[f].push(result.secure_url);
                     doc.save();
-                }
-            })
-            msg = "saving images";
-        }
-        if (cb && i === fields.length) cb(msg);
+                });
+            } else {
+                var ytUrl = ["youtu"].filter(x => mediaStr.includes(x)).length && notIframe;
+                var toReplace = /^.*(youtu.?be\/|v\/|u\/\w\/|watch\?v=|\&v=|\?v=)/i;
+                var ytIframe = '<iframe src="' + mediaStr.replace(toReplace, "https://youtube.com/embed/") + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+                mediaStr = ytUrl ? ytIframe : mediaStr;
+                doc[f].push( mediaStr.replace(/(width|height|style)\=\"?\'?(.*?)\"?\'? /gi, "") );
+                doc.save();
+            }
+        });
+        msg = " - saving images / videos";
     });
+    if (cb) cb(msg);
 };
 
 router.get('/', (req, res) => {
@@ -51,16 +50,9 @@ router.get('/article/:id', (req, res, next) => {
 });
 
 router.post('/article/new', (req, res) => {
-    var article = new Article({
-        headline: req.body.headline,
-        textbody: req.body.textbody
-    });
-
-    article.save((err, doc) => {
-        var message_update = "";
-        saveMedia(req.body, doc, msg => { message_update = msg || "" });
-        res.send("DONE" + message_update);
-    });
+    var { headline, textbody } = req.body;
+    var article = new Article({ headline, textbody });
+    article.save((err, doc) => { saveMedia(req.body, doc, msg => res.send("DONE" + msg)) });
 });
 
 router.post('/article/delete', (req, res) => {
@@ -69,7 +61,7 @@ router.post('/article/delete', (req, res) => {
         Article.deleteMany({_id : { $in: ids }}, (err, result) => {
             if (err || !result.deletedCount) return res.send(err || "Article(s) not found");
             ids.forEach(id => {
-                cloud.v2.api.delete_resources_by_prefix("article/" + id, (err, result) => { console.log(result, "\n\nError: " + err) });
+                cloud.v2.api.delete_resources_by_prefix("article/" + id, (err, result) => { console.log(err || result) });
             })
             res.send("ARTICLE"+ (ids.length > 1 ? "S" : "") +" DELETED SUCCESSFULLY")
         })
