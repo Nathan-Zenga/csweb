@@ -235,6 +235,10 @@ footer {
 	font-size: 1.5em;
 }
 
+footer > a:not(:first-child) {
+	margin-left: 15px;
+}
+
 article.content-container {
 	background-color: transparent;
 	padding: 10px 10px 20px;
