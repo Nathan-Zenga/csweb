@@ -26,7 +26,7 @@ router.post('/project/new', (req, res) => {
 			var public_id = "discography/"+ doc.id +"/"+ doc.title.replace(/ /g, "-");
 			cloud.v2.uploader.upload(req.body.artwork_file, { public_id }, (err, result) => {
 				if (err) return res.send(err);
-				doc.artwork = result.url;
+				doc.artwork = result.secure_url;
 				doc.save();
 			});
 		}
@@ -66,7 +66,7 @@ router.post('/project/edit', (req, res) => {
 					var public_id = "discography/"+ doc.id +"/"+ doc.title.replace(/ /g, "-");
 					cloud.v2.uploader.upload(req.body.artwork_file_change, { public_id }, (err, result) => {
 						if (err) return res.send(err);
-						doc.artwork = result.url;
+						doc.artwork = result.secure_url;
 						doc.save();
 					});
 				});

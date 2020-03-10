@@ -10,10 +10,8 @@ router.get('/', (req, res) => {
 });
 
 router.post('/new', (req, res) => {
-	var artist = new Artist({
-		name: req.body.name,
-		bio: req.body.bio
-	});
+	var { name, bio } = req.body;
+	var artist = new Artist({ name, bio });
 
 	for (k in req.body) if (k.includes("socials")) {
 		if (!artist.socials) artist.socials = {};
@@ -28,7 +26,7 @@ router.post('/new', (req, res) => {
 			var public_id = "artists/"+ doc.id +"/"+ doc.name.replace(/ /g, "-");
 			cloud.v2.uploader.upload(req.body.profile_image, { public_id }, (err, result) => {
 				if (err) return res.send(err);
-				doc.profile_image = result.url;
+				doc.profile_image = result.secure_url;
 				doc.save();
 			});
 		}
@@ -53,7 +51,7 @@ router.post('/edit', (req, res) => {
 					var public_id = "artists/"+ id +"/"+ artist.name.replace(/ /g, "-");
 					cloud.v2.uploader.upload(req.body.profile_image_change, { public_id }, (err, result) => {
 						if (err) return res.send(err);
-						artist.profile_image = result.url;
+						artist.profile_image = result.secure_url;
 						artist.save();
 					});
 				});
