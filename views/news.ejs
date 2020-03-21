@@ -1,7 +1,7 @@
 <%_ include partials/header _%>
     <div class="container">
         <%_ articles.forEach(article => { _%>
-        <article class="content-container col-sm-4">
+        <article class="content-container col-md-4 col-sm-6">
             <div class="article-content">
                 <%_ if (article.headline_image_thumb) { _%>
                 <a class="img" href="/news/article/<%= article._id %>" style="background-image: url('<%= article.headline_image_thumb %>')"></a>
