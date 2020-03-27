@@ -4,6 +4,7 @@
             <li class="active"><a data-toggle="pill" href="#articles">ARTICLES</a></li>
             <li><a data-toggle="pill" href="#discography">DISCOGRAPHY</a></li>
             <li><a data-toggle="pill" href="#artists">ARTISTS</a></li>
+            <li><a data-toggle="pill" href="#locations">LOCATIONS</a></li>
             <li><a data-toggle="pill" href="#edit-remove">EDIT / REMOVE</a></li>
         </ul>
         <div class="tab-content container">
@@ -17,6 +18,10 @@
 
             <div id="artists" class="tab-pane fade">
             <%_ include partials/admin/artists _%>
+            </div>
+
+            <div id="locations" class="tab-pane fade">
+            <%_ include partials/admin/locations _%>
             </div>
 
             <div id="edit-remove" class="tab-pane fade">
@@ -264,6 +269,12 @@
                 $form.find("#year_edit").val(result.year);
                 $form.find("#links_edit").val(result.links ? result.links.join("\n") : "");
                 $form.find("#all_platforms_change").attr("checked", result.all_platforms);
+
+                $form.find("#location_name_edit").val(result.name);
+                $form.find("#street_address_edit").val(result.street_address);
+                $form.find("#city_edit").val(result.city);
+                $form.find("#country_edit").val(result.country);
+                $form.find("#postcode_edit").val(result.postcode);
             });
         });
         $("#edit-artist form").submit(function(e) {
@@ -314,7 +325,7 @@
             if (artwork_file) data.artwork_file_change = artwork_file;
         });
 
-        $("#remove form").submit(function(e) {
+        $(".tab-pane[id*=remove-] form").submit(function(e) {
             e.preventDefault();
             var data = {};
             $(this).serializeArray().forEach(function(field) {
@@ -339,5 +350,20 @@
             var em = this.firstChild.tagName.toLowerCase();
             if (selection.length) $textarea.val( before + "<"+em+">" + selection +"</"+em+">" + after );
         });
+
+        $("#locations form").submit(function(e) {
+            e.preventDefault();
+
+            var data = {};
+            $(this).serializeArray().forEach(function(field) {
+                var name = field.name;
+                data[name] = field.value;
+            });
+
+            $.post(this.action, data, function(result) {
+                e.target.reset();
+                showMessage(result, e.target);
+            });
+        })
     </script>
 <%_ include partials/footer _%>

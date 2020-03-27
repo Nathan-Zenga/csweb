@@ -32,3 +32,13 @@ module.exports.MailingList = mongoose.model('MailingList', Schema({
 	size_top: String,
 	size_bottom: String
 }));
+
+module.exports.Location = mongoose.model('Location', Schema({
+	name: String,
+	street_address: String,
+	city: String,
+	country: String,
+	postcode: String,
+	latitude: Number,
+	longitude: Number
+}));

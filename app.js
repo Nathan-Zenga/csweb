@@ -42,6 +42,7 @@ app.use('/news', require('./routes/news'));
 app.use('/artists', require('./routes/artists'));
 app.use('/discography', require('./routes/discography'));
 app.use('/mailing-list', require('./routes/mailing-list'));
+app.use('/map', require('./routes/map'));
 
 app.get("*", (req, res) => {
 	res.status(404).render('error', { title: "Error 404", pagename: "error" });
