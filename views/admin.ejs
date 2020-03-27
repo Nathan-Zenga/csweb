@@ -323,6 +323,25 @@
             var url_format = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/gim;
             if (data.links_edit) data.links_edit = data.links_edit.match(url_format);
             if (artwork_file) data.artwork_file_change = artwork_file;
+
+            $.post(this.action, data, function(result) {
+                e.target.reset();
+                showMessage(result, e.target, true);
+            });
+        });
+
+        $("#edit-location form").submit(function(e) {
+            e.preventDefault();
+            var data = {};
+            $(this).serializeArray().forEach(function(field) {
+                var name = field.name;
+                data[name] = field.value;
+            });
+
+            $.post(this.action, data, function(result) {
+                e.target.reset();
+                showMessage(result, e.target, true);
+            });
         });
 
         $(".tab-pane[id*=remove-] form").submit(function(e) {

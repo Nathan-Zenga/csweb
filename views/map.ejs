@@ -4,16 +4,23 @@
 	</div>
 	<script>
 		function initMap() {
-			var position = {lat: -34.397, lng: 150.644};
-			var map = new google.maps.Map(document.getElementById("map"), { center: position, zoom: 15 });
-			var marker = new google.maps.Marker({ position, map, icon: "/img/cs-marker.png" });
-			var content = '<div id="content"><div id="siteNotice"></div>'+
-				'<h2 id="firstHeading">TITLE</h2>'+
-				'<div id="bodyContent">TEXT</div>'+
-				'</div>';
-			var infowindow = new google.maps.InfoWindow({ content });
+			$.post("/map/init", function(res) {
+				var locations = res.locations, center = res.mid_point;
+				var bounds = new google.maps.LatLngBounds();
+				var map = new google.maps.Map(document.getElementById("map"), { center, zoom: 15 });
 
-			marker.addListener('click', function() { infowindow.open(map, marker) });
+				locations.forEach(function(location, i) {
+					var position = { lat: location.latitude, lng: location.longitude };
+					var marker = new google.maps.Marker({ position, map, icon: "/img/cs-marker.png" });
+					var content = '<div id="content"><div id="siteNotice"></div>'+
+						'<h1 id="firstHeading" style="font-size: 1.5em">'+ location.name +'</h1>'+
+						'<div id="bodyContent">'+ location.street_address +'</div></div>';
+					var infowindow = new google.maps.InfoWindow({ content });
+					marker.addListener('click', function() { infowindow.open(map, marker) });
+					bounds.extend(position);
+					if (i === locations.length-1) map.fitBounds(bounds);
+				});
+			})
 		}
 	</script>
 	<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRIzIyhXXI1JxBGUqmUsX5N4MnxYHHGCo&libraries=visualization&callback=initMap"></script>
