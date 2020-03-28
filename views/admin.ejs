@@ -354,8 +354,10 @@
             });
             $.post(form.action, data, function(result) {
                 showMessage(result, e.target);
-                $(form).find(":input:checked, :input:checked + span").slideUp(function() { $(this).remove() });
-                e.target.reset();
+                $(form).find(":input:checked, :input:checked + span").slideUp(function() {
+                    $(this).remove();
+                    Object.values(data).forEach(function(id) { $("option[value="+ id +"]").remove() });
+                });
             });
         });
 
