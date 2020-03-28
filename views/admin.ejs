@@ -346,14 +346,16 @@
 
         $(".tab-pane[id*=remove-] form").submit(function(e) {
             e.preventDefault();
+            var form = this;
             var data = {};
-            $(this).serializeArray().forEach(function(field) {
+            $(form).serializeArray().forEach(function(field) {
                 var name = field.name;
                 data[name] = field.value;
             });
-            $.post(this.action, data, function(result) {
+            $.post(form.action, data, function(result) {
+                showMessage(result, e.target);
+                $(form).find(":input:checked, :input:checked + span").slideUp(function() { $(this).remove() });
                 e.target.reset();
-                showMessage(result, e.target, true);
             });
         });
 

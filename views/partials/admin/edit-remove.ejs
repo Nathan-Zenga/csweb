@@ -132,7 +132,7 @@
             <form action="artists/delete" method="post">
                 <label>ARTISTS</label>
                 <%_ artists.forEach((artist, i) => { _%>
-                <input type="checkbox" name="artist<%= i %>" value="<%= artist._id %>"> <%= artist.name %><br>
+                <input type="checkbox" name="artist<%= i %>" value="<%= artist._id %>"> <span><%= artist.name %></span><br>
                 <%_ }) _%>
                 <br>
                 <input type="submit" value="DELETE ARTISTS">
@@ -146,7 +146,7 @@
             <form action="discography/project/delete" method="post">
                 <label>PROJECTS</label>
                 <%_ projects.forEach((project, i) => { _%>
-                <input type="checkbox" name="project<%= i %>" value="<%= project._id %>"> <%= project.title %><br>
+                <input type="checkbox" name="project<%= i %>" value="<%= project._id %>"> <span><%= project.title %></span><br>
                 <%_ }) _%>
                 <br>
                 <input type="submit" value="DELETE PROJECTS">
@@ -160,7 +160,7 @@
             <form action="news/article/delete" method="post">
                 <label>ARTICLES</label>
                 <%_ articles.forEach((article, i) => { _%>
-                <input type="checkbox" name="article<%= i %>" value="<%= article._id %>"> <%= article.headline %><br>
+                <input type="checkbox" name="article<%= i %>" value="<%= article._id %>"> <span><%= article.headline %></span><br>
                 <%_ }) _%>
                 <br>
                 <input type="submit" value="DELETE ARTICLES">
@@ -174,7 +174,7 @@
             <form action="map/location/delete" method="post">
                 <label>LOCATION</label>
                 <%_ locations.forEach((location, i) => { _%>
-                <input type="checkbox" name="location<%= i %>" value="<%= location._id %>"> <%= location.name %><br>
+                <input type="checkbox" name="location<%= i %>" value="<%= location._id %>"> <span><%= location.name %></span><br>
                 <%_ }) _%>
                 <br>
                 <input type="submit" value="DELETE LOCATIONS">
