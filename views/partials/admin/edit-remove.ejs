@@ -1,6 +1,19 @@
 <%_ var { artists, projects, articles, locations } = db; _%>
-<div class="col-sm-3">
-    <ul class="nav nav-pills nav-stacked">
+<div class="col-sm-3" id="edit-remove-sidebar">
+    <div class="mb-view" id="edit-remove-dropdown-options" style="font-weight: bold; max-width: 250px; margin: 0 auto">
+        <label>SELECT OPTION</label>
+        <select >
+            <option value="#edit-artist">EDIT ARTIST</option>
+            <option value="#edit-article">EDIT ARTICLE</option>
+            <option value="#edit-project">EDIT PROJECT</option>
+            <option value="#edit-location">EDIT LOCATION</option>
+            <option value="#remove-artist">REMOVE ARTIST</option>
+            <option value="#remove-article">REMOVE ARTICLE</option>
+            <option value="#remove-project">REMOVE PROJECT</option>
+            <option value="#remove-location">REMOVE LOCATION</option>
+        </select>
+    </div>
+    <ul class="nav nav-pills nav-stacked dt-view">
         <li class="active"><a data-toggle="pill" href="#edit-artist">EDIT ARTIST</a></li>
         <li><a data-toggle="pill" href="#edit-article">EDIT ARTICLE</a></li>
         <li><a data-toggle="pill" href="#edit-project">EDIT PROJECT</a></li>

@@ -387,6 +387,8 @@
                 e.target.reset();
                 showMessage(result, e.target);
             });
-        })
+        });
+
+        $("#edit-remove-dropdown-options select").change(function() { $(".nav-pills a[href='"+ this.value +"']").click() });
     </script>
 <%_ include partials/footer _%>
