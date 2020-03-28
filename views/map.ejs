@@ -18,7 +18,7 @@
 					var infowindow = new google.maps.InfoWindow({ content });
 					marker.addListener('click', function() { infowindow.open(map, marker) });
 					bounds.extend(position);
-					if (i === locations.length-1) map.fitBounds(bounds);
+					if (locations.length > 1 && i === locations.length-1) map.fitBounds(bounds);
 				});
 			})
 		}
