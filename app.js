@@ -1,10 +1,10 @@
 var express = require('express');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var http = require('http'); // core module
 var path = require('path'); // core module
 var mongoose = require('mongoose');
 var session = require('express-session');
+var MemoryStore = require('memorystore')(session);
 
 mongoose.connect(process.env.CSDB, { useNewUrlParser: true, useUnifiedTopology: true });
 mongoose.connection.once('open', () => { console.log("Connected to DB") });
@@ -27,9 +27,8 @@ app.use(session({
 	secret: 'secret',
 	saveUninitialized: true,
 	resave: true,
-	cookie: {
-		secure: false
-	}
+	cookie: { secure: false },
+	store: new MemoryStore({ checkPeriod: 1000 * 60 * 60 * 12 })
 }));
 
 // Global variables
