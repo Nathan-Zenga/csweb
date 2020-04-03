@@ -5,6 +5,7 @@
             <li><a data-toggle="pill" href="#discography">DISCOGRAPHY</a></li>
             <li><a data-toggle="pill" href="#artists">ARTISTS</a></li>
             <li><a data-toggle="pill" href="#locations">LOCATIONS</a></li>
+            <li><a data-toggle="pill" href="#mail">MAIL</a></li>
             <li><a data-toggle="pill" href="#edit-remove">EDIT / REMOVE</a></li>
         </ul>
         <div class="tab-content container">
@@ -26,6 +27,10 @@
 
             <div id="edit-remove" class="tab-pane fade">
             <%_ include partials/admin/edit-remove _%>
+            </div>
+
+            <div id="mail" class="tab-pane fade">
+            <%_ include partials/admin/mail _%>
             </div>
         </div>
     </div>
@@ -330,9 +335,10 @@
             });
         });
 
-        $("#edit-location form").submit(function(e) {
+        $("#locations form, #edit-location form, #mail form").submit(function(e) {
             e.preventDefault();
             var data = {};
+            var refresh = !!$(this).closest("#edit-location").length;
             $(this).serializeArray().forEach(function(field) {
                 var name = field.name;
                 data[name] = field.value;
@@ -340,7 +346,7 @@
 
             $.post(this.action, data, function(result) {
                 e.target.reset();
-                showMessage(result, e.target, true);
+                showMessage(result, e.target, refresh);
             });
         });
 
@@ -372,21 +378,6 @@
             var after = value.slice(selectionEnd, value.length);
             var em = this.firstChild.tagName.toLowerCase();
             if (selection.length) $textarea.val( before + "<"+em+">" + selection +"</"+em+">" + after );
-        });
-
-        $("#locations form").submit(function(e) {
-            e.preventDefault();
-
-            var data = {};
-            $(this).serializeArray().forEach(function(field) {
-                var name = field.name;
-                data[name] = field.value;
-            });
-
-            $.post(this.action, data, function(result) {
-                e.target.reset();
-                showMessage(result, e.target);
-            });
         });
 
         $("#edit-remove-dropdown-options select").change(function() { $(".nav-pills a[href='"+ this.value +"']").click() });
