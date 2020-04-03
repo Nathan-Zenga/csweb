@@ -183,27 +183,29 @@ label span {
 	min-height: 100px;
 }
 
-.video-container {
+.banner-container {
 	padding: 0;
 }
 
-.video-container > .video {
+.banner-container > .banner {
 	border-radius: 0;
 }
 
-.merch-highlights-section {
+.homepage-images-section {
 	padding-top: 3em;
 	padding-bottom: 3em;
 }
 
-.merch-highlights {
+.homepage-images {
 	padding: 10px;
 	background-color: transparent;
 }
 
-.merch-highlights .merch {
+.homepage-images .image {
 	border-radius: 7px;
 	background-color: white;
+	background-size: cover;
+	background-position: center;
 }
 
 .logo-container {
