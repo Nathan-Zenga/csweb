@@ -21,6 +21,7 @@ router.post('/new', (req, res) => {
 
 router.post('/send/email', (req, res) => {
     MailingList.find((err, members) => {
+        if (err || !members.length) return res.send(err || "NO MEMBERS IN THE MAILING LIST TO SEND THE EMAIL TO");
         members.forEach((member, i) => {
             var oauth2Client = new OAuth2( OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, "https://developers.google.com/oauthplayground" );
             oauth2Client.setCredentials({ refresh_token: OAUTH_REFRESH_TOKEN });
