@@ -38,14 +38,14 @@
         </form>
     </div>
     <script>
-        var showMessage = function(result, container, error) {
+        var showMessage = function(result, container, reload) {
             var $msg = $('<div class="msg" style><div class="text">'+ result.replace(/\n/g, "<br>") +'</div></div>');
             $msg.css("display", "none").appendTo(container).fadeIn().delay(2000).fadeOut(function(){
                 $(this).remove();
-                if (!error) location.reload();
+                if (reload) location.reload();
             });
         };
-        $("form").submit(function() {
+        $("form").submit(function(e) {
             e.preventDefault();
             var data = {};
             $(this).serializeArray().forEach(function(field) {

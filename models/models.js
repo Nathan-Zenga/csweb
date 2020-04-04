@@ -26,7 +26,7 @@ module.exports.Artist = mongoose.model('Artist', Schema({
 }));
 
 module.exports.MailingList = mongoose.model('MailingList', Schema({
-    fistname: String,
+    firstname: String,
     lastname: String,
     email: String,
     size_top: String,
@@ -50,5 +50,5 @@ module.exports.Homepage_banner = mongoose.model('Homepage_banner', Schema({
 
 module.exports.Homepage_image = mongoose.model('Homepage_image', Schema({
     p_id: String,
-    image: String
+    url: String
 }));

@@ -1,7 +1,8 @@
 <%_ include partials/header _%>
     <div class="content-container" style="padding-top: 2em;">
         <ul class="nav nav-pills">
-            <li class="active"><a data-toggle="pill" href="#articles">ARTICLES</a></li>
+            <li class="active"><a data-toggle="pill" href="#homepage">HOMEPAGE</a></li>
+            <li><a data-toggle="pill" href="#articles">ARTICLES</a></li>
             <li><a data-toggle="pill" href="#discography">DISCOGRAPHY</a></li>
             <li><a data-toggle="pill" href="#artists">ARTISTS</a></li>
             <li><a data-toggle="pill" href="#locations">LOCATIONS</a></li>
@@ -9,7 +10,11 @@
             <li><a data-toggle="pill" href="#edit-remove">EDIT / REMOVE</a></li>
         </ul>
         <div class="tab-content container">
-            <div id="articles" class="tab-pane fade in active">
+            <div id="homepage" class="tab-pane fade in active">
+            <%_ include partials/admin/homepage _%>
+            </div>
+
+            <div id="articles" class="tab-pane fade">
             <%_ include partials/admin/articles _%>
             </div>
 
@@ -280,6 +285,12 @@
                 $form.find("#city_edit").val(result.city);
                 $form.find("#country_edit").val(result.country);
                 $form.find("#postcode_edit").val(result.postcode);
+
+                $form.find("#firstname_edit").val(result.firstname);
+                $form.find("#lastname_edit").val(result.lastname);
+                $form.find("#email_edit").val(result.email);
+                $form.find("#size_top_edit").val(result.size_top);
+                $form.find("#size_bottom_edit").val(result.size_bottom);
             });
         });
         $("#edit-artist form").submit(function(e) {
@@ -335,7 +346,7 @@
             });
         });
 
-        $("#locations form, #edit-location form, #mail form").submit(function(e) {
+        $("#locations form, #mail form, #edit-location form, #edit-member").submit(function(e) {
             e.preventDefault();
             var data = {};
             var refresh = !!$(this).closest("#edit-location").length;
@@ -381,5 +392,33 @@
         });
 
         $("#edit-remove-dropdown-options select").change(function() { $(".nav-pills a[href='"+ this.value +"']").click() });
+
+        var homepage_image = "", homepage_image_filename = "";
+        $("#homepage_image_input").change(function() {
+            var $form = $(this).closest("form");
+            var files = this.files;
+            if (files && files.length === 1) {
+                var $submitInput = $(this).closest("form").children("input:submit");
+                $submitInput.attr("disabled", true);
+                readDataURLs(files, function(e) {
+                    homepage_image = e.target.result;
+                    $form.find("#homepage_image_filename").val(files[0].name);
+                    $submitInput.attr("disabled", false);
+                });
+            }
+        });
+        $("#homepage_images_form").submit(function(e) {
+            e.preventDefault();
+            var data = { homepage_image };
+            $(this).serializeArray().forEach(function(field) {
+                var name = field.name;
+                data[name] = field.value;
+            });
+
+            $.post(this.action, data, function(result) {
+                e.target.reset();
+                showMessage(result, e.target, true);
+            });
+        });
     </script>
 <%_ include partials/footer _%>
