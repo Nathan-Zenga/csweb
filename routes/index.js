@@ -1,15 +1,17 @@
 var express = require('express');
 var router = express.Router();
 var cloud = require('cloudinary');
-var { Article, Project, Artist, Location, Homepage_banner, Homepage_image } = require('../models/models');
+var { Article, Project, Artist, Location, MailingList, Homepage_banner, Homepage_image } = require('../models/models');
 var Collections = cb => {
     Article.find().sort({ created_at: -1 }).exec((err, articles) => {
         Artist.find((err, artists) => {
             Project.find().sort({ year: -1 }).exec((err, projects) => {
                 Location.find((err, locations) => {
-                    Homepage_banner.find((err, banners) => {
-                        Homepage_image.find((err, homepage_images) => {
-                            cb({ articles, artists, projects, locations, banners, homepage_images });
+                    MailingList.find((err, members) => {
+                        Homepage_banner.find((err, banners) => {
+                            Homepage_image.find((err, homepage_images) => {
+                                cb({ articles, artists, projects, locations, members, banners, homepage_images });
+                            })
                         })
                     })
                 })
@@ -32,8 +34,8 @@ router.get('/admin', (req, res) => {
 
 router.post('/search', (req, res) => {
     Collections(db => {
-        var { articles, artists, projects, locations, banners, homepage_images } = db;
-        res.send([...articles, ...artists, ...projects, ...locations, ...banners, ...homepage_images]);
+        var { articles, artists, projects, locations, members, banners, homepage_images } = db;
+        res.send([...articles, ...artists, ...projects, ...locations, ...members, ...banners, ...homepage_images]);
     })
 });
 

@@ -1,4 +1,4 @@
-<%_ var { artists, projects, articles, locations } = db; _%>
+<%_ var { artists, projects, articles, locations, members } = db; _%>
 <div class="col-sm-3" id="edit-remove-sidebar">
     <div class="mb-view" id="edit-remove-dropdown-options" style="font-weight: bold; max-width: 250px; margin: 0 auto">
         <label>SELECT OPTION</label>
@@ -7,10 +7,12 @@
             <option value="#edit-article">EDIT ARTICLE</option>
             <option value="#edit-project">EDIT PROJECT</option>
             <option value="#edit-location">EDIT LOCATION</option>
+            <option value="#edit-member">EDIT MEMBER</option>
             <option value="#remove-artist">REMOVE ARTIST</option>
             <option value="#remove-article">REMOVE ARTICLE</option>
             <option value="#remove-project">REMOVE PROJECT</option>
             <option value="#remove-location">REMOVE LOCATION</option>
+            <option value="#remove-member">REMOVE MEMBER</option>
         </select>
     </div>
     <ul class="nav nav-pills nav-stacked dt-view">
@@ -18,11 +20,13 @@
         <li><a data-toggle="pill" href="#edit-article">EDIT ARTICLE</a></li>
         <li><a data-toggle="pill" href="#edit-project">EDIT PROJECT</a></li>
         <li><a data-toggle="pill" href="#edit-location">EDIT LOCATION</a></li>
+        <li><a data-toggle="pill" href="#edit-member">EDIT MEMBER</a></li>
         <br>
         <li><a data-toggle="pill" href="#remove-artist">REMOVE ARTIST</a></li>
         <li><a data-toggle="pill" href="#remove-article">REMOVE ARTICLE</a></li>
         <li><a data-toggle="pill" href="#remove-project">REMOVE PROJECT</a></li>
         <li><a data-toggle="pill" href="#remove-location">REMOVE LOCATION</a></li>
+        <li><a data-toggle="pill" href="#remove-member">REMOVE MEMBER</a></li>
     </ul>
 </div>
 <div class="col-sm-9">
@@ -56,6 +60,7 @@
                 <input type="submit" value="UPDATE ARTIST">
             </form>
         </div>
+
         <div id="edit-article" class="tab-pane fade">
             <form method="post" action="/news/article/edit">
                 <label>CHOOSE ARTICLE</label>
@@ -85,6 +90,7 @@
                 <input type="submit" value="UPDATE ARTICLE">
             </form>
         </div>
+
         <div id="edit-project" class="tab-pane fade">
             <form action="/discography/project/edit">
                 <label>CHOOSE PROJECT</label>
@@ -113,6 +119,7 @@
                 <input type="submit" value="UPDATE PROJECT">
             </form>
         </div>
+
         <div id="edit-location" class="tab-pane fade">
             <form method="post" action="/map/location/edit">
                 <label>CHOOSE LOCATION</label>
@@ -138,9 +145,56 @@
                 <label>ZIP / POST CODE (OPTIONAL)</label>
                 <input type="text" name="postcode_edit" id="postcode_edit">
 
-                <input type="submit" value="POST">
+                <input type="submit" value="UPDATE LOCATION">
             </form>
         </div>
+
+        <div id="edit-member" class="tab-pane fade">
+            <form method="POST" action="/mailing-list/update">
+                <label>CHOOSE MEMBER</label>
+                <select name="member_id" id="member_id">
+                    <option value=""></option>
+                    <%_ members.forEach(member => { _%>
+                    <option value="<%= member._id %>"><%= member.firstname + " " + member.lastname %></option>
+                    <%_ }) _%>
+                </select>
+                <div class="input-group" style="display: block">
+                    <div class="col-sm-6">
+                        <label>FIRST NAME</label>
+                        <input type="text" name="firstname" id="firstname_edit" required>
+                    </div>
+                    <div class="col-sm-6">
+                        <label>LAST NAME</label>
+                        <input type="text" name="lastname" id="lastname_edit" required>
+                    </div>
+                </div>
+                <label>EMAIL</label>
+                <input type="email" name="email" id="email_edit" required>
+                <div class="input-group" style="display: block">
+                    <%_ var sizes = ["XS", "S", "M", "L", "XL"]; _%>
+                    <div class="col-sm-6">
+                        <label>SIZE (TOP)</label>
+                        <select name="size_top" id="size_top_edit" required>
+                            <option value="">Select size</option>
+                            <%_ sizes.forEach(size => { _%>
+                            <option value="<%= size %>"><%= size %></option>
+                            <%_ }) _%>
+                        </select>
+                    </div>
+                    <div class="col-sm-6">
+                        <label>SIZE (BOTTOMS)</label>
+                        <select name="size_bottom" id="size_bottom_edit" required>
+                            <option value="">Select size</option>
+                            <%_ sizes.forEach(size => { _%>
+                            <option value="<%= size %>"><%= size %></option>
+                            <%_ }) _%>
+                        </select>
+                    </div>
+                </div>
+                <input type="submit" value="UPDATE MAILING LIST">
+            </form>
+        </div>
+
         <div id="remove-artist" class="tab-pane fade">
             <%_ if (artists.length) { _%>
             <form action="artists/delete" method="post">
@@ -155,6 +209,7 @@
             <p style="text-align: center; margin-top: 2em"><b>NO ARTISTS TO DELETE</b></p>
             <%_ } _%>
         </div>
+
         <div id="remove-project" class="tab-pane fade">
             <%_ if (projects.length) { _%>
             <form action="discography/project/delete" method="post">
@@ -169,6 +224,7 @@
             <p style="text-align: center; margin-top: 2em"><b>NO PROJECTS TO DELETE</b></p>
             <%_ } _%>
         </div>
+
         <div id="remove-article" class="tab-pane fade">
             <%_ if (articles.length) { _%>
             <form action="news/article/delete" method="post">
@@ -183,6 +239,7 @@
             <p style="text-align: center; margin-top: 2em"><b>NO ARTICLES TO DELETE</b></p>
             <%_ } _%>
         </div>
+
         <div id="remove-location" class="tab-pane fade">
             <%_ if (locations.length) { _%>
             <form action="map/location/delete" method="post">

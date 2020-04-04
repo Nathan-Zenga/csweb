@@ -280,6 +280,12 @@
                 $form.find("#city_edit").val(result.city);
                 $form.find("#country_edit").val(result.country);
                 $form.find("#postcode_edit").val(result.postcode);
+
+                $form.find("#firstname_edit").val(result.firstname);
+                $form.find("#lastname_edit").val(result.lastname);
+                $form.find("#email_edit").val(result.email);
+                $form.find("#size_top_edit").val(result.size_top);
+                $form.find("#size_bottom_edit").val(result.size_bottom);
             });
         });
         $("#edit-artist form").submit(function(e) {
@@ -335,7 +341,7 @@
             });
         });
 
-        $("#locations form, #edit-location form, #mail form").submit(function(e) {
+        $("#locations form, #mail form, #edit-location form, #edit-member").submit(function(e) {
             e.preventDefault();
             var data = {};
             var refresh = !!$(this).closest("#edit-location").length;

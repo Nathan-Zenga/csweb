@@ -19,6 +19,19 @@ router.post('/new', (req, res) => {
     })
 });
 
+router.post('/update', (req, res) => {
+    var { member_id, firstname, lastname, email, size_top, size_bottom } = req.body;
+    MailingList.findById(member_id, (err, member) => {
+        if (err || !member) return res.send(err || "MEMBER NOT FOUND");
+        member.firstname = firstname || member.firstname;
+        member.lastname = lastname || member.lastname;
+        member.email = email || member.email;
+        member.size_top = size_top || member.size_top;
+        member.size_bottom = size_bottom || member.size_bottom;
+        member.save(err => res.send(err || "MEMBER UPDATED"));
+    })
+});
+
 router.post('/send/mail', (req, res) => {
     MailingList.find((err, members) => {
         if (err || !members.length) return res.send(err || "NO MEMBERS IN THE MAILING LIST TO SEND THE EMAIL TO");
