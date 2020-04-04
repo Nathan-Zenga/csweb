@@ -1,7 +1,16 @@
 <%_ include partials/header _%>
 	<section>
 		<div class="banner-container content-container">
-			<div class="banner content"><%- banner %></div>
+			<div class="banner content">
+				<%_ if (banner) { _%>
+				<div class="banner-item">
+					<div class="banner-text"><%= banner.text %></div>
+					<%_ banner.banner_media.forEach(url => { _%>
+					<img class="banner-item-media" src="<%= url %>">
+					<%_ }) _%>
+				</div>
+				<%_ } _%>
+			</div>
 		</div>
 	</section>
 	<section class="homepage-images-section container">

@@ -183,12 +183,41 @@ label span {
 	min-height: 100px;
 }
 
-.banner-container {
-	padding: 0;
+.banner-container > .banner {
+	min-height: auto;
+	height: 80px;
+	white-space: nowrap;
+	overflow-y: scroll;
+	-ms-overflow-style: none;
 }
 
-.banner-container > .banner {
-	border-radius: 0;
+.banner-container > .banner::-webkit-scrollbar {
+	display: none;
+}
+
+.banner-container > .banner > .banner-item {
+	display: inline-table;
+	height: 100%;
+}
+
+.banner-container > .banner > .banner-item:not(:first-child) {
+	margin-left: 50px;
+}
+
+.banner-container > .banner > .banner-item > .banner-text {
+	display: table-cell;
+	vertical-align: middle;
+	padding-left: 15px;
+	padding-right: 15px;
+	font-size: 2em;
+	font-weight: bold;
+	text-align: center;
+}
+
+.banner-container > .banner > .banner-item > .banner-item-media {
+	display: inline-block;
+	height: 100%;
+	width: 50px;
 }
 
 .homepage-images-section {
