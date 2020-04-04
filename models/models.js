@@ -50,5 +50,5 @@ module.exports.Homepage_banner = mongoose.model('Homepage_banner', Schema({
 
 module.exports.Homepage_image = mongoose.model('Homepage_image', Schema({
     p_id: String,
-    image: String
+    url: String
 }));

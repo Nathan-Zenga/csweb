@@ -48,9 +48,9 @@ router.post('/homepage/banner', (req, res) => {
 });
 
 router.post('/homepage/image/save', (req, res) => {
-    cloud.v2.uploader.upload(req.body.homepage_image, { public_id: `homepage/images/${req.body.filename}` }, (err, result) => {
+    cloud.v2.uploader.upload(req.body.homepage_image, { public_id: `homepage/images/${req.body.filename.replace(" ", "_")}` }, (err, result) => {
         if (err) return res.send(err);
-        var newImage = new Homepage_image({ image: result.secure_url, p_id: result.public_id });
+        var newImage = new Homepage_image({ url: result.secure_url, p_id: result.public_id });
         newImage.save(err => res.send(err || "IMAGE SAVED"));
     })
 });

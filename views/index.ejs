@@ -6,7 +6,7 @@
 	</section>
 	<section class="homepage-images-section container">
 		<%_ images.forEach(img => { _%>
-		<div class="homepage-images content-container col-sm-4 col-xs-6"><div class="image content" style="background-image: url(<%- img %>)"></div></div>
+		<div class="homepage-images content-container col-md-4 col-sm-6"><div class="image content" style="background-image: url(<%= img.url %>)"></div></div>
 		<%_ }) _%>
 	</section>
 <%_ include partials/footer _%>
