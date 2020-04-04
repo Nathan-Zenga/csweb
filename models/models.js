@@ -26,7 +26,7 @@ module.exports.Artist = mongoose.model('Artist', Schema({
 }));
 
 module.exports.MailingList = mongoose.model('MailingList', Schema({
-    fistname: String,
+    firstname: String,
     lastname: String,
     email: String,
     size_top: String,
