@@ -40,45 +40,18 @@ router.post('/search', (req, res) => {
 });
 
 router.post('/homepage/banner', (req, res) => {
-    var saveMedia = (doc, cb) => {
-        var msg = "", { banner_media } = req.body;
-        if (banner_media) {
-            msg = " - saving images / videos";
-            banner_media.split(",").forEach((mediaStr, i) => {
-                doc.banner_media = [];
-                var public_id = "homepage/banner/image" + (i+1);
-                cloud.v2.uploader.upload(mediaStr, { public_id, resource_type: "auto" }, (err, result) => {
-                    if (err) res.send(err);
-                    doc.banner_media.push(result.secure_url);
-                    doc.save();
-                });
-            });
-        }
-        if (cb) cb(msg);
-    };
-
     Homepage_banner.find((err, banners) => {
         var banner = !banners.length ? new Homepage_banner() : banners[0];
-        banner.text = req.body.text;
-        banner.save((err, saved) => {
-            if (err) return res.send(err);
-            cloud.v2.api.delete_resources_by_prefix("homepage/banner/", err => {
-                if (err) return res.send(err);
-                saveMedia(saved, msg => res.send("BANNER " + (!banners.length ? "SAVED" : "UPDATED") + msg))
-            });
-        });
+        banner.text = req.body.text || banner.text;
+        banner.save(err => res.send("BANNER " + (!banners.length ? "SAVED" : "UPDATED")));
     })
 });
 
 router.post('/homepage/image/save', (req, res) => {
-    cloud.v2.uploader.upload(req.body.image, { public_id: `homepage/images/${req.body.filename}` }, (err, result) => {
+    cloud.v2.uploader.upload(req.body.homepage_image, { public_id: `homepage/images/${req.body.filename}` }, (err, result) => {
         if (err) return res.send(err);
-        var newImage = new Homepage_image({ image: result.secure_url });
-        newImage.save(err => {
-            if (err) return res.send(err);
-            saved.p_id = result.public_id;
-            saved.save(err => res.send(err || "IMAGE SAVED"));
-        })
+        var newImage = new Homepage_image({ image: result.secure_url, p_id: result.public_id });
+        newImage.save(err => res.send(err || "IMAGE SAVED"));
     })
 });
 

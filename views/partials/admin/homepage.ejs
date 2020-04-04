@@ -1,0 +1,17 @@
+<form method="POST" action="/homepage/banner" id="homepage_banner_form">
+    <label for="banner_text">BANNER TEXT</label>
+    <input type="text" name="text" id="banner_text">
+
+    <input type="submit" value="SAVE BANNER">
+</form>
+<br>
+
+<form method="POST" action="/homepage/image/save" id="homepage_images_form">
+    <label for="homepage_image_input">UPLOAD IMAGE</label>
+    <input type="file" name="image" id="homepage_image_input" accept="image/*">
+
+    <label for="homepage_image_filename">FILE NAME <span>(Automatically appears when you upload images, but feel free to rename)</span></label>
+    <input type="text" name="filename" id="homepage_image_filename">
+
+    <input type="submit" value="UPLOAD IMAGES">
+</form>
