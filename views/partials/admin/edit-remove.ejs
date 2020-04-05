@@ -1,4 +1,4 @@
-<%_ var { artists, projects, articles, locations, members } = db; _%>
+<%_ var { artists, projects, articles, locations, members, homepage_images } = db; _%>
 <div class="col-sm-3" id="edit-remove-sidebar">
     <div class="mb-view" id="edit-remove-dropdown-options" style="font-weight: bold; max-width: 250px; margin: 0 auto">
         <label>SELECT OPTION</label>
@@ -13,6 +13,7 @@
             <option value="#remove-project">REMOVE PROJECT</option>
             <option value="#remove-location">REMOVE LOCATION</option>
             <option value="#remove-member">REMOVE MEMBER</option>
+            <option value="#remove-homepage-image">REMOVE HOMEPAGE IMAGE</option>
         </select>
     </div>
     <ul class="nav nav-pills nav-stacked dt-view">
@@ -27,6 +28,7 @@
         <li><a data-toggle="pill" href="#remove-project">REMOVE PROJECT</a></li>
         <li><a data-toggle="pill" href="#remove-location">REMOVE LOCATION</a></li>
         <li><a data-toggle="pill" href="#remove-member">REMOVE MEMBER</a></li>
+        <li><a data-toggle="pill" href="#remove-homepage-image">REMOVE HOMEPAGE IMAGE</a></li>
     </ul>
 </div>
 <div class="col-sm-9">
@@ -267,6 +269,24 @@
             </form>
             <%_ } else { _%>
             <p style="text-align: center; margin-top: 2em"><b>NO MEMBERS TO REMOVE</b></p>
+            <%_ } _%>
+        </div>
+
+        <div id="remove-homepage-image" class="tab-pane fade">
+            <%_ if (homepage_images.length) { _%>
+            <form action="/homepage/image/delete" method="post">
+                <label>HOMEPAGE IMAGES</label>
+                <%_ homepage_images.forEach((image, i) => { _%>
+                <div style="display: inline-block">
+                    <input type="checkbox" name="image<%= i %>" value="<%= image.p_id %>">
+                    <span><img style="height: 100px; margin-bottom: 10px;" src="<%= image.url %>" alt="<%= image.p_id.replace('homepage/images/', '') %>"></span>
+                </div>
+                <%_ }) _%>
+                <br><br>
+                <input type="submit" value="DELETE IMAGES">
+            </form>
+            <%_ } else { _%>
+            <p style="text-align: center; margin-top: 2em"><b>NO IMAGES TO DELETE</b></p>
             <%_ } _%>
         </div>
     </div>

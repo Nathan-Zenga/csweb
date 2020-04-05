@@ -56,11 +56,15 @@ router.post('/homepage/image/save', (req, res) => {
 });
 
 router.post('/homepage/image/delete', (req, res) => {
-    var { p_id } = req.body;
-    cloud.v2.api.delete_resources([ p_id ], err => {
-        if (err) return res.send(err);
-        Homepage_image.deleteOne({ p_id }, err => res.send(err || "IMAGE REMOVED"))
-    })
+    var p_ids = Object.values(req.body);
+    if (p_ids.length) {
+        p_ids.forEach(p_id => {
+            cloud.v2.api.delete_resources([ p_id ], err => {
+                if (err) return res.send(err);
+                Homepage_image.deleteOne({ p_id }, err => res.send(err || "IMAGE REMOVED"))
+            })
+        });
+    } else { res.send("NOTHING SELECTED") }
 });
 
 module.exports = router;
