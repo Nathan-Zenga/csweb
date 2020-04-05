@@ -104,6 +104,12 @@ form {
 	margin: 0 auto 2em;
 }
 
+#admin-page form {
+	border-radius: 10px;
+	box-shadow: 0 0 15px grey;
+	padding: 20px;
+}
+
 form label {
 	display: block;
 }
