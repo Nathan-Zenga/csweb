@@ -254,17 +254,21 @@ label span {
 }
 
 .logo-container {
+	height: 70px;
 	text-align: center;
+	padding: 0!important;
+	margin: 2em 0;
 }
 
 @media (min-width: 768px) {
 	.logo-container {
 		text-align: left;
+		margin: 0;
 	}
 }
 
 #cs-logo {
-	height: 70px;
+	height: 100%;
 	border-radius: 50%;
 	border: 2px solid;
 	padding: 10px;

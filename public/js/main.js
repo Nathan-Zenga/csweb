@@ -2,7 +2,7 @@ $(function() {
 	var height = $("#cs-logo").css("height");
 	function fixLogo() {
 		var state = window.pageYOffset > $("main").offset().top+20;
-		$("#cs-logo").toggleClass("fixed", state).parent("a").attr("href", "/").removeAttr(state ? "href" : "").parents(".logo-container").css("height", state ? height : "");
+		$("#cs-logo").toggleClass("fixed", state).parent("a").attr("href", "/").removeAttr(state ? "href" : "");
 	}
 
 	fixLogo();
