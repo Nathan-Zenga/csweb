@@ -18,4 +18,20 @@
 		<div class="homepage-images content-container col-md-4 col-sm-6"><div class="image content" style="background-image: url(<%= img.url %>)"></div></div>
 		<%_ }) _%>
 	</section>
+
+	<script>
+		var banner_html = $(".banner").html();
+		while ($(".banner-item:last").offset().left <= window.innerWidth) $(".banner").append(banner_html);
+		banner_html = $(".banner").html();
+
+		$(".banner").scroll(function() {
+			var $last = $(".banner-item:last");
+			var lastOffsetLeft = $last.offset().left;
+			if (lastOffsetLeft < window.innerWidth) $last.clone().appendTo(".banner");
+		});
+
+		(function banner_autoplay() {
+			$(".banner").animate({scrollLeft: "+=" + $(".banner").width() }, 20000, "linear", banner_autoplay);
+		})();
+	</script>
 <%_ include partials/footer _%>
