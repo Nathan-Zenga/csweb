@@ -389,6 +389,7 @@
             var after = value.slice(selectionEnd, value.length);
             var em = this.firstChild.tagName.toLowerCase();
             if (selection.length) $textarea.val( before + "<"+em+">" + selection +"</"+em+">" + after );
+            $textarea.get(0).focus();
         });
 
         $("#edit-remove-dropdown-options select").change(function() { $(".nav-pills a[href='"+ this.value +"']").click() });
