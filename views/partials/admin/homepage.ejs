@@ -11,11 +11,11 @@
 <br>
 
 <form method="POST" action="/homepage/image/save" id="homepage_images_form">
-    <label for="homepage_image_input">UPLOAD IMAGE</label>
-    <input type="file" name="image" id="homepage_image_input" accept="image/*">
+    <label for="homepage_image_input">HOMEPAGE IMAGE UPLOAD</label><br>
+    <input type="file" name="image" id="homepage_image_input" accept="image/*" required>
 
     <label for="homepage_image_filename">FILE NAME <span>(Automatically appears when you upload images, but feel free to rename)</span></label>
-    <input type="text" name="filename" id="homepage_image_filename">
+    <input type="text" name="filename" id="homepage_image_filename" required>
 
     <input type="submit" value="UPLOAD HOMEPAGE IMAGES">
 </form>
