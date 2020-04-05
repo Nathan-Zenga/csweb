@@ -1,8 +1,12 @@
-<form method="POST" action="/homepage/banner" id="homepage_banner_form">
+<%_ var { homepage_contents } = db, contents = homepage_contents; _%>
+<form method="POST" action="/homepage/content" id="homepage_content_form">
     <label for="banner_text">BANNER TEXT</label>
-    <input type="text" name="text" id="banner_text">
+    <input type="text" name="banner_text" id="banner_text" value="<%= contents[0] ? contents[0].banner_text : '' %>">
 
-    <input type="submit" value="SAVE BANNER">
+    <label for="footnote_text">FOOTNOTE TEXT / QUOTE</label>
+    <input type="text" name="footnote_text" id="footnote_text" value="<%= contents[0] ? contents[0].footnote_text : '' %>">
+
+    <input type="submit" value="UPDATE HOMEPAGE CONTENT">
 </form>
 <br>
 
@@ -13,5 +17,5 @@
     <label for="homepage_image_filename">FILE NAME <span>(Automatically appears when you upload images, but feel free to rename)</span></label>
     <input type="text" name="filename" id="homepage_image_filename">
 
-    <input type="submit" value="UPLOAD IMAGES">
+    <input type="submit" value="UPLOAD HOMEPAGE IMAGES">
 </form>

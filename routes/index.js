@@ -1,16 +1,16 @@
 var express = require('express');
 var router = express.Router();
 var cloud = require('cloudinary');
-var { Article, Project, Artist, Location, MailingList, Homepage_banner, Homepage_image } = require('../models/models');
+var { Article, Project, Artist, Location, MailingList, Homepage_content, Homepage_image } = require('../models/models');
 var Collections = cb => {
     Article.find().sort({ created_at: -1 }).exec((err, articles) => {
         Artist.find((err, artists) => {
             Project.find().sort({ year: -1 }).exec((err, projects) => {
                 Location.find((err, locations) => {
                     MailingList.find((err, members) => {
-                        Homepage_banner.find((err, banners) => {
+                        Homepage_content.find((err, homepage_contents) => {
                             Homepage_image.find((err, homepage_images) => {
-                                cb({ articles, artists, projects, locations, members, banners, homepage_images });
+                                cb({ articles, artists, projects, locations, members, homepage_contents, homepage_images });
                             })
                         })
                     })
@@ -21,9 +21,9 @@ var Collections = cb => {
 };
 
 router.get('/', (req, res) => {
-    Homepage_banner.findOne((err, banner) => {
+    Homepage_content.findOne((err, content) => {
         Homepage_image.find((err, images) => {
-            res.render('index', { title: null, pagename: "home", banner, images })
+            res.render('index', { title: null, pagename: "home", content, images })
         })
     })
 });
@@ -34,16 +34,17 @@ router.get('/admin', (req, res) => {
 
 router.post('/search', (req, res) => {
     Collections(db => {
-        var { articles, artists, projects, locations, members, banners, homepage_images } = db;
-        res.send([...articles, ...artists, ...projects, ...locations, ...members, ...banners, ...homepage_images]);
+        var { articles, artists, projects, locations, members } = db;
+        res.send([...articles, ...artists, ...projects, ...locations, ...members]);
     })
 });
 
-router.post('/homepage/banner', (req, res) => {
-    Homepage_banner.find((err, banners) => {
-        var banner = !banners.length ? new Homepage_banner() : banners[0];
-        banner.text = req.body.text || banner.text;
-        banner.save(err => res.send("BANNER " + (!banners.length ? "SAVED" : "UPDATED")));
+router.post('/homepage/content', (req, res) => {
+    Homepage_content.find((err, contents) => {
+        var content = !contents.length ? new Homepage_content() : contents[0];
+        if (req.body.banner_text)   content.banner_text = req.body.banner_text;
+        if (req.body.footnote_text) content.footnote_text = req.body.footnote_text;
+        content.save(err => res.send("HOMEPAGE CONTENT " + (!contents.length ? "SAVED" : "UPDATED")));
     })
 });
 

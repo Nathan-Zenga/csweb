@@ -2,10 +2,10 @@
 	<section>
 		<div class="banner-container content-container">
 			<div class="banner content">
-				<%_ if (banner) { _%>
+				<%_ if (content) { _%>
 				<div class="banner-item">
-					<div class="banner-text"><%= banner.text %></div>
-					<%_ banner.banner_media.forEach(url => { _%>
+					<div class="banner-text"><%= content.banner_text %></div>
+					<%_ content.banner_media.forEach(url => { _%>
 					<img class="banner-item-media" src="<%= url %>">
 					<%_ }) _%>
 				</div>
@@ -18,6 +18,10 @@
 		<div class="homepage-images content-container col-md-4 col-sm-6"><div class="image content" style="background-image: url(<%= img.url %>)"></div></div>
 		<%_ }) _%>
 	</section>
+
+	<%_ if (content) { _%>
+	<section class="homepage-footnote-text container"><%- content.footnote_text %></section>
+	<%_ } _%>
 
 	<script>
 		var banner_html = $(".banner").html();

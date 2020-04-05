@@ -183,6 +183,11 @@ label span {
 	min-height: 100px;
 }
 
+.banner-container {
+	background-color: transparent;
+	color: inherit;
+}
+
 .banner-container > .banner {
 	min-height: auto;
 	height: 80px;
@@ -198,9 +203,6 @@ label span {
 .banner-container > .banner > .banner-item {
 	display: inline-table;
 	height: 100%;
-}
-
-.banner-container > .banner > .banner-item:not(:first-child) {
 	margin-left: 50px;
 }
 
@@ -236,6 +238,13 @@ label span {
 	background-size: cover;
 	background-position: center;
 	height: 300px;
+}
+
+.homepage-footnote-text {
+	padding-top: 2em;
+	padding-bottom: 2em;
+	text-align: center;
+	font-family: 'Rock Salt', cursive;
 }
 
 .logo-container {

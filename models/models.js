@@ -43,9 +43,10 @@ module.exports.Location = mongoose.model('Location', Schema({
     longitude: Number
 }));
 
-module.exports.Homepage_banner = mongoose.model('Homepage_banner', Schema({
-    text: String,
-    banner_media: [String]
+module.exports.Homepage_content = mongoose.model('Homepage_content', Schema({
+    banner_text: String,
+    banner_media: [String],
+    footnote_text: String
 }));
 
 module.exports.Homepage_image = mongoose.model('Homepage_image', Schema({
