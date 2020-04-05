@@ -75,4 +75,14 @@ router.post('/send/mail', (req, res) => {
     })
 });
 
+router.post('/member/delete', (req, res) => {
+    var ids = Object.values(req.body);
+    if (ids.length) {
+        MailingList.deleteMany({_id : { $in: ids }}, (err, result) => {
+            if (err || !result.deletedCount) return res.send(err || "Member(s) not found");
+            res.send("MEMBER"+ (ids.length > 1 ? "S" : "") +" REMOVED SUCCESSFULLY")
+        })
+    } else { res.send("NOTHING SELECTED") }
+});
+
 module.exports = router;

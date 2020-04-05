@@ -254,5 +254,20 @@
             <p style="text-align: center; margin-top: 2em"><b>NO LOCATIONS TO DELETE</b></p>
             <%_ } _%>
         </div>
+
+        <div id="remove-member" class="tab-pane fade">
+            <%_ if (members.length) { _%>
+            <form action="/mailing-list/member/delete" method="post">
+                <label>MAILING LIST MEMBERS</label>
+                <%_ members.forEach((member, i) => { _%>
+                <input type="checkbox" name="member<%= i %>" value="<%= member._id %>"> <span><%= member.firstname +" "+ member.lastname %></span><br>
+                <%_ }) _%>
+                <br>
+                <input type="submit" value="REMOVE MEMBERS">
+            </form>
+            <%_ } else { _%>
+            <p style="text-align: center; margin-top: 2em"><b>NO MEMBERS TO REMOVE</b></p>
+            <%_ } _%>
+        </div>
     </div>
 </div>
