@@ -60,16 +60,19 @@ router.post('/send/mail', (req, res) => {
                 }
             });
 
-            transporter.sendMail({
-                from: "CS <info@thecs.co>",
-                to: email,
-                subject: req.body.subject,
-                html: req.body.message.replace(/\=FN\=|\=LN\=|\=ST\=|\=SB\=|\r?\n/g, s => refs[s] || "<br>")
-            }, err => {
-                if (err) return console.log(err), res.send("Could not send message. Error occurred.");
-                console.log("The message was sent!");
-                transporter.close();
-                if (i === members.length-1) res.send("MESSAGE SENT")
+            res.render('templates/mail', { message: req.body.message, refs }, (err, html) => {
+                transporter.sendMail({
+                    from: "CS <info@thecs.co>",
+                    to: email,
+                    subject: req.body.subject,
+                    html,
+                    attachments: [{ filename: 'cs-icon.png', path: 'public/img/cs-icon.png', cid: 'logo' }]
+                }, err => {
+                    if (err) return console.log(err), res.send("Could not send message. Error occurred.");
+                    console.log("The message was sent!");
+                    transporter.close();
+                    if (i === members.length-1) res.send("MESSAGE SENT")
+                });
             });
         })
     })
