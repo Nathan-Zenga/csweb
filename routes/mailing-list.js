@@ -10,8 +10,8 @@ router.get('/sign-up', (req, res) => {
 });
 
 router.post('/new', (req, res) => {
-    var { firstname, lastname, email, size_top, size_bottom } = req.body;
-    var newMember = new MailingList({ firstname, lastname, email, size_top, size_bottom });
+    var { firstname, lastname, email, size_top, size_bottom, extra_info } = req.body;
+    var newMember = new MailingList({ firstname, lastname, email, size_top, size_bottom, extra_info });
 
     MailingList.findOne({ email }, (err, member) => {
         if (err || member) return res.send(err || "ALREADY REGISTERED");
@@ -28,6 +28,7 @@ router.post('/update', (req, res) => {
         member.email = email || member.email;
         member.size_top = size_top || member.size_top;
         member.size_bottom = size_bottom || member.size_bottom;
+        member.extra_info = extra_info || member.extra_info;
         member.save(err => res.send(err || "MEMBER UPDATED"));
     })
 });

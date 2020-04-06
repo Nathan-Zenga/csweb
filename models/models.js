@@ -30,7 +30,8 @@ module.exports.MailingList = mongoose.model('MailingList', Schema({
     lastname: String,
     email: String,
     size_top: String,
-    size_bottom: String
+    size_bottom: String,
+    extra_info: String
 }));
 
 module.exports.Location = mongoose.model('Location', Schema({
