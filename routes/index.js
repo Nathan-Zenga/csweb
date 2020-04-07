@@ -1,28 +1,12 @@
 var express = require('express');
 var router = express.Router();
 var cloud = require('cloudinary');
-var { Article, Project, Artist, Location, MailingList, Homepage_content, Homepage_image } = require('../models/models');
-var Collections = cb => {
-    Article.find().sort({ created_at: -1 }).exec((err, articles) => {
-        Artist.find((err, artists) => {
-            Project.find().sort({ year: -1 }).exec((err, projects) => {
-                Location.find((err, locations) => {
-                    MailingList.find((err, members) => {
-                        Homepage_content.find((err, homepage_contents) => {
-                            Homepage_image.find((err, homepage_images) => {
-                                cb({ articles, artists, projects, locations, members, homepage_contents, homepage_images });
-                            })
-                        })
-                    })
-                })
-            })
-        })
-    })
-};
+var { indexReorder, Collections } = require('../config/config');
+var { Homepage_content, Homepage_image } = require('../models/models');
 
 router.get('/', (req, res) => {
     Homepage_content.findOne((err, content) => {
-        Homepage_image.find((err, images) => {
+        Homepage_image.find().sort({index: 1}).exec((err, images) => {
             res.render('index', { title: null, pagename: "home", content, images })
         })
     })
@@ -51,7 +35,7 @@ router.post('/homepage/content', (req, res) => {
 router.post('/homepage/image/save', (req, res) => {
     cloud.v2.uploader.upload(req.body.homepage_image, { public_id: `homepage/images/${req.body.filename.replace(" ", "_")}` }, (err, result) => {
         if (err) return res.send(err);
-        var newImage = new Homepage_image({ url: result.secure_url, p_id: result.public_id });
+        var newImage = new Homepage_image({ url: result.secure_url, p_id: result.public_id, index: req.body.index });
         newImage.save(err => res.send(err || "IMAGE SAVED"));
     })
 });
@@ -66,6 +50,11 @@ router.post('/homepage/image/delete', (req, res) => {
             })
         });
     } else { res.send("NOTHING SELECTED") }
+});
+
+router.post('/homepage/image/reorder', (req, res) => {
+    var { id, index } = req.body;
+    indexReorder(Homepage_image, id, index, () => res.send("RE-ORDERING PROCESS DONE"));
 });
 
 module.exports = router;

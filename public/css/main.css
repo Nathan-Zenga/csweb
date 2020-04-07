@@ -132,7 +132,7 @@ input[type="text"], input[type="number"], input[type="url"], input[type="email"]
 	padding: 10px;
 }
 
-input[type="checkbox"] {
+input[type="checkbox"], input[type="radio"] {
 	width: auto;
 }
 

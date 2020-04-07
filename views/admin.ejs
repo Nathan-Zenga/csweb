@@ -347,7 +347,7 @@
             });
         });
 
-        $("#locations form, #mail form, #homepage_content_form, #edit-location form, #edit-member").submit(function(e) {
+        $("#locations form, #mail form, #homepage_content_form, #edit-location form, #edit-member form, #edit-homepage-image form").submit(function(e) {
             e.preventDefault();
             var data = {};
             var refresh = !!$(this).closest("#edit-location").length;

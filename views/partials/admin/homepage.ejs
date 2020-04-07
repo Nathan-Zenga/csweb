@@ -1,4 +1,4 @@
-<%_ var { homepage_contents } = db, contents = homepage_contents; _%>
+<%_ var { homepage_contents, homepage_images } = db, contents = homepage_contents; _%>
 <form method="POST" action="/homepage/content" id="homepage_content_form">
     <label for="banner_text">BANNER TEXT</label>
     <input type="text" name="banner_text" id="banner_text" value="<%= contents[0] ? contents[0].banner_text : '' %>">
@@ -16,6 +16,10 @@
 
     <label for="homepage_image_filename">FILE NAME <span>(Automatically appears when you upload images, but feel free to rename)</span></label>
     <input type="text" name="filename" id="homepage_image_filename" required>
+
+    <%_ var newPosition = homepage_images.length + 1; _%>
+    <label for="homepage_image_index">IMAGE POSITION NUMBER</label><br>
+    <input type="number" name="index" id="homepage_image_index" min="1" max="<%= newPosition %>" value="<%= newPosition %>" required>
 
     <input type="submit" value="UPLOAD HOMEPAGE IMAGES">
 </form>

@@ -8,6 +8,7 @@
             <option value="#edit-project">EDIT PROJECT</option>
             <option value="#edit-location">EDIT LOCATION</option>
             <option value="#edit-member">EDIT MEMBER</option>
+            <option value="#edit-homepage-image">REORDER HOMEPAGE IMAGE</option>
             <option value="#remove-artist">REMOVE ARTIST</option>
             <option value="#remove-article">REMOVE ARTICLE</option>
             <option value="#remove-project">REMOVE PROJECT</option>
@@ -22,6 +23,7 @@
         <li><a data-toggle="pill" href="#edit-project">EDIT PROJECT</a></li>
         <li><a data-toggle="pill" href="#edit-location">EDIT LOCATION</a></li>
         <li><a data-toggle="pill" href="#edit-member">EDIT MEMBER</a></li>
+        <li><a data-toggle="pill" href="#edit-homepage-image">REORDER HOMEPAGE IMAGE</a></li>
         <br>
         <li><a data-toggle="pill" href="#remove-artist">REMOVE ARTIST</a></li>
         <li><a data-toggle="pill" href="#remove-article">REMOVE ARTICLE</a></li>
@@ -199,6 +201,28 @@
             </form>
         </div>
 
+        <div id="edit-homepage-image" class="tab-pane fade">
+            <%_ if (homepage_images.length) { _%>
+            <form action="/homepage/image/reorder" method="post">
+                <label>SELECT HOMEPAGE IMAGE TO RE-ORDER</label><br>
+                <%_ homepage_images.forEach((image, i) => { _%>
+                <div class="homepage-image-container" style="display: inline-block">
+                    <input type="radio" name="id" value="<%= image._id %>" required>
+                    <span><img style="height: 100px; margin-bottom: 10px;" src="<%= image.url %>" alt="<%= image.p_id.replace('homepage/images/', '') %>"></span>
+                </div>
+                <%_ }) _%>
+                <br><br>
+                <div class="input-group" style="display: block">
+                    <div class="col-sm-4"><label>POSITION NUMBER</label></div>
+                    <div class="col-sm-8"><input type="number" name="index" min="1" max="<%= homepage_images.length %>" required></div>
+                </div>
+                <input type="submit" value="RE-ORDER IMAGE">
+            </form>
+            <%_ } else { _%>
+            <p style="text-align: center; margin-top: 2em"><b>NO IMAGES TO RE-ORDER</b></p>
+            <%_ } _%>
+        </div>
+
         <div id="remove-artist" class="tab-pane fade">
             <%_ if (artists.length) { _%>
             <form action="artists/delete" method="post">
@@ -277,7 +301,7 @@
         <div id="remove-homepage-image" class="tab-pane fade">
             <%_ if (homepage_images.length) { _%>
             <form action="/homepage/image/delete" method="post">
-                <label>HOMEPAGE IMAGES</label>
+                <label>HOMEPAGE IMAGES</label><br>
                 <%_ homepage_images.forEach((image, i) => { _%>
                 <div style="display: inline-block">
                     <input type="checkbox" name="image<%= i %>" value="<%= image.p_id %>">

@@ -6,7 +6,8 @@ module.exports.Article = mongoose.model('Article', Schema({
     headline_images: [String],
     headline_image_thumb: String,
     textbody: String,
-    textbody_media: [String]
+    textbody_media: [String],
+    index: Number
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } }));
 
 module.exports.Project = mongoose.model('Project', Schema({
@@ -52,5 +53,6 @@ module.exports.Homepage_content = mongoose.model('Homepage_content', Schema({
 
 module.exports.Homepage_image = mongoose.model('Homepage_image', Schema({
     p_id: String,
-    url: String
+    url: String,
+    index: Number
 }));
