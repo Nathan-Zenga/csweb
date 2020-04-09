@@ -293,6 +293,20 @@
                 $form.find("#size_bottom_edit").val(result.size_bottom);
                 $form.find("#extra_info_edit").val(result.extra_info);
             });
+
+            $("#mail form #recipient_email").change(function() {
+                var $form = $(this).closest("form");
+                var email = this.value;
+                var result = docs.filter(function(m) { return email == m.email })[0] || {};
+                var exists = !!Object.values(result).length;
+
+                $form.find("#recipient_details").css("display", exists ? "block" : "none").html(
+                    "<b>Name</b>: " + result.firstname + " " + result.lastname + "<br> " +
+                    "<b>Sizes</b>: " + result.size_top + " (Top), " + result.size_bottom + " (Bottoms)<br> " +
+                    (result.extra_info ? "<b>Extra info</b>: " + result.extra_info.replace(/\r?\n/g, "<br>") + "<br>" : "")
+                );
+            });
+
         });
         $("#edit-artist form").submit(function(e) {
             e.preventDefault();
