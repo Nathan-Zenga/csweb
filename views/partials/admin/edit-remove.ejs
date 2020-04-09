@@ -130,7 +130,7 @@
                 <select name="location_id" id="location_id" required>
                     <option value=""></option>
                     <%_ locations.forEach(location => { _%>
-                    <option value="<%= location._id %>"><%= location.name %></option>
+                    <option value="<%= location._id %>"><%= location.name +" - "+ location.city +", "+ location.country %></option>
                     <%_ }) _%>
                 </select>
 
@@ -273,7 +273,7 @@
             <form action="map/location/delete" method="post">
                 <label>LOCATION</label>
                 <%_ locations.forEach((location, i) => { _%>
-                <input type="checkbox" name="location<%= i %>" value="<%= location._id %>"> <span><%= location.name %></span><br>
+                <input type="checkbox" name="location<%= i %>" value="<%= location._id %>"> <span><%- "<b>"+ location.name +"</b> - "+ location.city +", "+ location.country %></span><br>
                 <%_ }) _%>
                 <br>
                 <input type="submit" value="DELETE LOCATIONS">
