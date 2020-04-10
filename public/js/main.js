@@ -1,12 +1,10 @@
 $(function() {
 	var height = $("#cs-logo").css("height");
-	function fixLogo() {
+
+	$(window).on("load scroll", function() {
 		var state = window.pageYOffset > $("main").offset().top+20;
 		$("#cs-logo").toggleClass("fixed", state).parent("a").attr("href", "/").removeAttr(state ? "href" : "");
-	}
-
-	fixLogo();
-	$(window).scroll(fixLogo);
+	});
 
 	$("#nav-button").click(function() {
 		$(this).toggleClass("nav-open");
