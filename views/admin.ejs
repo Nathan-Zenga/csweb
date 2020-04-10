@@ -363,15 +363,18 @@
 
         $("#locations form, #mail form, #homepage_content_form, #edit-location form, #edit-member form, #edit-homepage-image form").submit(function(e) {
             e.preventDefault();
+            var form = this;
             var data = {};
-            var refresh = !!$(this).closest("#edit-location").length;
-            $(this).serializeArray().forEach(function(field) {
+            var refresh = !!$(form).closest("#edit-location").length;
+            $(form).serializeArray().forEach(function(field) {
                 var name = field.name;
                 data[name] = field.value;
             });
+            var max = value = parseInt($(form).find("#homepage_image_index").attr("max")) + 1;
 
-            $.post(this.action, data, function(result) {
+            $.post(form.action, data, function(result) {
                 e.target.reset();
+                $(form).find("#homepage_image_index").attr({ max, value }).val(value);
                 showMessage(result, e.target, refresh);
             });
         });
