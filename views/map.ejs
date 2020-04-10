@@ -1,22 +1,31 @@
 <%_ include partials/header _%>
-	<div class="content-container">
+	<div class="content-container" style="background-color: transparent;">
 		<div class="content"><div id="map"></div></div>
 	</div>
+	<style>
+		#map > div {
+			background-color: transparent!important;
+		}
+	</style>
 	<script>
 		function initMap() {
 			$.post("/map/init", function(res) {
 				var locations = res.locations, center = res.mid_point;
 				var bounds = new google.maps.LatLngBounds();
 				var map = new google.maps.Map(document.getElementById("map"), { center, zoom: 15 });
+				var infowindow = null;
 
 				locations.forEach(function(location, i) {
 					var position = { lat: location.latitude, lng: location.longitude };
 					var marker = new google.maps.Marker({ position, map, icon: "/img/cs-marker.png" });
-					var content = '<div id="content"><div id="siteNotice"></div>'+
-						'<h1 id="firstHeading" style="font-size: 1.5em">'+ location.name +'</h1>'+
-						'<div id="bodyContent">'+ location.street_address +'</div></div>';
-					var infowindow = new google.maps.InfoWindow({ content });
-					marker.addListener('click', function() { infowindow.open(map, marker) });
+					marker.addListener('click', function() {
+						if (infowindow) infowindow.close();
+						var content = '<div id="content"><div id="siteNotice"></div>'+
+							'<h1 id="firstHeading" style="font-size: 1.5em">'+ location.name +'</h1>'+
+							'<div id="bodyContent">'+ location.street_address +", "+ location.city +", "+ location.country +'</div></div>';
+						infowindow = new google.maps.InfoWindow({ content });
+						infowindow.open(map, marker);
+					});
 					bounds.extend(position);
 					if (locations.length > 1 && i === locations.length-1) map.fitBounds(bounds);
 				});
