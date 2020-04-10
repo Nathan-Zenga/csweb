@@ -532,7 +532,7 @@ article.full .textbody-media iframe:not([src*=youtu]) {
 }
 
 .project-thumb .img {
-	height: 300px;
+	padding-top: 100%;
 	background-color: rgba(0,0,0,.5);
 	background-size: cover;
 	background-position: center;
