@@ -31,7 +31,7 @@
                             } else if (audio) {
                                 media = '<div class="textbody-media audio"><audio src="'+ media +'" controls><source src="'+ media +'"></audio></div>';
                             } else if (iframeElm) {
-                                media = '<div class="textbody-media iframe">'+ media +'</div>';
+                                media = '<div class="textbody-media iframe">'+ media.match(/<iframe(.*?)<\/iframe>/g)[0] +'</div>';
                             }
                             textbody = textbody.replace(/<p>x<\/p>/i, media);
                         });
