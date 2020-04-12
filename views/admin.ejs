@@ -220,21 +220,23 @@
                 });
             }
         });
-        $("#artists form").submit(function(e) {
+        $(".social-media-name, .social-media-url").change(function() {
+            var $groupInputs = $(this).closest(".social-media-input-group").find(":input");
+            var notEmpty = $groupInputs.filter(function() { return this.value }).length > 0;
+            $groupInputs.attr("required", notEmpty);
+        });
+        $(".social-media-input-group button").click(function(e) {
             e.preventDefault();
-            var data = { socials: {} };
-            $(this).serializeArray().filter(function(field) { return field.value }).forEach(function(field) {
-                var name = field.name;
-                var social = name.replace("social_", "");
-                !name.includes("social_") ? data[name] = field.value : data.socials[social] = field.value;
-            });
-
-            if (profile_image) data.profile_image = profile_image;
-
-            $.post(this.action, data, function(result) {
-                e.target.reset();
-                showMessage(result, e.target, true);
-            });
+            var $form = $(this).closest("form");
+            var $group = $(this).closest(".social-media-input-group");
+            switch (this.className) {
+                case "add":
+                    $group.clone(true).insertAfter($group);
+                    break;
+                case "remove":
+                    if ($form.find(".social-media-input-group").length > 1) $group.remove();
+                    break;
+            }
         });
 
         $.post("/search", function(docs) {
@@ -251,9 +253,14 @@
 
                 $form.find("#artist_name_edit").val(result.name);
                 $form.find("#artist_bio_edit").val(result.bio);
-                $form.find("*[id*=social_]").val("");
-                socials_keys.forEach(function(k) {
-                    $form.find("#social_"+ k +"_edit").val(result.socials[k]);
+                var $superGroup = $form.find(".social-media-inputs");
+                $superGroup.find(".social-media-input-group").find(":input").val("").end().not(":first").remove();
+                socials_keys.forEach(function(k, i) {
+                    if (i == 0) $superGroup.empty();
+                    var $clone = $("#artists .social-media-input-group").clone(true);
+                    $clone.find(".social-media-name").addClass("edit").val(k).end()
+                          .find(".social-media-url").addClass("edit").val(result.socials[k]).end()
+                          .appendTo($superGroup);
                 });
 
                 $form.find("#headline_edit").val(result.headline);
@@ -310,17 +317,12 @@
         });
         $("#edit-artist form").submit(function(e) {
             e.preventDefault();
-            var data = { socials: {} };
-            $(this).serializeArray().filter(function(field) { return field.value }).forEach(function(field) {
-                var name = field.name;
-                var social = name.replace("social_", "");
-                !name.includes("social_") ? data[name] = field.value : data.socials[social] = field.value;
-            });
-
-            if (profile_image) data.profile_image_change = profile_image;
+            var data = Object.assign([], $(this).serializeArray());
+            if (profile_image) data.push({ name: "profile_image", value: profile_image });
 
             $.post(this.action, data, function(result) {
                 e.target.reset();
+                profile_image = "";
                 showMessage(result, e.target, true);
             });
         });
@@ -361,20 +363,22 @@
             });
         });
 
-        $("#locations form, #mail form, #homepage_content_form, #edit-location form, #edit-member form, #edit-homepage-image form").submit(function(e) {
+        $("#locations form, #mail form, #homepage_content_form, #artists form, " +
+          "#edit-location form, #edit-member form, #edit-homepage-image form").submit(function(e) {
             e.preventDefault();
             var form = this;
-            var data = {};
+            var data = Object.assign([], $(form).serializeArray());
+            if (profile_image) data.push({ name: "profile_image", value: profile_image });
+            var $submitBtn = $(form).find("input[type=submit]");
             var refresh = !!$(form).closest("#edit-location").length;
-            $(form).serializeArray().forEach(function(field) {
-                var name = field.name;
-                data[name] = field.value;
-            });
             var max = value = parseInt($(form).find("#homepage_image_index").attr("max")) + 1;
+            $submitBtn.attr("disabled", true);
 
             $.post(form.action, data, function(result) {
                 e.target.reset();
+                $submitBtn.attr("disabled", false);
                 $(form).find("#homepage_image_index").attr({ max, value }).val(value);
+                profile_image = "";
                 showMessage(result, e.target, refresh);
             });
         });

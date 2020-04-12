@@ -11,12 +11,25 @@
         <div class="col-sm-6 col-xs-9"><input type="file" name="profile_image" id="profile_image" accept="image/*"></div>
         <div class="col-sm-6 col-xs-3"><button class="clear-uploads" data-id="profile_image">CLEAR</button></div>
     </div>
-    <div class="input-group" style="display: block">
-        <%_ ["SoundCloud", "Spotify", "Tidal", "Apple Music", "Deezer", "Google Play", "Twitter", "Instagram", "Facebook", "Linktree"].forEach(social => { _%>
-        <div class="col-sm-3"><label><%= social.toUpperCase() %>:</label></div>
-        <%_ social = social.toLowerCase().replace(/ /g, '_'); _%>
-        <div class="col-sm-9"><input type="url" name="social_<%= social %>" id="social_<%= social %>" placeholder="Enter URL (optional)"></div>
-        <%_ }) _%>
+
+    <label>SOCIAL MEDIA LINKS</label>
+    <div class="input-group social-media-input-group row" style="display: block">
+        <div class="col-sm-4">
+            <select name="social_media_name" class="social-media-name">
+                <option value="">Choose social</option>
+                <%_ ["Twitter", "Instagram", "Facebook", "Spotify", "SoundCloud", "Apple Music", "Tidal", "Bandcamp", "Deezer", "Google Play", "Linktree"].forEach(social => { _%>
+                <option value="<%= social.toLowerCase().replace(/ /g, '_') %>"><%= social %></option>
+                <%_ }) _%>
+            </select>
+        </div>
+        <div class="col-sm-8">
+            <input type="url" name="social_media_url" class="social-media-url" placeholder="Enter URL">
+        </div>
+        <div class="col-sm-12" style="text-align: right; margin-top: -1em;">
+            <button class="add">ADD</button>
+            <button class="remove">REMOVE</button>
+        </div>
     </div>
+
     <input type="submit" value="SAVE">
 </form>
