@@ -74,4 +74,14 @@ router.post('/homepage/image/reorder', (req, res) => {
     indexReorder(Homepage_image, id, index, () => res.send("RE-ORDERING PROCESS DONE"));
 });
 
+router.post('/cs/links/delete', (req, res) => {
+    var names = Object.values(req.body);
+    Homepage_content.findOne((err, content) => {
+        if (content && names.length) {
+            content.socials = content.socials.filter(x => !names.includes(x.name));
+            content.save(err => res.send(err || "LINK"+ (names.length > 1 ? "S" : "") +" REMOVED SUCCESSFULLY"));
+        } else { res.send("NOTHING SELECTED") }
+    })
+});
+
 module.exports = router;

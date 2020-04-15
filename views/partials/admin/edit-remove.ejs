@@ -1,6 +1,6 @@
-<%_ var { artists, projects, articles, locations, members, homepage_images } = db; _%>
-<div class="col-sm-3" id="edit-remove-sidebar">
-    <div class="mb-view" id="edit-remove-dropdown-options" style="font-weight: bold; max-width: 250px; margin: 0 auto">
+<%_ var { artists, projects, articles, locations, members, homepage_images, homepage_contents } = db; _%>
+<div class="col-md-3" id="edit-remove-sidebar">
+    <div class="mb-view-md" id="edit-remove-dropdown-options" style="font-weight: bold; max-width: 250px; margin: 0 auto">
         <label>SELECT OPTION</label>
         <select >
             <option value="#edit-artist">EDIT ARTIST</option>
@@ -9,6 +9,7 @@
             <option value="#edit-location">EDIT LOCATION</option>
             <option value="#edit-member">EDIT MEMBER</option>
             <option value="#edit-homepage-image">REORDER HOMEPAGE IMAGE</option>
+            <option value="#remove-cs-link">REMOVE CS LINKS</option>
             <option value="#remove-artist">REMOVE ARTIST</option>
             <option value="#remove-article">REMOVE ARTICLE</option>
             <option value="#remove-project">REMOVE PROJECT</option>
@@ -17,7 +18,7 @@
             <option value="#remove-homepage-image">REMOVE HOMEPAGE IMAGE</option>
         </select>
     </div>
-    <ul class="nav nav-pills nav-stacked dt-view">
+    <ul class="nav nav-pills nav-stacked dt-view-md">
         <li class="active"><a data-toggle="pill" href="#edit-artist">EDIT ARTIST</a></li>
         <li><a data-toggle="pill" href="#edit-article">EDIT ARTICLE</a></li>
         <li><a data-toggle="pill" href="#edit-project">EDIT PROJECT</a></li>
@@ -25,6 +26,7 @@
         <li><a data-toggle="pill" href="#edit-member">EDIT MEMBER</a></li>
         <li><a data-toggle="pill" href="#edit-homepage-image">REORDER HOMEPAGE IMAGE</a></li>
         <br>
+        <li><a data-toggle="pill" href="#remove-cs-link">REMOVE CS LINKS</a></li>
         <li><a data-toggle="pill" href="#remove-artist">REMOVE ARTIST</a></li>
         <li><a data-toggle="pill" href="#remove-article">REMOVE ARTICLE</a></li>
         <li><a data-toggle="pill" href="#remove-project">REMOVE PROJECT</a></li>
@@ -33,7 +35,7 @@
         <li><a data-toggle="pill" href="#remove-homepage-image">REMOVE HOMEPAGE IMAGE</a></li>
     </ul>
 </div>
-<div class="col-sm-9">
+<div class="col-md-9">
     <div class="tab-content" style="padding-top: 10px;">
         <div id="edit-artist" class="tab-pane fade in active">
             <form method="post" action="/artists/edit">
@@ -244,6 +246,23 @@
             </form>
             <%_ } else { _%>
             <p style="text-align: center; margin-top: 2em"><b>NO IMAGES TO RE-ORDER</b></p>
+            <%_ } _%>
+        </div>
+
+        <div id="remove-cs-link" class="tab-pane fade">
+            <%_ var { socials } = homepage_contents[0];
+                if (socials.length) { _%>
+            <form action="cs/links/delete" method="post">
+                <label>CS SOCIALS</label>
+                <%_ socials.forEach((social, i) => {
+                    var label = social.name.slice(0,1).toUpperCase() + social.name.slice(1).replace(/_/g, " "); _%>
+                <input type="checkbox" name="social<%= i %>" value="<%= social.name %>"> <span><%= label %></span><br>
+                <%_ }) _%>
+                <br>
+                <input type="submit" value="DELETE LINKS">
+            </form>
+            <%_ } else { _%>
+            <p style="text-align: center; margin-top: 2em"><b>NO SOCIAL LINKS TO DELETE</b></p>
             <%_ } _%>
         </div>
 
