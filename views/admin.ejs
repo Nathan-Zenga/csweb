@@ -217,22 +217,21 @@
                 });
             }
         });
-        $(".social-media-name, .social-media-url").change(function() {
-            var $groupInputs = $(this).closest(".social-media-input-group").find(":input");
+        $(".input-group .input-item :input").change(function() {
+            var $groupInputs = $(this).closest(".input-item").find(":input");
             var notEmpty = $groupInputs.filter(function() { return this.value }).length > 0;
             $groupInputs.attr("required", notEmpty);
         });
-        $(".social-media-input-group button, .link-items-group button").click(function(e) {
+        $(".input-group .input-item button").click(function(e) {
             e.preventDefault();
-            var parentSelectors = ".social-media-input-group, .link-items-group";
             var $form = $(this).closest("form");
-            var $group = $(this).closest(parentSelectors);
+            var $item = $(this).closest(".input-item");
             switch (this.className) {
                 case "add":
-                    $group.clone(true).find(":input").not("button").val("").end().end().insertAfter($group);
+                    $item.clone(true).find(":input").not("button").val("").end().end().insertAfter($item);
                     break;
                 case "remove":
-                    if ($form.find(parentSelectors).length > 1) $group.remove();
+                    if ($form.find(".input-item").length > 1) $item.remove();
                     break;
             }
         });
@@ -251,11 +250,11 @@
 
                 $form.find("#artist_name_edit").val(result.name);
                 $form.find("#artist_bio_edit").val(result.bio);
-                var $superGroup = $form.find(".social-media-inputs");
-                $superGroup.find(".social-media-input-group").find(":input").val("").end().not(":first").remove();
+                var $superGroup = $form.find(".social-media-input-group");
+                $superGroup.find(".social-media-input").find(":input").val("").end().not(":first").remove();
                 socials_keys.forEach(function(k, i) {
                     if (i == 0) $superGroup.empty();
-                    var $clone = $("#artists .social-media-input-group").clone(true);
+                    var $clone = $("#artists .social-media-input").clone(true);
                     $clone.find(".social-media-name").addClass("edit").val(k).end()
                           .find(".social-media-url").addClass("edit").val(result.socials[k]).end()
                           .appendTo($superGroup);
@@ -282,7 +281,7 @@
                 $form.find("#title_edit").val(result.title);
                 $form.find("#artist_edit").val(result.artist);
                 $form.find("#year_edit").val(result.year);
-                var $superGroup = $form.find(".link-items-group");
+                var $superGroup = $form.find(".link-item-group");
                 $superGroup.find(".link-item").find(":input").val("").end().not(":first").remove();
                 (result.links || []).forEach(function(link, i) {
                     if (i == 0) $superGroup.empty();

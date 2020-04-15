@@ -57,8 +57,8 @@
                     <div class="col-sm-6 col-xs-3"><button class="clear-uploads" data-id="profile_image_change">CLEAR</button></div>
                 </div>
                 <label>SOCIAL MEDIA LINKS</label>
-                <div class="social-media-inputs">
-                    <div class="input-group social-media-input-group row" style="display: block">
+                <div class="social-media-input-group input-group row" style="display: block">
+                    <div class="social-media-input input-item">
                         <div class="col-sm-4">
                             <select name="social_media_name" class="social-media-name edit">
                                 <option value="">Choose social</option>
@@ -133,9 +133,9 @@
                 <%_ var thisYear = new Date().getFullYear(); _%>
                 <input type="number" name="year_edit" id="year_edit" min="2000" max="<%= thisYear %>" value="<%= thisYear %>">
                 <label>LINKS (OPTIONAL)</label>
-                <div class="link-items-group input-group row" style="display: block">
-                    <div class="link-item">
-                        <div class="row"><input type="url" name="links_edit" class="link" placeholder="Enter the image URL" required></div>
+                <div class="link-item-group input-group row" style="display: block">
+                    <div class="link-item input-item">
+                        <div class="row"><input type="url" name="links_edit" class="link" placeholder="Enter URL"></div>
                         <div class="row" style="text-align: right; margin: -1em 0 1em;">
                             <button class="add">ADD</button>
                             <button class="remove">REMOVE</button>
