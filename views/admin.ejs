@@ -152,7 +152,6 @@
         });
         $("#articles form").submit(function(e) {
             e.preventDefault();
-            console.log(textbody_media);
             if (invalidURLs(textbody_media).length) { showMessage("Invalid URL", this); return false }
 
             var data = { headline_images, textbody_media };
@@ -168,19 +167,21 @@
 
         var artwork_file = "";
         $(":input[id*=all_platforms]").change(function() {
-            $(this).closest("form").find(":input[id*=links]").val("").attr({ required: !this.checked, disabled: this.checked });
+            $(this).closest("form").find(".link-item").not(":first").remove()
+                   .end().find(":input[type=url]").val("").attr({ required: !this.checked })
+                   .end().find(":input").attr({ disabled: this.checked })
         });
-        $(":input[id*=artwork_file], :input[id*=artwork_url]").change(function() {
-            var id = this.id.includes("artwork_url") ? "artwork_file" : "artwork_url";
-            var required = /edit|change/.test(this.id) ? false : !this.value;
-            $(this).closest("form").find(":input[id*="+ id +"]").val("").attr({ required });
+        $(".artwork-upload :input").change(function() {
+            $(this).closest(".artwork-upload").find(":input").not(this).val("").attr("required", false);
+            $(this).attr("required", true);
         });
-        $("#artwork_file, #artwork_file_change").change(function() {
+        $(".artwork-upload :file").change(function() {
             var files = this.files;
             artwork_file = "";
             if (files.length) {
                 var $submitInput = $(this).closest("form").children("input:submit");
                 var counter = 0;
+                $submitInput.attr("disabled", true);
                 readDataURLs(files, function(e) {
                     counter += 1;
                     artwork_file = e.target.result;
@@ -188,17 +189,13 @@
                 });
             }
         });
+        $(".artwork-upload :input[type=url]").change(function() {
+            if (this.value.trim() && artwork_file) artwork_file = "";
+        });
         $("#discography form").submit(function(e) {
             e.preventDefault();
-            var data = {};
-            $(this).serializeArray().forEach(function(field) {
-                var name = field.name;
-                data[name] = field.value;
-            });
-
-            var url_format = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/gim;
-            if (data.links) data.links = data.links.match(url_format);
-            if (artwork_file) data.artwork_file = artwork_file;
+            var data = Object.assign([], $(this).serializeArray());
+            if (artwork_file) data.push({ name: "artwork_file", value: artwork_file });
 
             $.post(this.action, data, function(result) {
                 e.target.reset();
@@ -225,16 +222,17 @@
             var notEmpty = $groupInputs.filter(function() { return this.value }).length > 0;
             $groupInputs.attr("required", notEmpty);
         });
-        $(".social-media-input-group button").click(function(e) {
+        $(".social-media-input-group button, .link-items-group button").click(function(e) {
             e.preventDefault();
+            var parentSelectors = ".social-media-input-group, .link-items-group";
             var $form = $(this).closest("form");
-            var $group = $(this).closest(".social-media-input-group");
+            var $group = $(this).closest(parentSelectors);
             switch (this.className) {
                 case "add":
-                    $group.clone(true).insertAfter($group);
+                    $group.clone(true).find(":input").not("button").val("").end().end().insertAfter($group);
                     break;
                 case "remove":
-                    if ($form.find(".social-media-input-group").length > 1) $group.remove();
+                    if ($form.find(parentSelectors).length > 1) $group.remove();
                     break;
             }
         });
@@ -284,7 +282,14 @@
                 $form.find("#title_edit").val(result.title);
                 $form.find("#artist_edit").val(result.artist);
                 $form.find("#year_edit").val(result.year);
-                $form.find("#links_edit").val(result.links ? result.links.join("\n") : "");
+                var $superGroup = $form.find(".link-items-group");
+                $superGroup.find(".link-item").find(":input").val("").end().not(":first").remove();
+                (result.links || []).forEach(function(link, i) {
+                    if (i == 0) $superGroup.empty();
+                    var $clone = $("#discography .link-item").clone(true);
+                    $clone.find(":input[type=url]").addClass("edit").attr("name", "links_edit").val(link).end().appendTo($superGroup);
+                });
+
                 $form.find("#all_platforms_change").attr("checked", result.all_platforms);
 
                 $form.find("#location_name_edit").val(result.name);
@@ -313,7 +318,6 @@
                     (result.extra_info ? "<b>Extra info</b>: " + result.extra_info.replace(/\r?\n/g, "<br>") + "<br>" : "")
                 );
             });
-
         });
         $("#edit-artist form").submit(function(e) {
             e.preventDefault();
@@ -329,7 +333,6 @@
 
         $("#edit-article form").submit(function(e) {
             e.preventDefault();
-            console.log(textbody_media);
             if (invalidURLs(textbody_media).length) { showMessage("Invalid URL", this); return false }
 
             var headline_images_change = headline_images;
@@ -347,15 +350,8 @@
 
         $("#edit-project form").submit(function(e) {
             e.preventDefault();
-            var data = {};
-            $(this).serializeArray().forEach(function(field) {
-                var name = field.name;
-                data[name] = field.value;
-            });
-
-            var url_format = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/gim;
-            if (data.links_edit) data.links_edit = data.links_edit.match(url_format);
-            if (artwork_file) data.artwork_file_change = artwork_file;
+            var data = Object.assign([], $(this).serializeArray());
+            if (artwork_file) data.push({name: "artwork_file_change", value: artwork_file});
 
             $.post(this.action, data, function(result) {
                 e.target.reset();
@@ -386,16 +382,13 @@
         $(".tab-pane[id*=remove-] form").submit(function(e) {
             e.preventDefault();
             var form = this;
-            var data = {};
-            $(form).serializeArray().forEach(function(field) {
-                var name = field.name;
-                data[name] = field.value;
-            });
+            var data = Object.assign([], $(form).serializeArray());
+
             $.post(form.action, data, function(result) {
                 showMessage(result, e.target);
                 $(form).find(":input:checked, :input:checked + span").slideUp(function() {
                     $(this).remove();
-                    Object.values(data).forEach(function(id) { $("option[value="+ id +"]").remove() });
+                    data.forEach(function(field) { $("option[value="+ field.value +"]").remove() });
                 });
             });
         });
