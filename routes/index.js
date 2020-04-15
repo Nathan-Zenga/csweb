@@ -28,6 +28,17 @@ router.post('/homepage/content', (req, res) => {
         var content = !contents.length ? new Homepage_content() : contents[0];
         if (req.body.banner_text)   content.banner_text = req.body.banner_text;
         if (req.body.footnote_text) content.footnote_text = req.body.footnote_text;
+        if (req.body.socials_name && req.body.socials_url) {
+            var names = (req.body.socials_name instanceof Array ? req.body.socials_name : [req.body.socials_name]).filter(e => e);
+            var urls = (req.body.socials_url instanceof Array ? req.body.socials_url : [req.body.socials_url]).filter(e => e);
+            var socials = [];
+            names.forEach((name, i) => { socials.push({name, url: urls[i] })});
+            if (content.socials instanceof Array) {
+                content.socials = content.socials.filter(s => req.body.socials_name !== s.name).concat(socials);
+            } else {
+                content.socials = socials;
+            }
+        }
         content.save(err => res.send("HOMEPAGE CONTENT " + (!contents.length ? "SAVED" : "UPDATED")));
     })
 });

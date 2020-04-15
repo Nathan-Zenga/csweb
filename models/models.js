@@ -48,7 +48,8 @@ module.exports.Location = mongoose.model('Location', Schema({
 module.exports.Homepage_content = mongoose.model('Homepage_content', Schema({
     banner_text: String,
     banner_media: [String],
-    footnote_text: String
+    footnote_text: String,
+    socials: Array
 }));
 
 module.exports.Homepage_image = mongoose.model('Homepage_image', Schema({

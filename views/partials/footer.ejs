@@ -1,10 +1,12 @@
 	</main>
 	<footer>
-		<a class="fab fa-instagram" target="_blank" aria-hidden="true" href="http://instagram.com/thecsrecords"></a>
-		<a class="fab fa-youtube" target="_blank" aria-hidden="true" href="https://www.youtube.com/channel/UC0aXn5NX6Q9nYspOr9jpUUA"></a>
-		<a class="fab fa-facebook" target="_blank" aria-hidden="true" href="https://facebook.com/thecs.co"></a>
-		<a class="fab fa-twitter" target="_blank" aria-hidden="true" href="https://twitter.com/thecsrecords"></a>
-		<a class="fab fa-soundcloud" target="_blank" aria-hidden="true" href="https://soundcloud.com/thecsrecords"></a>
+		<%_ socials.forEach(link => {
+		    if (!(/tidal/i.test(link.name))) { _%>
+		<a class="fab fa-<%= link.name %>" target="_blank" aria-hidden="true" href="<%= link.url %>"></a>
+		<%_ } else {
+		    var img = { tidal: "https://simpleicons.org/icons/tidal.svg" }; _%>
+		<a target="_blank" href="<%= link.url %>"><img style="height: 1.2em" src="<%= img[link.name] %>" alt="<%= link.name %> link"></a>
+		<%_ }}) _%>
 	</footer>
 </body>
 </html>

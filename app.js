@@ -5,6 +5,7 @@ var path = require('path'); // core module
 var mongoose = require('mongoose');
 var session = require('express-session');
 var MemoryStore = require('memorystore')(session);
+var { Homepage_content } = require('./models/models');
 
 mongoose.connect(process.env.CSDB, { useNewUrlParser: true, useUnifiedTopology: true });
 mongoose.connection.once('open', () => { console.log("Connected to DB") });
@@ -33,8 +34,10 @@ app.use(session({
 
 // Global variables
 app.use((req, res, next) => {
-	// res.locals.production = production;
-	next();
+	Homepage_content.find((err, contents) => {
+		res.locals.socials = contents && contents.length ? contents[0].socials : [];
+		next();
+	})
 });
 
 app.use('/', require('./routes/index'));

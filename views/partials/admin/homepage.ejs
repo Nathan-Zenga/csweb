@@ -6,6 +6,27 @@
     <label for="footnote_text">FOOTNOTE TEXT / QUOTE</label>
     <input type="text" name="footnote_text" id="footnote_text" value="<%= contents[0] ? contents[0].footnote_text : '' %>">
 
+    <label>SOCIALS</label>
+    <div class="social-media-input-group input-group row" style="display: block">
+        <div class="social-media-input input-item">
+            <div class="col-sm-4">
+                <select name="socials_name" class="socials-name">
+                    <option value="">Choose social</option>
+                    <%_ ["Twitter", "Instagram", "Facebook", "Spotify", "YouTube", "SoundCloud", "Apple Music", "Tidal", "Bandcamp", "Deezer", "Google Play"].forEach(social => { _%>
+                    <option value="<%= social.toLowerCase().replace(/ /g, '_') %>"><%= social %></option>
+                    <%_ }) _%>
+                </select>
+            </div>
+            <div class="col-sm-8">
+                <input type="url" name="socials_url" class="socials-url" placeholder="Enter URL">
+            </div>
+            <div class="col-sm-12" style="text-align: right; margin-top: -1em;">
+                <button class="add">ADD</button>
+                <button class="remove">REMOVE</button>
+            </div>
+        </div>
+    </div>
+
     <input type="submit" value="UPDATE HOMEPAGE CONTENT">
 </form>
 <br>
