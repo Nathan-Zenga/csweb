@@ -1,6 +1,6 @@
 <%_ include partials/header _%>
     <div class="container">
-        <%_ articles.forEach(article => { _%>
+        <%_ articles.forEach((article, i) => { _%>
         <article class="content-container col-md-4 col-sm-6">
             <div class="article-content">
                 <%_ if (article.headline_image_thumb) { _%>
@@ -20,6 +20,7 @@
                 <div class="overflow-fade-sheet"><a href="/news/article/<%= article._id %>">READ MORE</a></div>
             </div>
         </article>
+        <%- ((i + 1) % 3 == 0) ? '<div class="breakpoint row dt-view-md"></div>' : '' %>
         <%_ }) _%>
     </div>
 <%_ include partials/footer _%>
