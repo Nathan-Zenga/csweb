@@ -90,7 +90,7 @@
 
         var textbody_media = [];
         var spots = [];
-        $("#textbody, #textbody_edit").change(function() {
+        $("#textbody, #textbody_edit").keyup(function() {
             var textbody = this;
             var tbm_container = $(this).closest("form").find(".textbody_media");
             textbody_media = [];
@@ -154,11 +154,10 @@
             e.preventDefault();
             if (invalidURLs(textbody_media).length) { showMessage("Invalid URL", this); return false }
 
-            var data = { headline_images, textbody_media };
-            $(this).serializeArray().forEach(function(field) {
-                var name = field.name;
-                data[name] = field.value;
-            });
+            var data = Object.assign([], $(this).serializeArray());
+            if (headline_images.length) data.push({ name: "headline_images", value: headline_images });
+            if (textbody_media.length)  data.push({ name: "textbody_media", value: textbody_media });
+
             $.post(this.action, data, function(result) {
                 e.target.reset();
                 showMessage(result, e.target, true);
@@ -178,7 +177,7 @@
         $(".artwork-upload :file").change(function() {
             var files = this.files;
             artwork_file = "";
-            if (files.length) {
+            if (files && files.length) {
                 var $submitInput = $(this).closest("form").children("input:submit");
                 var counter = 0;
                 $submitInput.attr("disabled", true);
@@ -250,14 +249,14 @@
 
                 $form.find("#artist_name_edit").val(result.name);
                 $form.find("#artist_bio_edit").val(result.bio);
-                var $superGroup = $form.find(".social-media-input-group");
-                $superGroup.find(".social-media-input").find(":input").val("").end().not(":first").remove();
+                var $group = $form.find(".social-media-input-group");
+                $group.find(".social-media-input").find(":input").val("").end().not(":first").remove();
                 socials_keys.forEach(function(k, i) {
-                    if (i == 0) $superGroup.empty();
+                    if (i == 0) $group.empty();
                     var $clone = $("#artists .social-media-input").clone(true);
                     $clone.find(".social-media-name").addClass("edit").val(k).end()
                           .find(".social-media-url").addClass("edit").val(result.socials[k]).end()
-                          .appendTo($superGroup);
+                          .appendTo($group);
                 });
 
                 $form.find("#headline_edit").val(result.headline);
@@ -281,12 +280,12 @@
                 $form.find("#title_edit").val(result.title);
                 $form.find("#artist_edit").val(result.artist);
                 $form.find("#year_edit").val(result.year);
-                var $superGroup = $form.find(".link-item-group");
-                $superGroup.find(".link-item").find(":input").val("").end().not(":first").remove();
+                var $group = $form.find(".link-item-group");
+                $group.find(".link-item").find(":input").val("").end().not(":first").remove();
                 (result.links || []).forEach(function(link, i) {
-                    if (i == 0) $superGroup.empty();
+                    if (i == 0) $group.empty();
                     var $clone = $("#discography .link-item").clone(true);
-                    $clone.find(":input[type=url]").addClass("edit").attr("name", "links_edit").val(link).end().appendTo($superGroup);
+                    $clone.find(":input[type=url]").addClass("edit").attr("name", "links_edit").val(link).end().appendTo($group);
                 });
 
                 $form.find("#all_platforms_change").attr("checked", result.all_platforms);
@@ -314,7 +313,7 @@
                 $form.find("#recipient_details").css("display", exists ? "block" : "none").html(
                     "<b>Name</b>: " + result.firstname + " " + result.lastname + "<br> " +
                     "<b>Sizes</b>: " + result.size_top + " (Top), " + result.size_bottom + " (Bottoms)<br> " +
-                    (result.extra_info ? "<b>Extra info</b>: " + result.extra_info.replace(/\r?\n/g, "<br>") + "<br>" : "")
+                    (result.extra_info ? "<b>Extra info</b>: " + result.extra_info.trim().replace(/\r?\n/g, "<br>") + "<br>" : "")
                 );
             });
         });
@@ -334,13 +333,10 @@
             e.preventDefault();
             if (invalidURLs(textbody_media).length) { showMessage("Invalid URL", this); return false }
 
-            var headline_images_change = headline_images;
-            var textbody_media_change = textbody_media;
-            var data = { headline_images_change, textbody_media_change };
-            $(this).serializeArray().forEach(function(field) {
-                var name = field.name;
-                data[name] = field.value;
-            });
+            var data = Object.assign([], $(this).serializeArray());
+            if (headline_images.length) data.push({ name: "headline_images_change", value: headline_images });
+            if (textbody_media.length) data.push({ name: "textbody_media_change", value: textbody_media });
+
             $.post(this.action, data, function(result) {
                 e.target.reset();
                 showMessage(result, e.target, true);

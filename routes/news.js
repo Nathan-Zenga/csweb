@@ -4,21 +4,18 @@ var cloud = require('cloudinary');
 var { Article } = require('../models/models');
 var saveMedia = (body, doc, cb) => {
     var msg = "";
-    var fields = ["headline_images", "textbody_media", "headline_images[]", "textbody_media[]",
-                  "headline_images_change", "textbody_media_change", "headline_images_change[]", "textbody_media_change[]"]
-                  .filter(f => body[f]);
+    var fields = ["headline_images", "textbody_media", "headline_images_change", "textbody_media_change"].filter(f => body[f]);
     fields.forEach(field => {
-        var f = field.replace(/_change|\[\]/g, "");
-        doc[f] = [];
+        doc[field] = [];
         body[field] = typeof body[field] === "string" ? [body[field]] : body[field];
         body[field].forEach((mediaStr, i) => {
             var notIframe = !["<iframe", "embed"].filter(x => mediaStr.includes(x)).length;
             if (notIframe) {
-                var public_id = "article/"+ doc.id +"/"+ f + (i+1);
+                var public_id = "article/"+ doc.id +"/"+ field + (i+1);
                 cloud.v2.uploader.upload(mediaStr, { public_id, resource_type: "auto" }, (err, result) => {
                     if (err) console.log(err);
                     if (body.headline_image_thumb === mediaStr) doc.headline_image_thumb = result.secure_url;
-                    doc[f].push(result.secure_url);
+                    doc[field].push(result.secure_url);
                     doc.save();
                 });
             } else {
@@ -26,7 +23,7 @@ var saveMedia = (body, doc, cb) => {
                 var toReplace = /^.*(youtu.?be\/|v\/|u\/\w\/|watch\?v=|\&v=|\?v=)/i;
                 var ytIframe = '<iframe src="' + mediaStr.replace(toReplace, "https://youtube.com/embed/") + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
                 mediaStr = ytUrl ? ytIframe : mediaStr;
-                doc[f].push( mediaStr.replace(/(width|height|style)\=\"?\'?(.*?)\"?\'? /gi, "") );
+                doc[field].push( mediaStr.replace(/(width|height|style)\=\"?\'?(.*?)\"?\'? /gi, "") );
                 doc.save();
             }
         });
