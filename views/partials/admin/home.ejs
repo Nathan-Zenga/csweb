@@ -1,10 +1,59 @@
-<%_ var { homepage_contents, homepage_images } = db, contents = homepage_contents; _%>
+<div id="mailing-list-stats">
+    <h1>MAILING LIST STATS</h1>
+    <ul>
+        <li>TOTAL SIGN UPS: <b><%= members.length %></b></li>
+    </ul>
+    <br>
+
+    <h1>NUMBER OF REQUESTS PER SIZE</h1>
+    <div class='table-responsive'>
+        <table id="total-reqs-per-size-table" class="table table-borderless table-hover">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>TOP</th>
+                    <th>BOTTOM</th>
+                </tr>
+            </thead>
+            <tbody>
+                <%_ var sizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
+                    sizes.forEach(size => { _%>
+                <tr>
+                    <th scope="row"><%= size %></th>
+                    <td id="top-<%= size %>"><%= members.filter(m => m.size_top === size).length %></td>
+                    <td id="bottom-<%= size %>"><%= members.filter(m => m.size_bottom === size).length %></td>
+                </tr>
+                <%_ }) _%>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    #mailing-list-stats {
+        max-width: 600px;
+        margin: 0 auto 3em;
+        border-radius: 10px;
+        box-shadow: 0 0 15px grey;
+        padding: 20px;
+    }
+
+    #mailing-list-stats h1 {
+        padding-bottom: 1em;
+        font-size: 1em;
+    }
+
+    #mailing-list-stats tr > * {
+        width: 33.333%;
+    }
+</style>
+
 <form method="POST" action="/homepage/content" id="homepage_content_form">
     <label for="banner_text">BANNER TEXT</label>
-    <input type="text" name="banner_text" id="banner_text" value="<%= contents[0] ? contents[0].banner_text : '' %>">
+    <input type="text" name="banner_text" id="banner_text" value="<%= homepage_contents[0] ? homepage_contents[0].banner_text : '' %>">
 
     <label for="footnote_text">FOOTNOTE TEXT / QUOTE</label>
-    <input type="text" name="footnote_text" id="footnote_text" value="<%= contents[0] ? contents[0].footnote_text : '' %>">
+    <input type="text" name="footnote_text" id="footnote_text" value="<%= homepage_contents[0] ? homepage_contents[0].footnote_text : '' %>">
 
     <label>CS SOCIALS</label>
     <div class="social-media-input-group input-group row" style="display: block">

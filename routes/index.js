@@ -13,7 +13,7 @@ router.get('/', (req, res) => {
 });
 
 router.get('/admin', (req, res) => {
-    Collections(db => res.render('admin', { title: "Admin", pagename: "admin", db }))
+    Collections(db => res.render('admin', { title: "Admin", pagename: "admin", ...db }))
 });
 
 router.post('/search', (req, res) => {
