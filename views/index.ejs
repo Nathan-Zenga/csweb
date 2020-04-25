@@ -3,7 +3,7 @@
 		<div class="banner-container content-container">
 			<div class="banner content">
 				<%_ if (content) { _%>
-				<div class="banner-item">
+				<div class="banner-item" style="left: 100%">
 					<div class="banner-text"><%= content.banner_text %></div>
 					<%_ content.banner_media.forEach(url => { _%>
 					<img class="banner-item-media" src="<%= url %>">
@@ -24,18 +24,18 @@
 	<%_ } _%>
 
 	<script>
-		var banner_html = $(".banner").html();
-		while ($(".banner-item:last").offset().left <= window.innerWidth) $(".banner").append(banner_html);
-		banner_html = $(".banner").html();
-
-		$(".banner").scroll(function() {
-			var $last = $(".banner-item:last");
-			var lastOffsetLeft = $last.offset().left;
-			if (lastOffsetLeft < window.innerWidth) $last.clone().appendTo(".banner");
-		});
-
 		(function banner_autoplay() {
-			$(".banner").animate({scrollLeft: "+=1500" }, 20000, "linear", banner_autoplay);
+			$(".banner-item").animate({ left: "-=100" }, 1000, "linear", function() {
+				var $last = $(".banner-item:last");
+				var offsetLeft = $last.offset().left;
+				var width = parseInt($last.css("width")) + 50;
+				if ((offsetLeft + width) < window.innerWidth) $last.clone().css("left", "100%").appendTo(".banner");
+				var $first = $(".banner-item:first");
+				offsetLeft = $first.offset().left;
+				width = parseInt($first.css("width"));
+				if ((offsetLeft + width) < 0) $first.remove();
+				banner_autoplay();
+			});
 		})();
 	</script>
 <%_ include partials/footer _%>

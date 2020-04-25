@@ -207,9 +207,9 @@ label span {
 }
 
 .banner-container > .banner > .banner-item {
+	position: absolute;
 	display: inline-table;
-	height: 100%;
-	margin-left: 50px;
+	height: inherit;
 }
 
 .banner-container > .banner > .banner-item > .banner-text {
