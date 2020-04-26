@@ -44,14 +44,14 @@ router.post('/homepage/content', (req, res) => {
 });
 
 router.post('/homepage/image/save', (req, res) => {
-    cloud.v2.uploader.upload(req.body.homepage_image, { public_id: `homepage/images/${req.body.filename.replace(" ", "_")}` }, (err, result) => {
+    cloud.v2.uploader.upload(req.body.homepage_image, { public_id: `homepage/images/${req.body.filename.replace(/ /g, "_")}` }, (err, result) => {
         Homepage_image.find((err, images) => {
             if (err) return res.send(err);
             var length = images.length;
             var newImage = new Homepage_image({ url: result.secure_url, p_id: result.public_id, index: req.body.index });
             newImage.save((err, saved) => {
                 if (saved.index === length + 1) return res.send(err || "IMAGE SAVED");
-                indexReorder(Homepage_image, saved._id, saved.index, () => res.send(err || "IMAGE SAVED"));
+                indexReorder(Homepage_image, { id: saved._id, newIndex: saved.index }, () => res.send(err || "IMAGE SAVED"));
             });
         })
     })
@@ -71,7 +71,7 @@ router.post('/homepage/image/delete', (req, res) => {
 
 router.post('/homepage/image/reorder', (req, res) => {
     var { id, index } = req.body;
-    indexReorder(Homepage_image, id, index, () => res.send("RE-ORDERING PROCESS DONE"));
+    indexReorder(Homepage_image, { id, newIndex: index }, () => res.send("RE-ORDERING PROCESS DONE"));
 });
 
 router.post('/cs/links/delete', (req, res) => {

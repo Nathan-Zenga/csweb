@@ -2,10 +2,10 @@ var express = require('express');
 var router = express.Router();
 var cloud = require('cloudinary');
 var { Article } = require('../models/models');
-var { saveMedia } = require('../config/config');
+var { saveMedia, indexReorder } = require('../config/config');
 
 router.get('/', (req, res) => {
-    Article.find().sort({ created_at: -1 }).exec((err, articles) => {
+    Article.find().sort({ index: 1 }).exec((err, articles) => {
         res.render('news', { title: "News", pagename: "news", articles })
     })
 });
@@ -62,6 +62,11 @@ router.post('/article/edit', (req, res) => {
 
         article.save((err, saved) => { res.send("ARTICLE UPDATED SUCCESSFULLY") });
     })
+});
+
+router.post('/article/edit/reorder', (req, res) => {
+    var { id, index } = req.body;
+    indexReorder(Article, { id, newIndex: index, sort: {created_at: -1} }, () => res.send("ARTICLE RE-ORDERED SUCCESSFULLY"));
 });
 
 module.exports = router;

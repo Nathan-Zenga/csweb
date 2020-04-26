@@ -1,12 +1,13 @@
 var { Article, Project, Artist, Location, MailingList, Homepage_content, Homepage_image } = require('../models/models');
 var cloud = require('cloudinary');
+var { Model } = require('mongoose');
 
 /**
  * Getting all documents from all collections
  * @param {function} cb callback with passed document collections as arguments
  */
 module.exports.Collections = cb => {
-    Article.find().sort({ created_at: -1 }).exec((err, articles) => {
+    Article.find().sort({ index: 1 }).exec((err, articles) => {
         Artist.find((err, artists) => {
             Project.find().sort({ year: -1 }).exec((err, projects) => {
                 Location.find((err, locations) => {
@@ -24,21 +25,23 @@ module.exports.Collections = cb => {
 };
 
 /**
- * Executing process of re-ordering document item by index field
- * @param {[Document]} collection a DB collection
- * @param {string} id identifier to specify document to re-order
- * @param {number} newIndex the new order number (position) to which the selected document is assigned (by index field)
+ * Executing process of re-ordering document items
+ * @param {Model.<Document, {}>} collection a database collection model
+ * @param {Object} args
+ * @param {string} args.id identifier to specify document to re-order
+ * @param {number} args.newIndex the new order number (position) to which the selected document is assigned (by index field)
+ * @param {{}} [args.sort] sort query
  * @param {function} [cb] callback
  */
-module.exports.indexReorder = (collection, id, newIndex, cb) => {
-    collection.find().sort({index: 1}).exec((err, docs) => {
+module.exports.indexReorder = (collection, args, cb) => {
+    var { id, newIndex, sort } = args;
+    collection.find().sort(sort || {index: 1}).exec((err, docs) => {
         if (err) return err;
         var selected_doc = docs.filter(e => e._id == id)[0];
-        docs.splice(selected_doc.index-1, 1);
-        docs.splice(parseInt(newIndex-1), 0, selected_doc);
+        docs.splice(selected_doc.index-1, 1); //remove selected
+        docs.splice(parseInt(newIndex-1), 0, selected_doc); //insert selected
         docs.forEach((doc, i) => {
-            if (doc.index != i+1) doc.index = i+1;
-            doc.save();
+            if (doc.index != i+1) { doc.index = i+1; doc.save() }
         });
         if (cb) cb();
     })
@@ -47,7 +50,7 @@ module.exports.indexReorder = (collection, id, newIndex, cb) => {
 /**
  * Executing process of saving media
  * @param {{}} body response body object
- * @param {Document} doc the new / existing document to contain references (URLs) to the media being uploaded / saved
+ * @param {{}} doc the new / existing document to contain references (URLs) to the media being uploaded / saved
  * @param {function} [cb] callback with optional message
  */
 module.exports.saveMedia = (body, doc, cb) => {
