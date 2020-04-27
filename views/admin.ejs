@@ -355,7 +355,7 @@
         });
 
         $("#locations form, #mail form, #homepage_content_form, #artists form, " +
-          "#edit-location form, #edit-member form, #edit-homepage-image form").submit(function(e) {
+          "#edit-location form, #edit-member form, #reorder-homepage-image form, #reorder-article form").submit(function(e) {
             e.preventDefault();
             var form = this;
             var data = Object.assign([], $(form).serializeArray());

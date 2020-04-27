@@ -4,10 +4,11 @@
         <select >
             <option value="#edit-artist">EDIT ARTIST</option>
             <option value="#edit-article">EDIT ARTICLE</option>
+            <option value="#reorder-article">REORDER ARTICLE</option>
             <option value="#edit-project">EDIT PROJECT</option>
             <option value="#edit-location">EDIT LOCATION</option>
             <option value="#edit-member">EDIT MEMBER</option>
-            <option value="#edit-homepage-image">REORDER HOMEPAGE IMAGE</option>
+            <option value="#reorder-homepage-image">REORDER HOMEPAGE IMAGE</option>
             <option value="#remove-cs-link">REMOVE CS LINKS</option>
             <option value="#remove-artist">REMOVE ARTIST</option>
             <option value="#remove-article">REMOVE ARTICLE</option>
@@ -20,10 +21,11 @@
     <ul class="nav nav-pills nav-stacked dt-view-md">
         <li class="active"><a data-toggle="pill" href="#edit-artist">EDIT ARTIST</a></li>
         <li><a data-toggle="pill" href="#edit-article">EDIT ARTICLE</a></li>
+        <li><a data-toggle="pill" href="#reorder-article">REORDER ARTICLE</a></li>
         <li><a data-toggle="pill" href="#edit-project">EDIT PROJECT</a></li>
         <li><a data-toggle="pill" href="#edit-location">EDIT LOCATION</a></li>
         <li><a data-toggle="pill" href="#edit-member">EDIT MEMBER</a></li>
-        <li><a data-toggle="pill" href="#edit-homepage-image">REORDER HOMEPAGE IMAGE</a></li>
+        <li><a data-toggle="pill" href="#reorder-homepage-image">REORDER HOMEPAGE IMAGE</a></li>
         <br>
         <li><a data-toggle="pill" href="#remove-cs-link">REMOVE CS LINKS</a></li>
         <li><a data-toggle="pill" href="#remove-artist">REMOVE ARTIST</a></li>
@@ -109,6 +111,25 @@
                 <div class="input-group textbody_media"></div>
                 <input type="submit" value="UPDATE ARTICLE">
             </form>
+        </div>
+
+        <div id="reorder-article" class="tab-pane fade">
+            <%_ if (articles.length) { _%>
+            <form method="post" action="/news/article/edit/reorder">
+                <label>ARTICLES</label>
+                <%_ articles.forEach((article, i) => { _%>
+                <input type="radio" name="id" value="<%= article._id %>" required> <%= i+1 %>) <span><%= article.headline %></span><br>
+                <%_ }) _%>
+                <br><br>
+                <div class="input-group" style="display: block">
+                    <div class="col-sm-4"><label>POSITION NUMBER</label></div>
+                    <div class="col-sm-8"><input type="number" name="index" min="1" max="<%= articles.length %>" required></div>
+                </div>
+                <input type="submit" value="RE-ORDER ARTICLE">
+            </form>
+            <%_ } else { _%>
+            <p style="text-align: center; margin-top: 2em"><b>NO ARTICLES TO RE-ORDER</b></p>
+            <%_ } _%>
         </div>
 
         <div id="edit-project" class="tab-pane fade">
@@ -226,7 +247,7 @@
             </form>
         </div>
 
-        <div id="edit-homepage-image" class="tab-pane fade">
+        <div id="reorder-homepage-image" class="tab-pane fade">
             <%_ if (homepage_images.length) { _%>
             <form action="/homepage/image/reorder" method="post">
                 <label>SELECT HOMEPAGE IMAGE TO RE-ORDER</label><br>
@@ -254,7 +275,9 @@
             <form action="cs/links/delete" method="post">
                 <label>CS SOCIALS</label>
                 <%_ socials.forEach((social, i) => {
-                    var label = social.name.slice(0,1).toUpperCase() + social.name.slice(1).replace(/_/g, " "); _%>
+                    var occurrences = socials.filter(s => s.name === social.name).length;
+                    var label = social.name.slice(0,1).toUpperCase() + social.name.slice(1).replace(/_/g, " ");
+                    label += occurrences > 1 ? " " + social.url : "";_%>
                 <input type="checkbox" name="social<%= i %>" value="<%= social.name %>"> <span><%= label %></span><br>
                 <%_ }) _%>
                 <br>
