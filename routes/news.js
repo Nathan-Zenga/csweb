@@ -20,8 +20,13 @@ router.get('/article/:id', (req, res, next) => {
 
 router.post('/article/new', (req, res) => {
     var { headline, textbody } = req.body;
-    var article = new Article({ headline, textbody });
-    article.save((err, doc) => { saveMedia(req.body, doc, msg => res.send("DONE" + msg)) });
+    var article = new Article({ headline, textbody, index: 1 });
+    article.save((err, saved) => {
+        Article.find({ _id: { $ne: saved._id } }).sort({index: 1, created_at: -1}).exec((err, articles) => {
+            articles.forEach((a, i) => { a.index += 1; a.save() });
+            saveMedia(req.body, saved, msg => res.send("DONE" + msg));
+        })
+    })
 });
 
 router.post('/article/delete', (req, res) => {
@@ -31,8 +36,11 @@ router.post('/article/delete', (req, res) => {
             if (err || !result.deletedCount) return res.send(err || "Article(s) not found");
             ids.forEach(id => {
                 cloud.v2.api.delete_resources_by_prefix("article/" + id, (err, result) => { console.log(err || result) });
+            });
+            Article.find().sort({index: 1}).exec((err, articles) => {
+                articles.forEach((a, i) => { a.index = i+1; a.save() });
+                res.send("ARTICLE"+ (ids.length > 1 ? "S" : "") +" DELETED SUCCESSFULLY")
             })
-            res.send("ARTICLE"+ (ids.length > 1 ? "S" : "") +" DELETED SUCCESSFULLY")
         })
     } else { res.send("NOTHING SELECTED") }
 });
@@ -66,7 +74,7 @@ router.post('/article/edit', (req, res) => {
 
 router.post('/article/edit/reorder', (req, res) => {
     var { id, index } = req.body;
-    indexReorder(Article, { id, newIndex: index, sort: {created_at: -1} }, () => res.send("ARTICLE RE-ORDERED SUCCESSFULLY"));
+    indexReorder(Article, { id, newIndex: index, sort: {updated_at: -1} }, result => res.send(result || "ARTICLE RE-ORDERED SUCCESSFULLY"));
 });
 
 module.exports = router;

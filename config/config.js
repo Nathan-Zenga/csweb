@@ -5,6 +5,7 @@ var { Model } = require('mongoose');
 /**
  * Getting all documents from all collections
  * @param {function} cb callback with passed document collections as arguments
+ * @callback cb
  */
 module.exports.Collections = cb => {
     Article.find().sort({ index: 1 }).exec((err, articles) => {
@@ -32,19 +33,31 @@ module.exports.Collections = cb => {
  * @param {number} args.newIndex the new order number (position) to which the selected document is assigned (by index field)
  * @param {{}} [args.sort] sort query
  * @param {function} [cb] callback
+ * @callback cb
  */
 module.exports.indexReorder = (collection, args, cb) => {
     var { id, newIndex, sort } = args;
-    collection.find().sort(sort || {index: 1}).exec((err, docs) => {
-        if (err) return err;
-        var selected_doc = docs.filter(e => e._id == id)[0];
-        docs.splice(selected_doc.index-1, 1); //remove selected
-        docs.splice(parseInt(newIndex-1), 0, selected_doc); //insert selected
-        docs.forEach((doc, i) => {
-            if (doc.index != i+1) { doc.index = i+1; doc.save() }
+    if (sort) sort = Object.assign({index: 1}, sort);
+    try {
+        collection.findById(id, (err, selected_doc) => {
+            if (err) throw err;
+            if (selected_doc.index != newIndex) {
+                selected_doc.index = newIndex;
+                selected_doc.save((err, saved) => {
+                    if (err) throw err;
+                    collection.find().sort(sort || {index: 1}).exec((err, docs) => {
+                        if (err) throw err;
+                        docs.forEach((doc, i) => { if (doc._id != saved._id) { doc.index = i+1; doc.save() }});
+                        if (cb) cb();
+                    })
+                });
+            } else {
+                if (cb) cb("NOTHING CHANGED - ITEM IS ALREADY IN THIS POSITION");
+            }
         });
-        if (cb) cb();
-    })
+    } catch(err) {
+        return cb ? cb(err.message) : err.message;
+    }
 };
 
 /**
@@ -52,6 +65,7 @@ module.exports.indexReorder = (collection, args, cb) => {
  * @param {{}} body response body object
  * @param {{}} doc the new / existing document to contain references (URLs) to the media being uploaded / saved
  * @param {function} [cb] callback with optional message
+ * @callback cb
  */
 module.exports.saveMedia = (body, doc, cb) => {
     var msg = "";
