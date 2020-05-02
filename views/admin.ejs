@@ -47,12 +47,9 @@
                 reader.readAsDataURL(file)
             });
         };
-        var showMessage = function(result, container, reload) {
-            var $msg = $('<div class="msg" style><div class="text">'+ result.replace(/\n/g, "<br>") +'</div></div>');
-            $msg.css("display", "none").appendTo(container).fadeIn().delay(2000).fadeOut(function(){
-                $(this).remove();
-                if (reload) location.reload();
-            });
+        var showMessage = function(result) {
+            var reload = confirm(result + "\n\n Refresh page?");
+            if (reload) location.reload();
         };
         var invalidURLs = function(links) {
             links = typeof links == "string" ? [links] : links;
@@ -73,6 +70,7 @@
                 var $submitInput = $form.children("input:submit");
                 var counter = 0;
                 var label = "<label>CHOOSE ARTICLE THUMBNAIL</label>";
+                $submitInput.attr("disabled", true);
                 $thumb_choice.show().append(label);
                 readDataURLs(files, function(e) {
                     var url = e.target.result;
@@ -108,7 +106,6 @@
                 $(tbm_container).find("input:text").change(function() {
                     var pos = $(tbm_container).find("input:text").index(this);
                     var length = $(tbm_container).find("input:text").length;
-                    var $submitInput = $(this).closest("form").children("input:submit");
                     if (!this.value) {
                         textbody_media.splice(pos, 1);
                     } else if (textbody_media.length <= 1) {
@@ -126,7 +123,6 @@
                     } else {
                         textbody_media.splice(pos, 1, this.value);
                     }
-                    $submitInput.attr("disabled", false);
                 });
 
                 $(tbm_container).find("input:file").change(function() {
@@ -134,13 +130,9 @@
                     var $textInput = $(this).next("input:text");
                     $textInput.val("");
                     if (files && files.length) {
-                        var $submitInput = $(this).closest("form").children("input:submit");
-                        var counter = 0;
                         $textInput.val("LOADING...").attr("disabled", true);
                         readDataURLs(files, function(e) {
-                            counter += 1;
                             $textInput.attr("disabled", false).val(e.target.result).change();
-                            if (counter === files.length) $submitInput.attr("disabled", false);
                         });
                     }
                 })
@@ -152,7 +144,7 @@
         });
         $("#articles form").submit(function(e) {
             e.preventDefault();
-            if (invalidURLs(textbody_media).length) { showMessage("Invalid URL", this); return false }
+            if (invalidURLs(textbody_media).length) { showMessage("Invalid URL"); return false }
 
             var data = Object.assign([], $(this).serializeArray());
             if (headline_images.length) data.push({ name: "headline_images", value: headline_images });
@@ -160,7 +152,7 @@
 
             $.post(this.action, data, function(result) {
                 e.target.reset();
-                showMessage(result, e.target, true);
+                showMessage(result);
             });
         });
 
@@ -179,12 +171,10 @@
             artwork_file = "";
             if (files && files.length) {
                 var $submitInput = $(this).closest("form").children("input:submit");
-                var counter = 0;
                 $submitInput.attr("disabled", true);
                 readDataURLs(files, function(e) {
-                    counter += 1;
                     artwork_file = e.target.result;
-                    if (counter === files.length) $submitInput.attr("disabled", false);
+                    $submitInput.attr("disabled", false);
                 });
             }
         });
@@ -198,7 +188,7 @@
 
             $.post(this.action, data, function(result) {
                 e.target.reset();
-                showMessage(result, e.target, true);
+                showMessage(result);
             });
         });
 
@@ -208,11 +198,9 @@
             profile_image = "";
             if (files.length) {
                 var $submitInput = $(this).closest("form").children("input:submit");
-                var counter = 0;
                 readDataURLs(files, function(e) {
-                    counter += 1;
                     profile_image = e.target.result;
-                    if (counter === files.length) $submitInput.attr("disabled", false);
+                    $submitInput.attr("disabled", false);
                 });
             }
         });
@@ -325,7 +313,7 @@
             $.post(this.action, data, function(result) {
                 e.target.reset();
                 profile_image = "";
-                showMessage(result, e.target, true);
+                showMessage(result);
             });
         });
 
@@ -339,7 +327,7 @@
 
             $.post(this.action, data, function(result) {
                 e.target.reset();
-                showMessage(result, e.target, true);
+                showMessage(result);
             });
         });
 
@@ -350,7 +338,7 @@
 
             $.post(this.action, data, function(result) {
                 e.target.reset();
-                showMessage(result, e.target, true);
+                showMessage(result);
             });
         });
 
