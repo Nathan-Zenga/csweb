@@ -35,46 +35,51 @@ router.post('/update', (req, res) => {
 
 router.post('/send/mail', (req, res) => {
     var { email, subject, message } = req.body;
-    MailingList.find((err, members) => {
+    MailingList.find(email ? { email } : {}, (err, members) => {
         if (err || !members.length) return res.send(err || "NO MEMBERS IN THE MAILING LIST TO SEND THE EMAIL TO");
 
         var oauth2Client = new OAuth2( OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, "https://developers.google.com/oauthplayground" );
         oauth2Client.setCredentials({ refresh_token: OAUTH_REFRESH_TOKEN });
         var accessToken = oauth2Client.getAccessToken();
-        members = email ? members.filter(m => m.email === email) : members;
+        var q = [], sentCount = 0, errCount = 0;
+        for (var i = 0; i < members.length; i += 20) q.push(members.slice(i, i + 20)); // split array in groups of 20 for queue system
 
-        members.forEach((member, i) => {
-            var transporter = nodemailer.createTransport({
-                service: 'gmail',
-                // port: 465,
-                // secure: true,
-                auth: {
-                    type: "OAuth2",
-                    user: "info@thecs.co",
-                    clientId: OAUTH_CLIENT_ID,
-                    clientSecret: OAUTH_CLIENT_SECRET,
-                    refreshToken: OAUTH_REFRESH_TOKEN,
-                    accessToken
-                },
-                tls: {
-                    rejectUnauthorized: true
-                }
-            });
+        q.forEach((group, i, arr1) => {
+            setTimeout(() => {
+                group.forEach((member, j, arr2) => {
+                    var transporter = nodemailer.createTransport({
+                        service: 'gmail', /* port: 465, secure: true, */
+                        auth: {
+                            type: "OAuth2",
+                            user: "info@thecs.co",
+                            clientId: OAUTH_CLIENT_ID,
+                            clientSecret: OAUTH_CLIENT_SECRET,
+                            refreshToken: OAUTH_REFRESH_TOKEN,
+                            accessToken
+                        },
+                        tls: {
+                            rejectUnauthorized: true
+                        }
+                    });
 
-            res.render('templates/mail', { message }, (err, html) => {
-                transporter.sendMail({
-                    from: "CS <info@thecs.co>",
-                    to: member.email,
-                    subject,
-                    html,
-                    attachments: [{ filename: 'cs-icon.png', path: 'public/img/cs-icon.png', cid: 'logo' }]
-                }, err => {
-                    if (err) return console.log(err), res.send("Could not send message. Error occurred.");
-                    console.log("The message was sent!");
-                    transporter.close();
-                    if (i === members.length-1) res.send("MESSAGE SENT")
+                    res.render('templates/mail', { message }, (err, html) => {
+                        var msg = {
+                            from: "CS <info@thecs.co>",
+                            to: member.email,
+                            subject,
+                            html,
+                            attachments: [{ filename: 'cs-icon.png', path: 'public/img/cs-icon.png', cid: 'logo' }]
+                        };
+                        transporter.sendMail(msg, err => {
+                            err ? errCount += 1 : console.log("The message was sent!"), sentCount += 1;
+                            if (j === arr2.length-1 && i === arr1.length-1) {
+                                var resMsg = `MESSAGE SENT TO ${sentCount} MEMBERS${errCount ? " ("+ errCount +"ERRORS)" : ""}`;
+                                console.log(resMsg); res.send(resMsg);
+                            }
+                        })
+                    })
                 })
-            })
+            }, i * 1000);
         })
     })
 });

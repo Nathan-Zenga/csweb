@@ -20,7 +20,7 @@
             <div id="logo">
                 <img src="cid:logo" alt="CS logo">
             </div>
-            <div id="message"><%- message %></div>
+            <div id="message"><%- message.replace(/\r?\n/g, "<br>") %></div>
         </div>
     </body>
 </html>
