@@ -1,7 +1,7 @@
-var express = require('express');
-var router = express.Router();
-var cloud = require('cloudinary');
-var { Project } = require('../models/models');
+const express = require('express');
+const router = express.Router();
+const cloud = require('cloudinary');
+const { Project } = require('../models/models');
 
 router.get('/', (req, res) => {
     Project.find().sort({ year: -1 }).exec((err, projects) => {

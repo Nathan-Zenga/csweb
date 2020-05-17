@@ -1,8 +1,8 @@
-var express = require('express');
-var router = express.Router();
-var cloud = require('cloudinary');
-var { indexReorder, Collections } = require('../config/config');
-var { Homepage_content, Homepage_image } = require('../models/models');
+const express = require('express');
+const router = express.Router();
+const cloud = require('cloudinary');
+const { indexReorder, Collections } = require('../config/config');
+const { Homepage_content, Homepage_image } = require('../models/models');
 
 router.get('/', (req, res) => {
     Homepage_content.findOne((err, content) => {

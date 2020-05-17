@@ -1,8 +1,8 @@
-var express = require('express');
-var router = express.Router();
-var cloud = require('cloudinary');
-var { Article } = require('../models/models');
-var { saveMedia, indexReorder } = require('../config/config');
+const express = require('express');
+const router = express.Router();
+const cloud = require('cloudinary');
+const { Article } = require('../models/models');
+const { saveMedia, indexReorder } = require('../config/config');
 
 router.get('/', (req, res) => {
     Article.find().sort({ index: 1 }).exec((err, articles) => {

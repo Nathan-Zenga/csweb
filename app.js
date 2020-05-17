@@ -1,16 +1,16 @@
-var express = require('express');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var path = require('path'); // core module
-var mongoose = require('mongoose');
-var session = require('express-session');
-var MemoryStore = require('memorystore')(session);
-var { Homepage_content } = require('./models/models');
+const express = require('express');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const path = require('path'); // core module
+const mongoose = require('mongoose');
+const session = require('express-session');
+const MemoryStore = require('memorystore')(session);
+const { Homepage_content } = require('./models/models');
 
 mongoose.connect(process.env.CSDB, { useNewUrlParser: true, useUnifiedTopology: true });
 mongoose.connection.once('open', () => { console.log("Connected to DB") });
 
-var app = express();
+const app = express();
 
 // View Engine
 app.set('view engine', 'ejs');

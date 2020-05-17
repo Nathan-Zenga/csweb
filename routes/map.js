@@ -1,8 +1,8 @@
-var express = require('express');
-var router = express.Router();
-var nodeGeocoder = require('node-geocoder');
-var { Location } = require('../models/models');
-var geocoder = nodeGeocoder({
+const express = require('express');
+const router = express.Router();
+const nodeGeocoder = require('node-geocoder');
+const { Location } = require('../models/models');
+const geocoder = nodeGeocoder({
     provider: 'google',
     httpAdapter: 'https',
     apiKey: 'AIzaSyCRIzIyhXXI1JxBGUqmUsX5N4MnxYHHGCo'

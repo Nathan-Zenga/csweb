@@ -1,6 +1,6 @@
-var { Article, Project, Artist, Location, MailingList, Homepage_content, Homepage_image } = require('../models/models');
-var cloud = require('cloudinary');
-var { Model } = require('mongoose');
+const { Article, Project, Artist, Location, MailingList, Homepage_content, Homepage_image } = require('../models/models');
+const cloud = require('cloudinary');
+const { Model } = require('mongoose');
 
 /**
  * Getting all documents from all collections

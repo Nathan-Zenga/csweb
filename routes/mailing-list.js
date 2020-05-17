@@ -1,9 +1,10 @@
-var express = require('express');
-var router = express.Router();
-var nodemailer = require('nodemailer');
-var { OAuth2 } = require("googleapis").google.auth;
-var { OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, OAUTH_REFRESH_TOKEN } = process.env;
-var { MailingList } = require('../models/models');
+const express = require('express');
+const router = express.Router();
+const nodemailer = require('nodemailer');
+const async = require('async');
+const { OAuth2 } = require("googleapis").google.auth;
+const { OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, OAUTH_REFRESH_TOKEN } = process.env;
+const { MailingList } = require('../models/models');
 
 router.get('/sign-up', (req, res) => {
     res.render('mailing-list', { title: "Sign Up", pagename: "sign-up" })

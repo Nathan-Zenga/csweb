@@ -1,7 +1,7 @@
-var express = require('express');
-var router = express.Router();
-var cloud = require('cloudinary');
-var { Artist } = require('../models/models');
+const express = require('express');
+const router = express.Router();
+const cloud = require('cloudinary');
+const { Artist } = require('../models/models');
 
 router.get('/', (req, res) => {
 	Artist.find((err, artists) => {
