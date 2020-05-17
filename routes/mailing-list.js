@@ -3,7 +3,7 @@ const router = express.Router();
 const nodemailer = require('nodemailer');
 const async = require('async');
 const { OAuth2 } = require("googleapis").google.auth;
-const { OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, OAUTH_REFRESH_TOKEN } = process.env;
+const { OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, OAUTH_REFRESH_TOKEN, NODE_ENV } = process.env;
 const { MailingList } = require('../models/models');
 
 router.get('/sign-up', (req, res) => {
@@ -42,13 +42,13 @@ router.post('/send/mail', (req, res) => {
         var oauth2Client = new OAuth2( OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, "https://developers.google.com/oauthplayground" );
         oauth2Client.setCredentials({ refresh_token: OAUTH_REFRESH_TOKEN });
         var accessToken = oauth2Client.getAccessToken();
-        var q = [], sentCount = 0, errCount = 0;
-        for (var i = 0; i < members.length; i += 20) q.push(members.slice(i, i + 20)); // split array in groups of 20 for queue system
+        var sentCount = 0, errCount = 0;
 
-        q.forEach((group, i, arr1) => {
-            setTimeout(() => {
-                group.forEach((member, j, arr2) => {
-                    var transporter = nodemailer.createTransport({
+        nodemailer.createTestAccount((err, acc) => {
+            async.each(members, (member, cb) => {
+                var transporter;
+                if (NODE_ENV === "production") {
+                    transporter = nodemailer.createTransport({
                         service: 'gmail', /* port: 465, secure: true, */
                         auth: {
                             type: "OAuth2",
@@ -58,30 +58,36 @@ router.post('/send/mail', (req, res) => {
                             refreshToken: OAUTH_REFRESH_TOKEN,
                             accessToken
                         },
-                        tls: {
-                            rejectUnauthorized: true
-                        }
+                        tls: { rejectUnauthorized: true }
                     });
+                } else {
+                    transporter = nodemailer.createTransport({
+                        host: 'smtp.ethereal.email',
+                        port: 587,
+                        secure: false,
+                        auth: { user: acc.user, pass: acc.pass }
+                    });
+                }
 
-                    res.render('templates/mail', { message }, (err, html) => {
-                        var msg = {
-                            from: "CS <info@thecs.co>",
-                            to: member.email,
-                            subject,
-                            html,
-                            attachments: [{ filename: 'cs-icon.png', path: 'public/img/cs-icon.png', cid: 'logo' }]
-                        };
-                        transporter.sendMail(msg, err => {
-                            err ? errCount += 1 : console.log("The message was sent!"), sentCount += 1;
-                            if (j === arr2.length-1 && i === arr1.length-1) {
-                                var resMsg = `MESSAGE SENT TO ${sentCount} MEMBERS${errCount ? " ("+ errCount +"ERRORS)" : ""}`;
-                                console.log(resMsg); res.send(resMsg);
-                            }
-                        })
+                res.render('templates/mail', { message }, (err, html) => {
+                    var msg = {
+                        from: "CS <info@thecs.co>",
+                        to: member.email,
+                        subject,
+                        html,
+                        attachments: [{ filename: 'cs-icon.png', path: 'public/img/cs-icon.png', cid: 'logo' }]
+                    };
+                    transporter.sendMail(msg, err => {
+                        err ? errCount += 1 : sentCount += 1;
+                        console.log(err || "The message was sent!");
+                        cb(err);
                     })
                 })
-            }, i * 1000);
-        })
+            }, err => {
+                if (err) console.log(err);
+                res.send(`MESSAGE SENT TO ${sentCount} MEMBERS${errCount ? " ("+ errCount +"ERRORS)" : ""}`);
+            });
+        });
     })
 });
 
