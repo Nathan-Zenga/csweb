@@ -1,6 +1,6 @@
 const { Article, Project, Artist, Location, MailingList, Homepage_content, Homepage_image } = require('../models/models');
 const cloud = require('cloudinary');
-const { Model } = require('mongoose');
+const mongoose = require('mongoose');
 
 /**
  * Getting all documents from all collections
@@ -27,7 +27,7 @@ module.exports.Collections = cb => {
 
 /**
  * Executing process of re-ordering document items
- * @param {Model.<Document, {}>} collection a database collection model
+ * @param {mongoose.Model.<Document, {}>} collection a database collection model
  * @param {Object} args
  * @param {string} args.id identifier to specify document to re-order
  * @param {number} args.newIndex the new order number (position) to which the selected document is assigned (by index field)
@@ -38,32 +38,25 @@ module.exports.Collections = cb => {
 module.exports.indexReorder = (collection, args, cb) => {
     var { id, newIndex, sort } = args;
     if (sort) sort = Object.assign({index: 1}, sort);
-    try {
-        collection.findById(id, (err, selected_doc) => {
-            if (err) throw err;
-            if (selected_doc.index != newIndex) {
-                selected_doc.index = newIndex;
-                selected_doc.save((err, saved) => {
-                    if (err) throw err;
-                    collection.find().sort(sort || {index: 1}).exec((err, docs) => {
-                        if (err) throw err;
-                        docs.forEach((doc, i) => { if (doc._id != saved._id) { doc.index = i+1; doc.save() }});
-                        if (cb) cb();
-                    })
-                });
-            } else {
-                if (cb) cb("NOTHING CHANGED - ITEM IS ALREADY IN THIS POSITION");
-            }
+    collection.find().sort({index: 1}).exec((err, docs) => {
+        if (err) return err;
+        var index = docs.findIndex(e => e._id == id);
+        var beforeSelectedDoc = docs.slice(0, index);
+        var afterSelectedDoc = docs.slice(index+1, docs.length);
+        var docs_mutable = [...beforeSelectedDoc, ...afterSelectedDoc];
+        docs_mutable.splice(parseInt(newIndex)-1, 0, docs[index]);
+        docs_mutable.forEach((doc, i) => {
+            doc.index = i+1;
+            doc.save();
         });
-    } catch(err) {
-        return cb ? cb(err.message) : err.message;
-    }
+        if (cb) cb();
+    })
 };
 
 /**
  * Executing process of saving media
  * @param {{}} body response body object
- * @param {{}} doc the new / existing document to contain references (URLs) to the media being uploaded / saved
+ * @param {mongoose.Document} doc the new / existing document to contain references (URLs) to the media being uploaded / saved
  * @param {function} [cb] callback with optional message
  * @callback cb
  */
