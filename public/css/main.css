@@ -358,8 +358,10 @@ article:not(.full) .article-content .img {
 }
 
 article.full {
+	position: relative;
 	padding: 30px 0;
 	background-color: white;
+	z-index: 10;
 }
 
 article.full .article-content {
