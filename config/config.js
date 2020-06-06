@@ -12,7 +12,7 @@ module.exports.Collections = cb => {
         Artist.find((err, artists) => {
             Project.find().sort({ year: -1 }).exec((err, projects) => {
                 Location.find((err, locations) => {
-                    MailingList.find((err, members) => {
+                    MailingList.find().sort({ lastname: 1 }).exec((err, members) => {
                         Homepage_content.find((err, homepage_contents) => {
                             Homepage_image.find().sort({index: 1}).exec((err, homepage_images) => {
                                 cb({ articles, artists, projects, locations, members, homepage_contents, homepage_images });

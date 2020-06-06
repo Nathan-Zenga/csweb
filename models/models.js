@@ -1,7 +1,6 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const { model, Schema } = require('mongoose');
 
-module.exports.Article = mongoose.model('Article', Schema({
+module.exports.Article = model('Article', Schema({
     headline: String,
     headline_images: [String],
     headline_image_thumb: String,
@@ -10,7 +9,7 @@ module.exports.Article = mongoose.model('Article', Schema({
     index: Number
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } }));
 
-module.exports.Project = mongoose.model('Project', Schema({
+module.exports.Project = model('Project', Schema({
     title: String,
     artist: String,
     year: Number,
@@ -19,23 +18,23 @@ module.exports.Project = mongoose.model('Project', Schema({
     all_platforms: { type: Boolean, default: false }
 }));
 
-module.exports.Artist = mongoose.model('Artist', Schema({
+module.exports.Artist = model('Artist', Schema({
     name: String,
     bio: String,
     socials: Schema.Types.Mixed,
     profile_image: String
 }));
 
-module.exports.MailingList = mongoose.model('MailingList', Schema({
-    firstname: String,
-    lastname: String,
+module.exports.MailingList = model('MailingList', Schema({
+    firstname: { type: String, set: v => v.charAt(0).toUpperCase() + v.slice(1) },
+    lastname: { type: String, set: v => v.charAt(0).toUpperCase() + v.slice(1) },
     email: String,
     size_top: String,
     size_bottom: String,
     extra_info: String
 }));
 
-module.exports.Location = mongoose.model('Location', Schema({
+module.exports.Location = model('Location', Schema({
     name: String,
     street_address: String,
     city: String,
@@ -45,14 +44,14 @@ module.exports.Location = mongoose.model('Location', Schema({
     longitude: Number
 }));
 
-module.exports.Homepage_content = mongoose.model('Homepage_content', Schema({
+module.exports.Homepage_content = model('Homepage_content', Schema({
     banner_text: String,
     banner_media: [String],
     footnote_text: String,
     socials: Array
 }));
 
-module.exports.Homepage_image = mongoose.model('Homepage_image', Schema({
+module.exports.Homepage_image = model('Homepage_image', Schema({
     p_id: String,
     url: String,
     index: Number

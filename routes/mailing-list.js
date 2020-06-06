@@ -21,7 +21,7 @@ router.post('/new', (req, res) => {
 });
 
 router.post('/update', (req, res) => {
-    var { member_id, firstname, lastname, email, size_top, size_bottom } = req.body;
+    var { member_id, firstname, lastname, email, size_top, size_bottom, extra_info } = req.body;
     MailingList.findById(member_id, (err, member) => {
         if (err || !member) return res.send(err || "MEMBER NOT FOUND");
         member.firstname = firstname || member.firstname;
