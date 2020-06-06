@@ -99,7 +99,10 @@
                 <input type="text" name="headline_edit" id="headline_edit">
                 <label>MAIN IMAGE(S) (OPTIONAL)</label>
                 <div class="input-group row" style="display: block">
-                    <div class="col-sm-6 col-xs-9"><input type="file" name="headline_images_change" id="headline_images_change" accept="image/*" multiple></div>
+                    <div class="col-sm-6 col-xs-9">
+                        <input type="file" id="headline_images_change" accept="image/*" multiple>
+                        <div class="headline-image-data"></div>
+                    </div>
                     <div class="col-sm-6 col-xs-3"><button class="clear-uploads" data-id="headline_images_change">CLEAR</button></div>
                 </div>
                 <div class="input-group headline-image-thumb-choice" style="display: none"></div>

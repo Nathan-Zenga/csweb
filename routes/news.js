@@ -23,8 +23,8 @@ router.post('/article/new', (req, res) => {
     var article = new Article({ headline, textbody, index: 1 });
     article.save((err, saved) => {
         Article.find({ _id: { $ne: saved._id } }).sort({index: 1, created_at: -1}).exec((err, articles) => {
-            articles.forEach((a, i) => { a.index += 1; a.save() });
-            saveMedia(req.body, saved, msg => res.send("DONE" + msg));
+            articles.forEach(a => { a.index += 1; a.save() });
+            saveMedia(req.body, saved, (err, msg) => res.send(err || `DONE${msg ? ". "+msg : ""}`));
         })
     })
 });
@@ -56,8 +56,7 @@ router.post('/article/edit', (req, res) => {
 
         for (k in req.body) {
             if (req.body[k] && k !== "article_id") {
-                if (/textbody_media_change|headline_images_change/g.test(k)) {
-                    var k = k.replace(/_change|\[\]/gi, "");
+                if (/textbody_media|headline_images/g.test(k)) {
                     cloud.v2.api.delete_resources_by_prefix("article/" + id + "/" + k, (err, result) => {
                         console.log(err || result);
                         article[k] = [];

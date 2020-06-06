@@ -1,6 +1,7 @@
 const { Article, Project, Artist, Location, MailingList, Homepage_content, Homepage_image } = require('../models/models');
 const cloud = require('cloudinary');
 const mongoose = require('mongoose');
+const { forEachOf } = require('async');
 
 /**
  * Getting all documents from all collections
@@ -38,55 +39,63 @@ module.exports.Collections = cb => {
 module.exports.indexReorder = (collection, args, cb) => {
     var { id, newIndex, sort } = args;
     if (sort) sort = Object.assign({index: 1}, sort);
-    collection.find().sort({index: 1}).exec((err, docs) => {
+    collection.find().sort(sort || {index: 1}).exec((err, docs) => {
         if (err) return err;
         var index = docs.findIndex(e => e._id == id);
         var beforeSelectedDoc = docs.slice(0, index);
         var afterSelectedDoc = docs.slice(index+1, docs.length);
         var docs_mutable = [...beforeSelectedDoc, ...afterSelectedDoc];
         docs_mutable.splice(parseInt(newIndex)-1, 0, docs[index]);
-        docs_mutable.forEach((doc, i) => {
-            doc.index = i+1;
-            doc.save();
-        });
+        docs_mutable.forEach((doc, i) => { doc.index = i+1; doc.save() });
         if (cb) cb();
     })
 };
 
 /**
- * Executing process of saving media
+ * Saving images / videos for news articles
  * @param {{}} body response body object
  * @param {mongoose.Document} doc the new / existing document to contain references (URLs) to the media being uploaded / saved
- * @param {function} [cb] callback with optional message
- * @callback cb
+ * @param {function} [cb] optional callback
  */
 module.exports.saveMedia = (body, doc, cb) => {
     var msg = "";
-    var fields = ["headline_images", "textbody_media", "headline_images_change", "textbody_media_change"].filter(f => body[f]);
-    fields.forEach(field => {
-        var f = field.replace("_change", "");
-        doc[f] = [];
-        body[field] = typeof body[field] === "string" ? [body[field]] : body[field];
-        body[field].forEach((mediaStr, i) => {
-            var notIframe = !["<iframe", "embed"].filter(x => mediaStr.includes(x)).length;
-            if (notIframe) {
-                var public_id = "article/"+ doc.id +"/"+ f + (i+1);
-                cloud.v2.uploader.upload(mediaStr, { public_id, resource_type: "auto" }, (err, result) => {
-                    if (err) console.log(err);
-                    if (body.headline_image_thumb === mediaStr) doc.headline_image_thumb = result.secure_url;
-                    doc[f].push(result.secure_url);
-                    doc.save();
-                });
-            } else {
-                var ytUrl = ["youtu"].filter(x => mediaStr.includes(x)).length && notIframe;
+    var fields = ["headline_images", "textbody_media"].filter(f => body[f]);
+    if (!fields.length) return cb ? cb("Skipping media saving...") : false;
+    forEachOf(fields, (field, i, callback1) => {
+        body[field] = !Array.isArray(body[field]) ? [body[field]] : body[field];
+        doc[field] = Object.assign([], body[field]);
+        forEachOf(body[field], (mediaStr, j, callback2) => {
+            var isIframe = /<iframe(.*?)><\/iframe>/i.test(mediaStr);
+            var ytUrl = /youtu.?be/.test(mediaStr) && !isIframe;
+            if (isIframe) {
+                doc[field].splice(j, 1, mediaStr.match(/<iframe(.*?)><\/iframe>/gi)[0].replace(/(width|height|style)\=\"?\'?(.*?)\"?\'? /gi, "") );
+                console.log("Stored iframe...");
+                callback2();
+            } else if (ytUrl) {
                 var toReplace = /^.*(youtu.?be\/|v\/|u\/\w\/|watch\?v=|\&v=|\?v=)/i;
-                var ytIframe = '<iframe src="' + mediaStr.replace(toReplace, "https://youtube.com/embed/") + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
-                mediaStr = ytUrl ? ytIframe : mediaStr;
-                doc[f].push( mediaStr.replace(/(width|height|style)\=\"?\'?(.*?)\"?\'? /gi, "") );
-                doc.save();
+                var iframe = '<iframe src="' + mediaStr.replace(toReplace, "https://youtube.com/embed/") + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+                doc[field].splice(j, 1, iframe );
+                console.log("Youtube link stored as iframe...");
+                callback2();
+            } else {
+                var public_id = "article/"+ doc.id +"/"+ field + ( parseInt(j)+1 );
+                cloud.v2.uploader.upload(mediaStr, { public_id, resource_type: "auto" }, (err, result) => {
+                    if (err) return console.error(err), callback2("Error occurred whilst uploading image");
+                    if (body.headline_image_thumb === mediaStr) doc.headline_image_thumb = result.secure_url;
+                    console.log("Uploaded image / video to cloud...");
+                    doc[field].splice(j, 1, result.secure_url);
+                    callback2();
+                });
             }
+        }, err => {
+            if (err) return console.log(err), callback1(err);
+            if (i === fields.length-1) doc.save();
+            console.log(`All media from ${field} field saved...`);
+            callback1();
         });
-        msg = " - saving images / videos";
+    }, err => {
+        msg = "Images / videos saved";
+        console.log("Media saving process done." + !cb ? "" : " Calling callback now....");
+        cb ? cb(err, msg) : console.log(err || msg)
     });
-    if (cb) cb(msg);
 };

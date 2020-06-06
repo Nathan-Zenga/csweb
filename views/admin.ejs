@@ -48,24 +48,16 @@
             });
         };
         var showMessage = function(result) {
-            var reload = confirm(result + "\n\n Refresh page?");
+            var reload = confirm(result + "\n\nRefresh page?");
             if (reload) location.reload();
         };
-        var invalidURLs = function(links) {
-            links = typeof links == "string" ? [links] : links;
-            return links.filter(function(link) {
-                var url_format = /(youtu.?be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*|<iframe(.*?)<\/iframe>|^(data:)|^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+(.jpe?g|.png|.gif|.mp(3|4)|.mov|.m4a|.wav)$/gi;
-                return !url_format.test(link);
-            });
-        }
 
-        var headline_images = [];
         $("#headline_images, #headline_images_change").change(function() {
             var $form = $(this).closest("form");
             var files = this.files;
             var $thumb_choice = $form.find(".headline-image-thumb-choice");
-            headline_images = [];
             $thumb_choice.find("input").off("change").end().empty().hide();
+            $form.find(".headline-image-data").empty();
             if (files.length) {
                 var $submitInput = $form.children("input:submit");
                 var counter = 0;
@@ -78,7 +70,7 @@
                     var name = "headline_image_thumb" + (edit ? "_change" : "");
                     var $input = $("<input>").attr({ type: "radio", name, value: url, required: true });
                     var $img = $("<img>").attr({ src: url });
-                    headline_images.push(url);
+                    $form.find(".headline-image-data").append( $("<input>").attr({ type: "hidden", name: "headline_images" }).val(url) );
                     $thumb_choice.append($input.add($img));
                     counter += 1;
                     if (counter === files.length) $submitInput.attr("disabled", false);
@@ -86,53 +78,27 @@
             }
         });
 
-        var textbody_media = [];
-        var spots = [];
         $("#textbody, #textbody_edit").keyup(function() {
             var textbody = this;
-            var tbm_container = $(this).closest("form").find(".textbody_media");
-            textbody_media = [];
-            spots = textbody.value.split("\n").filter(function(x) { return x.trim().toLowerCase() === "x" });
-            $(tbm_container).find("input").off("change");
-            if ($(tbm_container).html()) $(tbm_container).empty();
+            var $tbm_container = $(this).closest("form").find(".textbody_media");
+            var spots = textbody.value.match(/^x$/gim) || [];
+            $tbm_container.find("input").off("change");
+            if ($tbm_container.html()) $tbm_container.empty();
             if (spots.length) {
-                spots.forEach(function(spot, i) {
-                    var $fileInput = $("<input>").attr({ type: "file"});
-                    var $textInput = $("<input>").attr({ type: "text", required: true, placeholder: "...or enter image URL or embed code"});
-                    var $set = $fileInput.add($textInput);
-                    $(tbm_container).append($set);
+                spots.forEach(function() {
+                    var $fileInput = $("<input>").attr({ type: "file" });
+                    var $textInput = $("<input>").attr({ type: "text", name: "textbody_media", required: true, placeholder: "...or enter image URL or embed code" });
+                    $fileInput.add($textInput).appendTo($tbm_container);
                 });
 
-                $(tbm_container).find("input:text").change(function() {
-                    var pos = $(tbm_container).find("input:text").index(this);
-                    var length = $(tbm_container).find("input:text").length;
-                    if (!this.value) {
-                        textbody_media.splice(pos, 1);
-                    } else if (textbody_media.length <= 1) {
-                        if (pos == 0) {
-                            textbody_media.unshift(this.value);
-                        } else {
-                            textbody_media.push(this.value);
-                        }
-                    } else if (pos == 0) {
-                        textbody_media.shift();
-                        textbody_media.unshift(this.value);
-                    } else if (pos == length-1) {
-                        textbody_media.pop();
-                        textbody_media.push(this.value);
-                    } else {
-                        textbody_media.splice(pos, 1, this.value);
-                    }
-                });
-
-                $(tbm_container).find("input:file").change(function() {
+                $tbm_container.find("input:file").change(function() {
                     var files = this.files;
                     var $textInput = $(this).next("input:text");
                     $textInput.val("");
                     if (files && files.length) {
                         $textInput.val("LOADING...").attr("disabled", true);
                         readDataURLs(files, function(e) {
-                            $textInput.attr("disabled", false).val(e.target.result).change();
+                            $textInput.attr("disabled", false).val(e.target.result);
                         });
                     }
                 })
@@ -144,13 +110,7 @@
         });
         $("#articles form").submit(function(e) {
             e.preventDefault();
-            if (invalidURLs(textbody_media).length) { showMessage("Invalid URL"); return false }
-
-            var data = Object.assign([], $(this).serializeArray());
-            if (headline_images.length) data.push({ name: "headline_images", value: headline_images });
-            if (textbody_media.length)  data.push({ name: "textbody_media", value: textbody_media });
-
-            $.post(this.action, data, function(result) {
+            $.post(this.action, $(this).serializeArray(), function(result) {
                 e.target.reset();
                 showMessage(result);
             });
@@ -319,13 +279,7 @@
 
         $("#edit-article form").submit(function(e) {
             e.preventDefault();
-            if (invalidURLs(textbody_media).length) { showMessage("Invalid URL", this); return false }
-
-            var data = Object.assign([], $(this).serializeArray());
-            if (headline_images.length) data.push({ name: "headline_images_change", value: headline_images });
-            if (textbody_media.length) data.push({ name: "textbody_media_change", value: textbody_media });
-
-            $.post(this.action, data, function(result) {
+            $.post(this.action, $(this).serializeArray(), function(result) {
                 e.target.reset();
                 showMessage(result);
             });

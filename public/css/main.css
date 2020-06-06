@@ -110,6 +110,10 @@ form {
 	padding: 20px;
 }
 
+#admin-page form .textbody_media {
+	width: 100%;
+}
+
 form label {
 	display: block;
 }
@@ -124,24 +128,29 @@ input, textarea, select {
 	background-color: white;
 }
 
-input[type="text"], input[type="number"], input[type="url"], input[type="email"] {
+textarea {
+	min-width: 100%;
+	max-width: 100%;
+}
+
+input[type=text], input[type=number], input[type=url], input[type=email] {
 	border-bottom: 1px solid black;
 }
 
-input[type="text"], input[type="number"], input[type="url"], input[type="email"], textarea, select {
+input[type=text], input[type=number], input[type=url], input[type=email], textarea, select {
 	padding: 10px;
 }
 
-input[type="checkbox"], input[type="radio"] {
+input[type=checkbox], input[type=radio] {
 	width: auto;
 }
 
-input[type="submit"], button {
+input[type=submit], button {
 	width: auto;
 	background-color: rgb(220, 220, 220);
 }
 
-input[type="submit"] {
+input[type=submit] {
 	display: table;
 	padding: 10px 30px;
 	margin-left: auto;
@@ -158,7 +167,7 @@ button + button {
 	margin-left: 10px;
 }
 
-input[type="file"] {
+input[type=file] {
 	font-weight: bold;
 }
 
