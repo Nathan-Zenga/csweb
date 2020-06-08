@@ -66,8 +66,7 @@
                 $thumb_choice.show().append(label);
                 readDataURLs(files, function(e) {
                     var url = e.target.result;
-                    var edit = /_change|_edit/i.test($form.get(0).id);
-                    var name = "headline_image_thumb" + (edit ? "_change" : "");
+                    var name = "headline_image_thumb";
                     var $input = $("<input>").attr({ type: "radio", name, value: url, required: true });
                     var $img = $("<img>").attr({ src: url });
                     $form.find(".headline-image-data").append( $("<input>").attr({ type: "hidden", name: "headline_images" }).val(url) );
@@ -220,7 +219,7 @@
                         $thumb_choice.append($input.add($img));
                     })
                 }
-                $form.find("#textbody_edit").val(result.textbody).change().end().find(".textbody_media input:text").each(function(i) {
+                $form.find("#textbody_edit").val(result.textbody).keyup().end().find(".textbody_media input:text").each(function(i) {
                     this.value = result.textbody_media[i];
                 });
 

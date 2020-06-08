@@ -46,28 +46,32 @@ router.post('/article/delete', (req, res) => {
 });
 
 router.post('/article/edit', (req, res) => {
-    var id = req.body.article_id;
-    Article.findById(id, (err, article) => {
-        if (err || !article) return res.send(err ? "ERROR OCCURED" : "ARTICLE NOT FOUND");
+    var { article_id, headline, textbody, headline_image_thumb } = req.body;
+    Article.findById(article_id, (err, article) => {
+        if (err || !article) return res.send(err ? "Error occurred" : "Article not found");
 
-        article.headline = req.body.headline_edit || article.headline;
-        article.textbody = req.body.textbody_edit || article.textbody;
-        article.headline_image_thumb = req.body.headline_image_thumb_change || article.headline_image_thumb;
+        if (headline) article.headline = headline;
+        if (textbody) article.textbody = textbody;
+        if (headline_image_thumb) article.headline_image_thumb = headline_image_thumb;
 
-        for (k in req.body) {
-            if (req.body[k] && k !== "article_id") {
-                if (/textbody_media|headline_images/g.test(k)) {
-                    cloud.v2.api.delete_resources_by_prefix("article/" + id + "/" + k, (err, result) => {
+        article.save((err, saved) => {
+            if (err) return console.error(err), res.send("Error occurred whilst saving article");
+            var fields = ["headline_images", "textbody_media"].filter(f => req.body[f]);
+            if (fields.length) {
+                fields.forEach((field, i, arr) => {
+                    var prefix = "article/" + article_id + "/" + field;
+                    cloud.v2.api.delete_resources_by_prefix(prefix, (err, result) => {
                         console.log(err || result);
-                        article[k] = [];
-                        article.save((err, doc) => { saveMedia(req.body, doc) });
+                        if (i === arr.length-1) saveMedia(req.body, saved, err => {
+                            if (err) return console.error(err), res.send(err);
+                            res.send("Article updated successfully");
+                        });
                     });
-                }
-                break;
+                });
+            } else {
+                res.send("Article updated successfully");
             }
-        }
-
-        article.save((err, saved) => { res.send("ARTICLE UPDATED SUCCESSFULLY") });
+        });
     })
 });
 
