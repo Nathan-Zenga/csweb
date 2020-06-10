@@ -275,7 +275,7 @@
         <div id="remove-cs-link" class="tab-pane fade">
             <%_ var { socials } = homepage_contents[0];
                 if (socials.length) { _%>
-            <form action="cs/links/delete" method="post">
+            <form action="/cs/links/delete" method="post">
                 <label>CS SOCIALS</label>
                 <%_ socials.forEach((social, i) => {
                     var occurrences = socials.filter(s => s.name === social.name).length;
@@ -293,7 +293,7 @@
 
         <div id="remove-artist" class="tab-pane fade">
             <%_ if (artists.length) { _%>
-            <form action="artists/delete" method="post">
+            <form action="/artists/delete" method="post">
                 <label>ARTISTS</label>
                 <%_ artists.forEach((artist, i) => { _%>
                 <input type="checkbox" name="artist<%= i %>" value="<%= artist._id %>"> <span><%= artist.name %></span><br>
@@ -308,7 +308,7 @@
 
         <div id="remove-project" class="tab-pane fade">
             <%_ if (projects.length) { _%>
-            <form action="discography/project/delete" method="post">
+            <form action="/discography/project/delete" method="post">
                 <label>PROJECTS</label>
                 <%_ projects.forEach((project, i) => { _%>
                 <input type="checkbox" name="project<%= i %>" value="<%= project._id %>"> <span><%= project.title %></span><br>
@@ -323,7 +323,7 @@
 
         <div id="remove-article" class="tab-pane fade">
             <%_ if (articles.length) { _%>
-            <form action="news/article/delete" method="post">
+            <form action="/news/article/delete" method="post">
                 <label>ARTICLES</label>
                 <%_ articles.forEach((article, i) => { _%>
                 <input type="checkbox" name="article<%= i %>" value="<%= article._id %>"> <span><%= article.headline %></span><br>
@@ -338,7 +338,7 @@
 
         <div id="remove-location" class="tab-pane fade">
             <%_ if (locations.length) { _%>
-            <form action="map/location/delete" method="post">
+            <form action="/map/location/delete" method="post">
                 <label>LOCATION</label>
                 <%_ locations.forEach((location, i) => { _%>
                 <input type="checkbox" name="location<%= i %>" value="<%= location._id %>"> <span><%- "<b>"+ location.name +"</b> - "+ location.city +", "+ location.country %></span><br>
