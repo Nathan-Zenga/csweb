@@ -26,6 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Express session
 app.use(session({
 	secret: 'secret',
+	name: 'session' + Math.round(Math.random() * 10000),
 	saveUninitialized: true,
 	resave: true,
 	cookie: { secure: false },
