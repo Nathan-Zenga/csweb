@@ -84,23 +84,26 @@
             $tbm_container.find("input").off("change");
             if ($tbm_container.html()) $tbm_container.empty();
             if (spots.length) {
-                spots.forEach(function() {
-                    var $fileInput = $("<input>").attr({ type: "file" });
-                    var $textInput = $("<input>").attr({ type: "text", name: "textbody_media", required: true, placeholder: "...or enter image URL or embed code" });
-                    $fileInput.add($textInput).appendTo($tbm_container);
+                spots.forEach(function(spot, i) {
+                    var $fileInput = $("<input>").attr({ class: "input-"+i, type: "file", id: "upload-"+i }).css({display: "initial", width: "auto"});
+                    var $clearUploadsButton = $("<button>").attr({ class: "clear-uploads", "data-id": "upload-"+i }).text("CLEAR FILE UPLOAD");
+                    var $textInput = $("<input>").attr({ class: "input-"+i, type: "text", name: "textbody_media", required: true, placeholder: "...or enter image URL or embed code" });
+                    $fileInput.add($clearUploadsButton).add($textInput).appendTo($tbm_container);
                 });
 
                 $tbm_container.find("input:file").change(function() {
                     var files = this.files;
-                    var $textInput = $(this).next("input:text");
-                    $textInput.val("");
-                    if (files && files.length) {
-                        $textInput.val("LOADING...").attr("disabled", true);
+                    var $textInput = $(this).nextAll("input:text." + this.className);
+                    var filesPresent = Boolean(files && files.length);
+                    $textInput.val(filesPresent ? "N/A" : "").attr("disabled", false).next(":hidden").remove();
+                    if (filesPresent) {
                         readDataURLs(files, function(e) {
-                            $textInput.attr("disabled", false).val(e.target.result);
+                            $textInput.val("N/A").attr("disabled", true).after($("<input>").attr({ type: "hidden", name: "textbody_media", value: e.target.result }));
                         });
                     }
-                })
+                }).end().find(".clear-uploads").click(function(e) {
+                    e.preventDefault(); $tbm_container.find(":file#"+this.dataset.id).val("").change()
+                });
             }
         });
         $(".clear-uploads").click(function(e) {
