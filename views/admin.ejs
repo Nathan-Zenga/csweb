@@ -213,12 +213,12 @@
                 if (images && images.length) {
                     $thumb_choice.show().append("<label>CHOOSE ARTICLE THUMBNAIL</label>");
                     images.forEach(function(image) {
-                        var name = "headline_image_thumb_change";
-                        var $input = $("<input>").attr({ type: "radio", name, value: image, required: true });
+                        var $input = $("<input>").attr({ type: "radio", name: "headline_image_thumb", value: image });
                         var $img = $("<img>").attr({ src: image });
                         $thumb_choice.append($input.add($img));
                     })
                 }
+                $form.find(".headline-image-data").empty();
                 $form.find("#textbody_edit").val(result.textbody).keyup().end().find(".textbody_media input:text").each(function(i) {
                     this.value = result.textbody_media[i];
                 });
