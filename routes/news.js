@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const cloud = require('cloudinary');
+const { each } = require('async');
 const { Article } = require('../models/models');
 const { saveMedia, indexReorder } = require('../config/config');
 
@@ -58,14 +59,17 @@ router.post('/article/edit', (req, res) => {
             if (err) return console.error(err), res.send("Error occurred whilst saving article");
             var fields = ["headline_images", "textbody_media"].filter(f => req.body[f]);
             if (fields.length) {
-                fields.forEach((field, i, arr) => {
+                each(fields, (field, cb) => {
                     var prefix = "article/" + article_id + "/" + field;
                     cloud.v2.api.delete_resources_by_prefix(prefix, (err, result) => {
-                        console.log(err || result);
-                        if (i === arr.length-1) saveMedia(req.body, saved, err => {
-                            if (err) return console.error(err), res.send(err);
-                            res.send("Article updated successfully");
-                        });
+                        if (err) return cb(err);
+                        cb();
+                    })
+                }, err => {
+                    if (err) return console.error(err), res.send("Error occurred whilst deleting article media");
+                    saveMedia(req.body, saved, err => {
+                        if (err) return console.error(err), res.send("Error occurred whilst saving article media");
+                        res.send("Article updated successfully");
                     });
                 });
             } else {

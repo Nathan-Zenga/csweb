@@ -53,7 +53,7 @@ module.exports.indexReorder = (collection, args, cb) => {
 
 /**
  * Saving images / videos for news articles
- * @param {{}} body response body object
+ * @param {object} body response body object
  * @param {mongoose.Document} doc the new / existing document to contain references (URLs) to the media being uploaded / saved
  * @param {function} [cb] optional callback
  */
@@ -82,20 +82,20 @@ module.exports.saveMedia = (body, doc, cb) => {
                 cloud.v2.uploader.upload(mediaStr, { public_id, resource_type: "auto" }, (err, result) => {
                     if (err) return console.error(err), callback2("Error occurred whilst uploading image");
                     if (body.headline_image_thumb === mediaStr) doc.headline_image_thumb = result.secure_url;
-                    console.log("Uploaded image / video to cloud...");
                     doc[field].splice(j, 1, result.secure_url);
+                    console.log("Uploaded image / video to cloud...");
                     callback2();
                 });
             }
         }, err => {
-            if (err) return console.log(err), callback1(err);
-            if (i === fields.length-1) doc.save();
+            if (err) return console.error(err), callback1(err);
             console.log(`All media from ${field} field saved...`);
             callback1();
         });
     }, err => {
         msg = "Images / videos saved";
-        console.log("Media saving process done." + !cb ? "" : " Calling callback now....");
+        console.log(`Media saving process done.${!cb ? "" : " Calling callback now...."}`);
+        doc.save();
         cb ? cb(err, msg) : console.log(err || msg)
     });
 };
