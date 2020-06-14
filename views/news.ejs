@@ -3,9 +3,8 @@
         <%_ articles.forEach((article, i) => { _%>
         <article class="content-container col-md-4 col-sm-6">
             <div class="article-content">
-                <%_ if (article.headline_image_thumb) { _%>
-                <a class="img" href="/news/article/<%= article._id %>" style="background-image: url('<%= article.headline_image_thumb %>')"></a>
-                <%_ } _%>
+                <%_ var img = article.headline_image_thumb || "/img/cs-logo.png"; _%>
+                <a class="img" href="/news/article/<%= article._id %>" style="background-image: url('<%= img %>')"></a>
                 <div class="text">
                     <h1><a href="/news/article/<%= article._id %>"><%- article.headline %></a></h1>
                     <%-
