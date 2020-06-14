@@ -7,7 +7,8 @@
             <li><a data-toggle="pill" href="#artists">ARTISTS</a></li>
             <li><a data-toggle="pill" href="#locations">LOCATIONS</a></li>
             <li><a data-toggle="pill" href="#mail">MAIL</a></li>
-            <li><a data-toggle="pill" href="#edit-remove">EDIT / REMOVE</a></li>
+            <li><a data-toggle="pill" href="#edit">EDIT</a></li>
+            <li><a data-toggle="pill" href="#remove">REMOVE</a></li>
         </ul>
         <div class="tab-content container">
             <div id="home" class="tab-pane fade in active">
@@ -30,8 +31,12 @@
             <%_ include partials/admin/locations _%>
             </div>
 
-            <div id="edit-remove" class="tab-pane fade">
-            <%_ include partials/admin/edit-remove _%>
+            <div id="edit" class="tab-pane fade">
+            <%_ include partials/admin/edit _%>
+            </div>
+
+            <div id="remove" class="tab-pane fade">
+            <%_ include partials/admin/remove _%>
             </div>
 
             <div id="mail" class="tab-pane fade">
@@ -186,7 +191,7 @@
         });
 
         $.post("/search", function(docs) {
-            $("#edit-remove select[id*='_id']").change(function() {
+            $("#edit select[id*='_id']").change(function() {
                 var $form = $(this).closest("form");
                 var id = this.value;
                 var result = docs.filter(function(item) { return id == item._id })[0] || {};
@@ -318,14 +323,14 @@
             });
         });
 
-        $(".tab-pane[id*=remove-] form").submit(function(e) {
+        $("#remove form").submit(function(e) {
             e.preventDefault();
             var form = this;
             var data = Object.assign([], $(form).serializeArray());
 
-            $.post(form.action, data, function(result) {
+            $.post(form.action, $(form).serializeArray(), function(result) {
                 showMessage(result, e.target);
-                $(form).find(":input:checked, :input:checked + span").slideUp(function() {
+                $(form).find(":input:checked, :input:checked + span, :input:checked + span + br").slideUp(function() {
                     $(this).remove();
                     data.forEach(function(field) { $("option[value="+ field.value +"]").remove() });
                 });
@@ -346,7 +351,9 @@
             $textarea.get(0).focus();
         });
 
-        $("#edit-remove-dropdown-options select").change(function() { $(".nav-pills a[href='"+ this.value +"']").click() });
+        $(".section-dropdown-options select").change(function() {
+            $(this).closest(".sidebar").find(".nav-pills a[href='"+ this.value +"']").click()
+        });
 
         var homepage_image = "", homepage_image_filename = "";
         $("#homepage_image_input").change(function() {
