@@ -25,9 +25,9 @@
                             return "<a target='_blank' href='"+ href +"'>" + match + "</a>"
                         });
                         article.textbody_media.forEach(media => {
-                            var image = /.?(jpe?g|png|gif)/gi.test(media);
-                            var video = /.?(mp4|mov)/gi.test(media);
-                            var audio = /.?(mp3|m4a|wav)/gi.test(media);
+                            var image = /.?(jpe?g|png|gif)$/gi.test(media);
+                            var video = /.?(mp4|mov)$/gi.test(media);
+                            var audio = /.?(mp3|m4a|wav)$/gi.test(media);
                             var iframeElm = /<iframe(.*?)<\/iframe>/gi.test(media);
                             if (image) {
                                 media = '<div class="textbody-media img"><img src="'+ media +'"></div>';
