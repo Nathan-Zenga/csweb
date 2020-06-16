@@ -86,14 +86,14 @@
             var textbody = this;
             var $tbm_container = $(this).closest("form").find(".textbody_media");
             var spots = textbody.value.match(/^x$/gim) || [];
-            $tbm_container.find("input").off("change");
+            var current_values = $tbm_container.find("input:text").map(function() { return this.value }).get();
             if ($tbm_container.html()) $tbm_container.empty();
             if (spots.length) {
                 spots.forEach(function(spot, i) {
-                    var $fileInput = $("<input>").attr({ class: "input-"+i, type: "file", id: "upload-"+i }).css({display: "initial", width: "auto"});
+                    var $fileInput = $("<input>").attr({ class: "input-"+i, type: "file", id: "upload-"+i }).css({ display: "initial", width: "auto" });
                     var $clearUploadsButton = $("<button>").attr({ class: "clear-uploads", "data-id": "upload-"+i }).text("CLEAR FILE UPLOAD");
                     var $textInput = $("<input>").attr({ class: "input-"+i, type: "text", name: "textbody_media", required: true, placeholder: "...or enter image URL or embed code" });
-                    $fileInput.add($clearUploadsButton).add($textInput).appendTo($tbm_container);
+                    $fileInput.add($clearUploadsButton).add($textInput.val(current_values[i])).appendTo($tbm_container);
                 });
 
                 $tbm_container.find("input:file").change(function() {
