@@ -1,7 +1,7 @@
 const { Article, Project, Artist, Location, MailingList, Homepage_content, Homepage_image } = require('../models/models');
 const cloud = require('cloudinary');
 const mongoose = require('mongoose');
-const { forEachOf } = require('async');
+const { each, forEachOf } = require('async');
 
 /**
  * Getting all documents from all collections
@@ -60,29 +60,29 @@ module.exports.indexReorder = (collection, args, cb) => {
 module.exports.saveMedia = (body, doc, cb) => {
     var msg = "";
     var fields = ["headline_images", "textbody_media"].filter(f => body[f]);
-    if (!fields.length) return cb ? cb("Skipping media saving...") : false;
-    forEachOf(fields, (field, i, callback1) => {
+    if (!fields.length) return cb ? cb(null, "Skipping media saving...") : false;
+    each(fields, (field, callback1) => {
         body[field] = !Array.isArray(body[field]) ? [body[field]] : body[field];
         doc[field] = Object.assign([], body[field]);
-        forEachOf(body[field], (mediaStr, j, callback2) => {
+        forEachOf(body[field], (mediaStr, i, callback2) => {
             var isIframe = /<iframe(.*?)><\/iframe>/i.test(mediaStr);
             var ytUrl = /youtu.?be/.test(mediaStr) && !isIframe;
             if (isIframe) {
-                doc[field].splice(j, 1, mediaStr.match(/<iframe(.*?)><\/iframe>/gi)[0].replace(/(width|height|style)\=\"?\'?(.*?)\"?\'? /gi, "") );
+                doc[field].splice(i, 1, mediaStr.match(/<iframe(.*?)><\/iframe>/gi)[0].replace(/(width|height|style)\=\"?\'?(.*?)\"?\'? /gi, "") );
                 console.log("Stored iframe...");
                 callback2();
             } else if (ytUrl) {
                 var toReplace = /^.*(youtu.?be\/|v\/|u\/\w\/|watch\?v=|\&v=|\?v=)/i;
                 var iframe = '<iframe src="' + mediaStr.replace(toReplace, "https://youtube.com/embed/") + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
-                doc[field].splice(j, 1, iframe );
+                doc[field].splice(i, 1, iframe );
                 console.log("Youtube link stored as iframe...");
                 callback2();
             } else {
-                var public_id = "article/"+ doc.id +"/"+ field + ( parseInt(j)+1 );
+                var public_id = "article/"+ doc.id +"/"+ field + ( parseInt(i)+1 );
                 cloud.v2.uploader.upload(mediaStr, { public_id, resource_type: "auto" }, (err, result) => {
                     if (err) return console.error(err), callback2("Error occurred whilst uploading image");
                     if (body.headline_image_thumb === mediaStr) doc.headline_image_thumb = result.secure_url;
-                    doc[field].splice(j, 1, result.secure_url);
+                    doc[field].splice(i, 1, result.secure_url);
                     console.log("Uploaded image / video to cloud...");
                     callback2();
                 });
@@ -94,7 +94,7 @@ module.exports.saveMedia = (body, doc, cb) => {
         });
     }, err => {
         msg = "Images / videos saved";
-        console.log(`Media saving process done.${!cb ? "" : " Calling callback now...."}`);
+        console.log(`Media saving process done.${!cb ? "" : " Calling callback now..."}`);
         doc.save();
         cb ? cb(err, msg) : console.log(err || msg)
     });
