@@ -35,21 +35,34 @@ router.post('/update', (req, res) => {
 });
 
 router.post('/send/mail', (req, res) => {
-    var { email, subject, message } = req.body, oauth2Client, accessToken, sentCount = 0;
+    var { email, subject, message } = req.body, sentCount = 0;
     MailingList.find(email ? { email } : {}, (err, members) => {
-        if (err || !members.length) return res.send(err || "NO MEMBERS IN THE MAILING LIST TO SEND THE EMAIL TO");
+        if (err || !members.length) return res.send(err || "Mailing list member(s) not found");
 
-        if (NODE_ENV === "production") {
-            oauth2Client = new OAuth2( OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, "https://developers.google.com/oauthplayground" );
-            oauth2Client.setCredentials({ refresh_token: OAUTH_REFRESH_TOKEN });
-            accessToken = oauth2Client.getAccessToken();
-        }
+        const oauth2Client = new OAuth2( OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, "https://developers.google.com/oauthplayground" );
+        oauth2Client.setCredentials({ refresh_token: OAUTH_REFRESH_TOKEN });
 
         nodemailer.createTestAccount((err, acc) => {
             each(members, (member, cb) => {
-                var transporter;
-                if (NODE_ENV === "production") {
-                    transporter = nodemailer.createTransport({
+                let mailTransporter = transportOpts => {
+                    res.render('templates/mail', { message }, (err, html) => {
+                        nodemailer.createTransport(transportOpts).sendMail({
+                            from: "CS <info@thecs.co>",
+                            to: member.email,
+                            subject,
+                            html,
+                            attachments: [{ filename: 'cs-icon.png', path: 'public/img/cs-icon.png', cid: 'logo' }]
+                        }, err => {
+                            if (err) return console.error(err), cb(err);
+                            sentCount += 1;
+                            console.log("The message was sent!");
+                            cb();
+                        })
+                    })
+                };
+
+                oauth2Client.getAccessToken().then(response => {
+                    mailTransporter({
                         service: 'gmail', /* port: 465, secure: true, */
                         auth: {
                             type: "OAuth2",
@@ -57,37 +70,22 @@ router.post('/send/mail', (req, res) => {
                             clientId: OAUTH_CLIENT_ID,
                             clientSecret: OAUTH_CLIENT_SECRET,
                             refreshToken: OAUTH_REFRESH_TOKEN,
-                            accessToken
+                            accessToken: response.token
                         },
                         tls: { rejectUnauthorized: true }
                     });
-                } else {
-                    transporter = nodemailer.createTransport({
+                }).catch(err => {
+                    if (NODE_ENV === "production") return console.error(err), cb(err);
+                    mailTransporter({
                         host: 'smtp.ethereal.email',
                         port: 587,
                         secure: false,
                         auth: { user: acc.user, pass: acc.pass }
                     });
-                }
-
-                res.render('templates/mail', { message }, (err, html) => {
-                    var msg = {
-                        from: "CS <info@thecs.co>",
-                        to: member.email,
-                        subject,
-                        html,
-                        attachments: [{ filename: 'cs-icon.png', path: 'public/img/cs-icon.png', cid: 'logo' }]
-                    };
-                    transporter.sendMail(msg, err => {
-                        if (err) return console.error(err), cb(err);
-                        sentCount += 1;
-                        console.log("The message was sent!");
-                        cb();
-                    })
-                })
+                });
             }, err => {
-                if (err) console.log(err);
-                res.send(`Message sent to ${sentCount}/${members.length} members${err ? " Error occurred" : ""}`);
+                if (err) console.error(err);
+                res.send(`Message sent to ${sentCount}/${members.length} members.${err ? err.message ? " "+err.message : " Error occurred" : ""}`);
             });
         });
     })
