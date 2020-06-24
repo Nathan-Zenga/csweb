@@ -20,7 +20,17 @@
             <div id="logo">
                 <img src="cid:logo" alt="CS logo">
             </div>
-            <div id="message"><%- message.replace(/\r?\n/g, "<br>") %></div>
+            <div id="message">
+                <%- 
+                    (function() {
+                        var url_pattern = /(?:(?:https?|ftp|file|data):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$])/gi;
+                        return message.replace(/\r?\n/g, "<br>").replace(url_pattern, match => {
+                            var href = /^www/.test(match) || !/^(https?|ftp|file|data)/.test(match) ? "http://" + match : match;
+                            return "<a target='_blank' href='"+ href +"'>" + match + "</a>"
+                        });
+                    })()
+                %>
+            </div>
         </div>
     </body>
 </html>
