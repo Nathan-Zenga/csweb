@@ -304,6 +304,11 @@ footer > a:not(:first-child) {
 	margin-left: 15px;
 }
 
+footer .social-icon {
+	-webkit-filter: invert(1);
+	filter: invert(1);
+}
+
 article.content-container {
 	background-color: transparent;
 	padding: 10px 10px 20px;

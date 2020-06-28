@@ -1,12 +1,8 @@
 	</main>
 	<footer>
-		<%_ socials.forEach(link => {
-		    if (!(/tidal/i.test(link.name))) { _%>
-		<a class="fab fa-<%= link.name %>" target="_blank" aria-hidden="true" href="<%= link.url %>"></a>
-		<%_ } else {
-		    var img = { tidal: "https://simpleicons.org/icons/tidal.svg" }; _%>
-		<a target="_blank" href="<%= link.url %>"><img style="height: 1.2em" src="<%= img[link.name] %>" alt="<%= link.name %> link"></a>
-		<%_ }}) _%>
+		<%_ socials.forEach(link => { _%>
+		<a target="_blank" href="<%= link.url %>"><img class="social-icon" style="height: 1em" src="https://cdn.jsdelivr.net/npm/simple-icons@v2/icons/<%= link.name.replace(/- /g, '') %>.svg" alt="<%= link.name %> link"></a>
+		<%_ }) _%>
 	</footer>
 </body>
 </html>
