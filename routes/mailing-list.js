@@ -45,14 +45,10 @@ router.post('/send/mail', (req, res) => {
         nodemailer.createTestAccount((err, acc) => {
             each(members, (member, cb) => {
                 let mailTransporter = transportOpts => {
-                    res.render('templates/mail', { message }, (err, html) => {
-                        nodemailer.createTransport(transportOpts).sendMail({
-                            from: "CS <info@thecs.co>",
-                            to: member.email,
-                            subject,
-                            html,
-                            attachments: [{ filename: 'cs-icon.png', path: 'public/img/cs-icon.png', cid: 'logo' }]
-                        }, err => {
+                    res.render('templates/mail', { message, member }, (err, html) => {
+                        let attachments = [{ path: 'public/img/cs-logo.png', cid: 'logo' }];
+                        res.locals.socials.forEach((s, i) => attachments.push({ path: `public/img/socials/${s.name}.png`, cid: `social_icon_${i}` }));
+                        nodemailer.createTransport(transportOpts).sendMail({ from: "CS <info@thecs.co>", to: member.email, subject, html, attachments }, err => {
                             if (err) return console.error(err), cb(err);
                             sentCount += 1;
                             console.log("The message was sent!");

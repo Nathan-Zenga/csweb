@@ -1,36 +1,62 @@
 <html>
     <head>
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Cutive+Mono&family=Rock+Salt&display=swap');
-            body, .inner-body { font-family: 'Cutive Mono', 'Courier New', monospace; }
+            #mail-body {
+                font-family: 'Courier New', monospace;
+                margin: 0;
+            }
+            #mail-body a, #mail-body a:link, #mail-body a:visited {
+                color: inherit;
+            }
             #logo {
-                margin-bottom: 1em;
                 text-align: center;
             }
             #logo img {
-                height: 80px;
-                padding: 10px;
-                border-radius: 50%;
-                border: 2px solid;
+                height: 70px;
+            }
+            .section {
+                padding-top: 30px;
+                padding-bottom: 30px;
+            }
+            .header, .footer {
+                background-color: grey;
+                color: white;
+            }
+            footer {
+                font-family: Arial, sans-serif;
+            }
+            .footer a + a {
+                margin-left: 10px;
+            }
+            #mail-body .social-icon {
+                -webkit-filter: invert(100%);
+                filter: invert(100%);
             }
         </style>
     </head>
-    <body>
-        <div class="inner-body">
-            <div id="logo">
-                <img src="cid:logo" alt="CS logo">
+    <body id="mail-body">
+        <div class="header section" style="padding: 10px 0">
+            <div id="logo"><img src="cid:logo" alt="CS logo"></div>
+        </div>
+        <div class="main section" id="message" style="margin: 0 auto; max-width: 500px; padding-left: 15px; padding-right: 15px;">
+            <%- 
+                (function() {
+                    var url_pattern = /(?:(?:https?|ftp|file|data):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$])/gi;
+                    return message.replace(/\r?\n/g, "<br>").replace(url_pattern, match => {
+                        var href = /^www/.test(match) || !/^(https?|ftp|file|data)/.test(match) ? "http://" + match : match;
+                        return "<a target='_blank' href='"+ href +"'>" + match + "</a>"
+                    });
+                })()
+            %>
+        </div>
+        <div class="footer section" style="text-align: center">
+            <div class="row">
+                <%_ socials.forEach((link, i) => { _%>
+                <a target="_blank" href="<%= link.url %>"><img class="social-icon" style="height: 1.2em" src="cid:social_icon_<%= i %>" alt="<%= link.name %> link"></a>
+                <%_ }) _%>
             </div>
-            <div id="message">
-                <%- 
-                    (function() {
-                        var url_pattern = /(?:(?:https?|ftp|file|data):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$])/gi;
-                        return message.replace(/\r?\n/g, "<br>").replace(url_pattern, match => {
-                            var href = /^www/.test(match) || !/^(https?|ftp|file|data)/.test(match) ? "http://" + match : match;
-                            return "<a target='_blank' href='"+ href +"'>" + match + "</a>"
-                        });
-                    })()
-                %>
-            </div>
+            <br>
+            <p style="font-size: .8em;">&copy; CS Records 2016 - <%= new Date().getFullYear() %></p>
         </div>
     </body>
 </html>
