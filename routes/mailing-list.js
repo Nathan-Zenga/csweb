@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const nodemailer = require('nodemailer');
+const { post } = require('request');
 const { each } = require('async');
 const { OAuth2 } = require("googleapis").google.auth;
 const { OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, OAUTH_REFRESH_TOKEN, NODE_ENV } = process.env;
@@ -8,6 +9,18 @@ const { MailingList } = require('../models/models');
 
 router.get('/sign-up', (req, res) => {
     res.render('mailing-list', { title: "Sign Up", pagename: "sign-up" })
+});
+
+router.get('/member/delete', (req, res) => {
+    const { id, src } = req.query;
+    MailingList.findById(id, (err, doc) => {
+        if (!src.match(/^email_unsub_link[A-Za-z0-9]{24}$/g) || src.slice(-24) !== id || err || !doc) return res.send("Invalid entry");
+        post({ url: res.locals.location_origin + req.originalUrl, json: { id } }, (err, response) => {
+            if (err) return console.error(err), res.send(err.message || "Error occurred");
+            var result = response.body === "NOTHING SELECTED" ? "You don't exist on our records." : "You are have been unsubscribed. Sorry to see you go!";
+            res.send(result + "<br><br> - CS");
+        })
+    })
 });
 
 router.post('/new', (req, res) => {

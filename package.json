@@ -1,6 +1,6 @@
 {
   "name": "csweb",
-  "version": "1.0.0",
+  "version": "1.3.1",
   "description": "merch store website",
   "main": "app.js",
   "scripts": {
@@ -19,7 +19,8 @@
     "memorystore": "^1.6.2",
     "mongoose": "^5.9.17",
     "node-geocoder": "^3.27.0",
-    "nodemailer": "^6.4.8"
+    "nodemailer": "^6.4.8",
+    "request": "^2.88.2"
   },
   "engines": {
     "node": "*",
