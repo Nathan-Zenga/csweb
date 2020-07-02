@@ -21,7 +21,7 @@ module.exports.Project = model('Project', Schema({
 module.exports.Artist = model('Artist', Schema({
     name: String,
     bio: String,
-    socials: Schema.Types.Mixed,
+    socials: [{ name: String, url: String }],
     profile_image: String
 }));
 
@@ -48,7 +48,7 @@ module.exports.Homepage_content = model('Homepage_content', Schema({
     banner_text: String,
     banner_media: [String],
     footnote_text: String,
-    socials: Array
+    socials: [{ name: String, url: String }]
 }));
 
 module.exports.Homepage_image = model('Homepage_image', Schema({

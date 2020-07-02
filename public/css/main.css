@@ -461,7 +461,11 @@ article.full .textbody-media iframe:not([src*=youtu]) {
 }
 
 .artist-bio .text .socials img {
-	height: 1.5em;
+	height: 1em;
+}
+
+.artist-bio .text .socials a + a {
+	margin-left: 1em;
 }
 
 .artist-bio .img-wrapper {

@@ -7,19 +7,20 @@
     </div>
     <textarea type="text" name="bio" id="bio" rows="5" required></textarea>
     <label>PROFILE PICTURE (OPTIONAL)</label>
-    <div class="input-group row" style="display: block">
-        <div class="col-sm-6 col-xs-9"><input type="file" name="profile_image" id="profile_image" accept="image/*"></div>
+    <div class="input-group file-upload-container row" style="display: block">
+        <div class="col-sm-6 col-xs-9"><input type="file" id="profile_image" accept="image/*"></div>
+        <input type="hidden" name="profile_image">
         <div class="col-sm-6 col-xs-3"><button class="clear-uploads" data-id="profile_image">CLEAR</button></div>
     </div>
 
     <label>SOCIAL MEDIA LINKS</label>
     <div class="social-media-input-group input-group row" style="display: block">
-        <div class="social-media-input input-item">
+        <div class="social-media-input input-item row">
             <div class="col-sm-4">
                 <select name="social_media_name" class="social-media-name">
                     <option value="">Choose social</option>
                     <%_ ["Twitter", "Instagram", "Facebook", "Spotify", "SoundCloud", "Apple Music", "Tidal", "Bandcamp", "Deezer", "Google Play", "Linktree"].forEach(social => { _%>
-                    <option value="<%= social.toLowerCase().replace(/ /g, '_') %>"><%= social %></option>
+                    <option value="<%= social.toLowerCase().replace(/[ _]/g, '') %>"><%= social %></option>
                     <%_ }) _%>
                 </select>
             </div>

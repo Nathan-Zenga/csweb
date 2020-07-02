@@ -159,19 +159,18 @@
             });
         });
 
-        var profile_image = "";
         $("#profile_image, #profile_image_change").change(function() {
             var files = this.files;
-            profile_image = "";
+            var $profile_image = $(this).closest(".file-upload-container").find(":hidden").val("");
             if (files.length) {
                 var $submitInput = $(this).closest("form").children("input:submit");
                 readDataURLs(files, function(e) {
-                    profile_image = e.target.result;
+                    $profile_image.val(e.target.result);
                     $submitInput.attr("disabled", false);
                 });
             }
         });
-        $(".input-group .input-item :input").change(function() {
+        $(".input-group .input-item :input").on("change keyup", function() {
             var $groupInputs = $(this).closest(".input-item").find(":input");
             var notEmpty = $groupInputs.filter(function() { return this.value }).length > 0;
             $groupInputs.attr("required", notEmpty);
@@ -195,22 +194,16 @@
                 var $form = $(this).closest("form");
                 var id = this.value;
                 var result = docs.filter(function(item) { return id == item._id })[0] || {};
-                var socials_keys;
-                try {
-                    socials_keys = Object.keys(result.socials);
-                } catch (e) {
-                    socials_keys = [];
-                }
 
                 $form.find("#artist_name_edit").val(result.name);
                 $form.find("#artist_bio_edit").val(result.bio);
                 var $group = $form.find(".social-media-input-group");
                 $group.find(".social-media-input").find(":input").val("").end().not(":first").remove();
-                socials_keys.forEach(function(k, i) {
+                result.socials.forEach(function(social, i) {
                     if (i == 0) $group.empty();
                     var $clone = $("#artists .social-media-input").clone(true);
-                    $clone.find(".social-media-name").addClass("edit").val(k).end()
-                          .find(".social-media-url").addClass("edit").val(result.socials[k]).end()
+                    $clone.find(".social-media-name").val(social.name).end()
+                          .find(".social-media-url").val(social.url).end()
                           .appendTo($group);
                 });
 
@@ -272,15 +265,17 @@
                 );
             });
         });
-        $("#edit-artist form").submit(function(e) {
+        $("#artists form, #edit-artist form").submit(function(e) {
             e.preventDefault();
             var data = Object.assign([], $(this).serializeArray());
-            if (profile_image) data.push({ name: "profile_image", value: profile_image });
+            var $profile_image = $(this).closest(".file-upload-container").find(":hidden");
+            if ($profile_image.val()) data.push({ name: "profile_image", value: $profile_image.val() });
 
             $.post(this.action, data, function(result) {
-                e.target.reset();
-                profile_image = "";
                 showMessage(result);
+                e.target.reset();
+            }).fail(function(err, status, codeMessage) {
+                showMessage(codeMessage + (err ? ": " + err : ""));
             });
         });
 
@@ -289,6 +284,8 @@
             $.post(this.action, $(this).serializeArray(), function(result) {
                 e.target.reset();
                 showMessage(result);
+            }).fail(function(err, status, codeMessage) {
+                showMessage(codeMessage + (err ? ": " + err : ""));
             });
         });
 
@@ -300,15 +297,16 @@
             $.post(this.action, data, function(result) {
                 e.target.reset();
                 showMessage(result);
+            }).fail(function(err, status, codeMessage) {
+                showMessage(codeMessage + (err ? ": " + err : ""));
             });
         });
 
-        $("#locations form, #mail form, #homepage_content_form, #artists form, " +
+        $("#locations form, #mail form, #homepage_content_form, " +
           "#edit-location form, #edit-member form, #reorder-homepage-image form, #reorder-article form").submit(function(e) {
             e.preventDefault();
             var form = this;
             var data = Object.assign([], $(form).serializeArray());
-            if (profile_image) data.push({ name: "profile_image", value: profile_image });
             var $submitBtn = $(form).find("input[type=submit]");
             var refresh = !!$(form).closest("#edit-location").length;
             var max = value = parseInt($(form).find("#homepage_image_index").attr("max")) + 1;
@@ -316,10 +314,12 @@
 
             $.post(form.action, data, function(result) {
                 e.target.reset();
-                $submitBtn.attr("disabled", false);
                 $(form).find("#homepage_image_index").attr({ max, value }).val(value);
-                profile_image = "";
                 showMessage(result, e.target, refresh);
+            }).fail(function(err, status, codeMessage) {
+                showMessage(codeMessage + (err ? ": " + err : ""));
+            }).always(function() {
+                $submitBtn.attr("disabled", false);
             });
         });
 
@@ -334,6 +334,8 @@
                     $(this).remove();
                     data.forEach(function(field) { $("option[value="+ field.value +"]").remove() });
                 });
+            }).fail(function(err, status, codeMessage) {
+                showMessage(codeMessage + (err ? ": " + err : ""));
             });
         });
 
@@ -380,6 +382,8 @@
             $.post(this.action, data, function(result) {
                 e.target.reset();
                 showMessage(result, e.target);
+            }).fail(function(err, status, codeMessage) {
+                showMessage(codeMessage + (err ? ": " + err : ""));
             });
         });
     </script>
