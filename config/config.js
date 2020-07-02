@@ -40,7 +40,7 @@ module.exports.indexReorder = (collection, args, cb) => {
     var { id, newIndex, sort } = args;
     if (sort) sort = Object.assign({index: 1}, sort);
     collection.find().sort(sort || {index: 1}).exec((err, docs) => {
-        if (err) return err;
+        if (err) return cb ? cb(err.message) : err;
         var index = docs.findIndex(e => e._id == id);
         var beforeSelectedDoc = docs.slice(0, index);
         var afterSelectedDoc = docs.slice(index+1, docs.length);
