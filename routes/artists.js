@@ -28,16 +28,16 @@ router.post('/new', (req, res) => {
                 if (err) return res.send(err);
                 saved.profile_image = result.secure_url;
                 saved.save();
-                res.send("DONE - image saved");
+                res.send("Done - image saved");
             });
-        } else { res.send("DONE") }
+        } else { res.send("Done") }
     });
 });
 
 router.post('/edit', (req, res) => {
     const { artist_id, artist_name, artist_bio, profile_image, social_media_name, social_media_url } = req.body;
     Artist.findById(artist_id, (err, artist) => {
-        if (err || !artist) return res.send(err ? "ERROR OCCURED" : "ARTIST NOT FOUND");
+        if (err || !artist) return res.send(err ? "Error occured" : "Artist not found");
         const social_media_names = (social_media_name instanceof Array ? social_media_name : [social_media_name]).filter(e => e);
         const social_media_urls = (social_media_url instanceof Array ? social_media_url : [social_media_url]).filter(e => e);
         if (social_media_names.length !== social_media_urls.length) return res.send("Number of specified social media names + urls don't match");
@@ -60,7 +60,7 @@ router.post('/edit', (req, res) => {
             artist.socials.push({ name: social_media_names[i], url: social_media_urls[i] });
         });
 
-        artist.save((err, saved) => { res.send("ARTIST UPDATED SUCCESSFULLY: " + saved.name.toUpperCase()) });
+        artist.save((err, saved) => { res.send("Artist updated successfully: " + saved.name) });
     })
 });
 
@@ -68,13 +68,13 @@ router.post('/delete', (req, res) => {
     var ids = Object.values(req.body);
     if (ids.length) {
         Artist.deleteMany({_id : { $in: ids }}, (err, result) => {
-            if (err || !result.deletedCount) return res.send(err || "ARTIST(S) NOT FOUND");
+            if (err || !result.deletedCount) return res.send(err || "Artist(s) not found");
             ids.forEach(id => {
                 cloud.v2.api.delete_resources_by_prefix("artists/" + id, (err, result) => { console.log(err || result) });
             })
-            res.send("ARTIST"+ (ids.length > 1 ? "S" : "") +" REMOVED SUCCESSFULLY")
+            res.send("Artist"+ (ids.length > 1 ? "s" : "") +" removed successfully")
         })
-    } else { res.send("NOTHING SELECTED") }
+    } else { res.send("Nothing selected") }
 });
 
 module.exports = router;

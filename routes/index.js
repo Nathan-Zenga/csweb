@@ -39,7 +39,7 @@ router.post('/homepage/content', (req, res) => {
                 content.socials = socials;
             }
         }
-        content.save(err => res.send("HOMEPAGE CONTENT " + (!contents.length ? "SAVED" : "UPDATED")));
+        content.save(err => res.send("Homepage content " + (!contents.length ? "saved" : "updated")));
     })
 });
 
@@ -50,8 +50,8 @@ router.post('/homepage/image/save', (req, res) => {
             var length = images.length;
             var newImage = new Homepage_image({ url: result.secure_url, p_id: result.public_id, index: req.body.index });
             newImage.save((err, saved) => {
-                if (saved.index === length + 1) return res.send(err || "IMAGE SAVED");
-                indexReorder(Homepage_image, { id: saved._id, newIndex: saved.index }, () => res.send(err || "IMAGE SAVED"));
+                if (saved.index === length + 1) return res.send(err || "Image saved");
+                indexReorder(Homepage_image, { id: saved._id, newIndex: saved.index }, () => res.send(err || "Image saved"));
             });
         })
     })
@@ -63,15 +63,15 @@ router.post('/homepage/image/delete', (req, res) => {
         p_ids.forEach(p_id => {
             cloud.v2.api.delete_resources([ p_id ], err => {
                 if (err) return res.send(err);
-                Homepage_image.deleteOne({ p_id }, err => res.send(err || "IMAGE REMOVED"))
+                Homepage_image.deleteOne({ p_id }, err => res.send(err || "Image removed"))
             })
         });
-    } else { res.send("NOTHING SELECTED") }
+    } else { res.send("Nothing selected") }
 });
 
 router.post('/homepage/image/reorder', (req, res) => {
     var { id, index } = req.body;
-    indexReorder(Homepage_image, { id, newIndex: index }, () => res.send("RE-ORDERING PROCESS DONE"));
+    indexReorder(Homepage_image, { id, newIndex: index }, () => res.send("Re-ordering process done"));
 });
 
 router.post('/cs/links/delete', (req, res) => {
@@ -79,8 +79,8 @@ router.post('/cs/links/delete', (req, res) => {
     Homepage_content.findOne((err, content) => {
         if (content && names.length) {
             content.socials = content.socials.filter(x => !names.includes(x.name));
-            content.save(err => res.send(err || "LINK"+ (names.length > 1 ? "S" : "") +" REMOVED SUCCESSFULLY"));
-        } else { res.send("NOTHING SELECTED") }
+            content.save(err => res.send(err || "Link"+ (names.length > 1 ? "s" : "") +" removed successfully"));
+        } else { res.send("Nothing selected") }
     })
 });
 

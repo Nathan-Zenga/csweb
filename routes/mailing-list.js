@@ -17,7 +17,7 @@ router.get('/member/delete', (req, res) => {
         if (!src.match(/^email_unsub_link[A-Za-z0-9]{24}$/g) || src.slice(-24) !== id || err || !doc) return res.send("Invalid entry");
         post({ url: res.locals.location_origin + req.originalUrl, json: { id } }, (err, response) => {
             if (err) return console.error(err), res.send(err.message || "Error occurred");
-            var result = response.body === "NOTHING SELECTED" ? "You don't exist on our records." : "You are have been unsubscribed. Sorry to see you go!";
+            var result = response.body === "Nothing selected" ? "You don't exist on our records." : "You are now unsubscribed. Sorry to see you go!";
             res.send(result + "<br><br> - CS");
         })
     })
@@ -28,22 +28,22 @@ router.post('/new', (req, res) => {
     var newMember = new MailingList({ firstname, lastname, email, size_top, size_bottom, extra_info });
 
     MailingList.findOne({ email }, (err, member) => {
-        if (err || member) return res.send(err || "ALREADY REGISTERED");
-        newMember.save(err => res.send(err || "YOU ARE NOW REGISTERED"))
+        if (err || member) return res.send(err || "Already registered");
+        newMember.save(err => res.send(err || "You are now registered"))
     })
 });
 
 router.post('/update', (req, res) => {
     var { member_id, firstname, lastname, email, size_top, size_bottom, extra_info } = req.body;
     MailingList.findById(member_id, (err, member) => {
-        if (err || !member) return res.send(err || "MEMBER NOT FOUND");
+        if (err || !member) return res.send(err || "Member not found");
         if (firstname)   member.firstname = firstname;
         if (lastname)    member.lastname = lastname;
         if (email)       member.email = email;
         if (size_top)    member.size_top = size_top;
         if (size_bottom) member.size_bottom = size_bottom;
         if (extra_info)  member.extra_info = extra_info;
-        member.save(err => res.send(err || "MEMBER UPDATED"));
+        member.save(err => res.send(err || "Member updated"));
     })
 });
 
@@ -105,9 +105,9 @@ router.post('/member/delete', (req, res) => {
     if (ids.length) {
         MailingList.deleteMany({_id : { $in: ids }}, (err, result) => {
             if (err || !result.deletedCount) return res.send(err || "Member(s) not found");
-            res.send("MEMBER"+ (ids.length > 1 ? "S" : "") +" REMOVED SUCCESSFULLY")
+            res.send("Member"+ (ids.length > 1 ? "s" : "") +" removed successfully")
         })
-    } else { res.send("NOTHING SELECTED") }
+    } else { res.send("Nothing selected") }
 });
 
 module.exports = router;

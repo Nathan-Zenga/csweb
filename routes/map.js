@@ -68,9 +68,9 @@ router.post('/location/delete', (req, res) => {
     if (ids.length) {
         Location.deleteMany({_id : { $in: ids }}, (err, result) => {
             if (err || !result.deletedCount) return res.send(err || "Location(s) not found");
-            res.send("LOCATION"+ (ids.length > 1 ? "S" : "") + " REMOVED SUCCESSFULLY")
+            res.send("Location"+ (ids.length > 1 ? "s" : "") + " removed successfully")
         })
-    } else { res.send("NOTHING SELECTED") }
+    } else { res.send("Nothing selected") }
 });
 
 module.exports = router;

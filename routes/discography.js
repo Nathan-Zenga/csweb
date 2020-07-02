@@ -15,7 +15,7 @@ router.post('/project/new', (req, res) => {
     var project = new Project({ title, artist, year, artwork: artwork_url, links, all_platforms: !!all_platforms });
 
     project.save((err, saved) => {
-        var message_update = "DONE";
+        var message_update = "Done";
         if (artwork_file) {
             var public_id = "discography/"+ saved.id +"/"+ saved.title.replace(/ /g, "-");
             cloud.v2.uploader.upload(artwork_file, { public_id }, (err, result) => {
@@ -37,9 +37,9 @@ router.post('/project/delete', (req, res) => {
             ids.forEach(id => {
                 cloud.v2.api.delete_resources_by_prefix("discography/" + id, (err, result) => { console.log(err || result) });
             })
-            res.send("PROJECT"+ (ids.length > 1 ? "S" : "") +" REMOVED SUCCESSFULLY")
+            res.send("Project"+ (ids.length > 1 ? "s" : "") +" removed successfully")
         })
-    } else { res.send("NOTHING SELECTED") }
+    } else { res.send("Nothing selected") }
 });
 
 router.post('/project/edit', (req, res) => {
@@ -54,7 +54,7 @@ router.post('/project/edit', (req, res) => {
         project.all_platforms = !!req.body.all_platforms_change;
 
         project.save((err, saved) => {
-            var message_update = "DONE";
+            var message_update = "Done";
             if (req.body.artwork_file_change) {
                 cloud.v2.api.delete_resources_by_prefix("discography/" + saved.id, (err, result) => {
                     console.log(err || result);

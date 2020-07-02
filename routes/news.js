@@ -25,7 +25,7 @@ router.post('/article/new', (req, res) => {
     article.save((err, saved) => {
         Article.find({ _id: { $ne: saved._id } }).sort({index: 1, created_at: -1}).exec((err, articles) => {
             articles.forEach(a => { a.index += 1; a.save() });
-            saveMedia(req.body, saved, (err, msg) => res.send(err || `DONE${msg ? ". "+msg : ""}`));
+            saveMedia(req.body, saved, (err, msg) => res.send(err || `Done${msg ? ". "+msg : ""}`));
         })
     })
 });
@@ -40,10 +40,10 @@ router.post('/article/delete', (req, res) => {
             });
             Article.find().sort({index: 1}).exec((err, articles) => {
                 articles.forEach((a, i) => { a.index = i+1; a.save() });
-                res.send("ARTICLE"+ (ids.length > 1 ? "S" : "") +" DELETED SUCCESSFULLY")
+                res.send("Article"+ (ids.length > 1 ? "s" : "") +" deleted successfully")
             })
         })
-    } else { res.send("NOTHING SELECTED") }
+    } else { res.send("Nothing selected") }
 });
 
 router.post('/article/edit', (req, res) => {
@@ -81,7 +81,7 @@ router.post('/article/edit', (req, res) => {
 
 router.post('/article/edit/reorder', (req, res) => {
     var { id, index } = req.body;
-    indexReorder(Article, { id, newIndex: index, sort: {updated_at: -1} }, result => res.send(result || "ARTICLE RE-ORDERED SUCCESSFULLY"));
+    indexReorder(Article, { id, newIndex: index, sort: {updated_at: -1} }, result => res.send(result || "Article re-ordered successfully"));
 });
 
 module.exports = router;
