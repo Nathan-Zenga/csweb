@@ -49,8 +49,8 @@ router.post('/update', (req, res) => {
 
 router.post('/send/mail', (req, res) => {
     var { email, subject, message } = req.body, sentCount = 0;
-    MailingList.find(email ? { email } : {}, (err, members) => {
-        if (err || !members.length) return res.send(err || "Mailing list member(s) not found");
+    MailingList.find(email !== "all" ? { email } : {}, (err, members) => {
+        if (err || !members.length) return console.error(err), res.send(err ? "Error occurred" : "Member(s) not found");
 
         const oauth2Client = new OAuth2( OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, "https://developers.google.com/oauthplayground" );
         oauth2Client.setCredentials({ refresh_token: OAUTH_REFRESH_TOKEN });

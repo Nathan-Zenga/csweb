@@ -1,7 +1,8 @@
 <form method="post" action="/mailing-list/send/mail">
     <label>CHOOSE RECIPIENT</label>
-    <select name="email" id="recipient_email">
-        <option value="">EVERYONE</option>
+    <select name="email" id="recipient_email" required>
+        <option value="">-</option>
+        <option value="all">EVERYONE</option>
         <%_ members.forEach(member => { _%>
         <option value="<%= member.email %>"><%= member.firstname +" "+ member.lastname %></option>
         <%_ }) _%>
