@@ -30,20 +30,20 @@ router.post('/location/new', (req, res) => {
     var { name, street_address, city, country, postcode } = req.body;
     var newLocation = new Location({ name, street_address, city, country, postcode });
     newLocation.save((err, saved) => {
-        if (err) return res.send(err);
+        if (err) return res.status(500).send(err.message);
         var address = `${street_address}, ${city}, ${country}` + (postcode ? ", "+postcode : "");
         geocoder.geocode(address, (err, result) => {
-            if (err) return res.send(err);
+            if (err) return res.status(500).send(err.message);
             saved.latitude = result[0].latitude;
             saved.longitude = result[0].longitude;
-            saved.save(err => res.send(err || "Location saved"));
+            saved.save(err => res.send(err ? err.message : "Location saved"));
         })
     })
 });
 
 router.post('/location/edit', (req, res) => {
     Location.findById(req.body.location_id, (err, doc) => {
-        if (err || !doc) return res.send(err || "Location not found");
+        if (err || !doc) return res.status(err ? 500 : 404).send(err ? err.message || "Error occurred" : "Location not found");
         var { name_edit, street_address_edit, city_edit, country_edit, postcode_edit } = req.body;
         var address = `${street_address_edit}, ${city_edit}, ${country_edit}` + (postcode_edit ? ", "+postcode_edit : "");
         doc.name = name_edit || doc.name;
@@ -52,12 +52,12 @@ router.post('/location/edit', (req, res) => {
         doc.country = country_edit || doc.country;
         doc.postcode = postcode_edit || doc.postcode;
         doc.save((err, saved) => {
-            if (err) return res.send(err);
+            if (err) return res.status(500).send(err.message);
             geocoder.geocode(address, (err, result) => {
-                if (err) return res.send(err);
+                if (err) return res.status(500).send(err.message);
                 saved.latitude = result[0].latitude;
                 saved.longitude = result[0].longitude;
-                saved.save(err => res.send(err || "Location updated"));
+                saved.save(err => res.send(err ? err.message : "Location updated"));
             })
         })
     })
@@ -67,7 +67,7 @@ router.post('/location/delete', (req, res) => {
     var ids = Object.values(req.body);
     if (ids.length) {
         Location.deleteMany({_id : { $in: ids }}, (err, result) => {
-            if (err || !result.deletedCount) return res.send(err || "Location(s) not found");
+            if (err || !result.deletedCount) return res.status(err ? 500 : 404).send(err ? err.message || "Error occurred" : "Location(s) not found");
             res.send("Location"+ (ids.length > 1 ? "s" : "") + " removed successfully")
         })
     } else { res.send("Nothing selected") }

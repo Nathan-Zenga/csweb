@@ -25,7 +25,7 @@ router.post('/article/new', (req, res) => {
     article.save((err, saved) => {
         Article.find({ _id: { $ne: saved._id } }).sort({index: 1, created_at: -1}).exec((err, articles) => {
             articles.forEach(a => { a.index += 1; a.save() });
-            saveMedia(req.body, saved, (err, msg) => res.send(err.message || `Done${msg ? ". "+msg : ""}`));
+            saveMedia(req.body, saved, (err, msg) => res.status(err ? 500 : 200).send(err.message || `Done${msg ? ". "+msg : ""}`));
         })
     })
 });
@@ -34,7 +34,7 @@ router.post('/article/delete', (req, res) => {
     var ids = Object.values(req.body);
     if (ids.length) {
         Article.deleteMany({_id : { $in: ids }}, (err, result) => {
-            if (err || !result.deletedCount) return res.send(err || "Article(s) not found");
+            if (err || !result.deletedCount) return res.status(err ? 500 : 404).send(err ? err.message || "Error occurred" : "Article(s) not found");
             ids.forEach(id => {
                 cloud.v2.api.delete_resources_by_prefix("article/" + id, (err, result) => { console.log(err || result) });
             });
@@ -49,14 +49,14 @@ router.post('/article/delete', (req, res) => {
 router.post('/article/edit', (req, res) => {
     var { article_id, headline, textbody, headline_image_thumb } = req.body;
     Article.findById(article_id, (err, article) => {
-        if (err || !article) return res.send(err ? "Error occurred" : "Article not found");
+        if (err || !article) return res.status(err ? 500 : 404).send(err ? err.message || "Error occurred" : "Article not found");
 
         if (headline) article.headline = headline;
         if (textbody) article.textbody = textbody;
         if (headline_image_thumb) article.headline_image_thumb = headline_image_thumb;
 
         article.save((err, saved) => {
-            if (err) return res.send(err.message || "Error occurred whilst saving article");
+            if (err) return res.status(500).send(err.message || "Error occurred whilst saving article");
             var fields = ["headline_images", "textbody_media"].filter(f => req.body[f]);
             if (fields.length) {
                 each(fields, (field, cb) => {
@@ -66,9 +66,9 @@ router.post('/article/edit', (req, res) => {
                         cb();
                     })
                 }, err => {
-                    if (err) return res.send(err.message || "Error occurred whilst deleting article media");
+                    if (err) return res.status(500).send(err.message || "Error occurred whilst deleting article media");
                     saveMedia(req.body, saved, err => {
-                        if (err) return res.send(err.message || "Error occurred whilst saving article media");
+                        if (err) return res.status(500).send(err.message || "Error occurred whilst saving article media");
                         res.send("Article updated successfully");
                     });
                 });

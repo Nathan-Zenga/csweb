@@ -46,12 +46,13 @@ router.post('/homepage/content', (req, res) => {
 router.post('/homepage/image/save', (req, res) => {
     cloud.v2.uploader.upload(req.body.homepage_image, { public_id: `homepage/images/${req.body.filename.replace(/ /g, "_")}` }, (err, result) => {
         Homepage_image.find((err, images) => {
-            if (err) return res.send(err.message);
+            if (err) return res.status(500).send(err.message);
             var length = images.length;
             var newImage = new Homepage_image({ url: result.secure_url, p_id: result.public_id, index: req.body.index });
             newImage.save((err, saved) => {
-                if (saved.index === length + 1) return res.send(err || "Image saved");
-                indexReorder(Homepage_image, { id: saved._id, newIndex: saved.index }, () => res.send(err || "Image saved"));
+                if (err) return res.status(500).send(err.message);
+                if (saved.index === length + 1) return res.send("Image saved");
+                indexReorder(Homepage_image, { id: saved._id, newIndex: saved.index }, () => res.send("Image saved"));
             });
         })
     })
@@ -62,8 +63,8 @@ router.post('/homepage/image/delete', (req, res) => {
     if (p_ids.length) {
         p_ids.forEach(p_id => {
             cloud.v2.api.delete_resources([ p_id ], err => {
-                if (err) return res.send(err);
-                Homepage_image.deleteOne({ p_id }, err => res.send(err || "Image removed"))
+                if (err) return res.status(500).send(err.message);
+                Homepage_image.deleteOne({ p_id }, err => res.send(err ? err.message : "Image removed"))
             })
         });
     } else { res.send("Nothing selected") }
@@ -79,7 +80,7 @@ router.post('/cs/links/delete', (req, res) => {
     Homepage_content.findOne((err, content) => {
         if (content && names.length) {
             content.socials = content.socials.filter(x => !names.includes(x.name));
-            content.save(err => res.send(err || "Link"+ (names.length > 1 ? "s" : "") +" removed successfully"));
+            content.save(err => res.send(err ? err.message : "Link"+ (names.length > 1 ? "s" : "") +" removed successfully"));
         } else { res.send("Nothing selected") }
     })
 });
