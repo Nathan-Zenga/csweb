@@ -19,7 +19,7 @@ router.post('/project/new', (req, res) => {
         if (artwork_file) {
             var public_id = "discography/"+ saved.id +"/"+ saved.title.replace(/ /g, "-");
             cloud.v2.uploader.upload(artwork_file, { public_id }, (err, result) => {
-                if (err) return res.send(err);
+                if (err) return res.send(err.message);
                 message_update += ": artwork saved";
                 saved.artwork = result.secure_url;
                 saved.save();
@@ -33,7 +33,7 @@ router.post('/project/delete', (req, res) => {
     var ids = Object.values(req.body);
     if (ids.length) {
         Project.deleteMany({_id : { $in: ids }}, (err, result) => {
-            if (err || !result.deletedCount) return res.send(err || "Project(s) not found");
+            if (err || !result.deletedCount) return res.send(err ? err.message || "Error occurred" : "Project(s) not found");
             ids.forEach(id => {
                 cloud.v2.api.delete_resources_by_prefix("discography/" + id, (err, result) => { console.log(err || result) });
             })
@@ -46,22 +46,21 @@ router.post('/project/edit', (req, res) => {
     var links = req.body.links_edit instanceof Array ? req.body.links_edit : [req.body.links_edit].filter(e => e);
 
     Project.findById(req.body.project_id, (err, project) => {
-        project.title = req.body.title_edit || project.title;
-        project.artist = req.body.artist_edit || project.artist;
-        project.year = req.body.year_edit || project.year;
-        project.artwork = req.body.artwork_url_edit || project.artwork;
-        project.links = links && links.length ? links : project.links;
+        if (req.body.title_edit) project.title = project.title;
+        if (req.body.artist_edit) project.artist = project.artist;
+        if (req.body.year_edit) project.year = project.year;
+        if (req.body.artwork_url_edit) project.artwork = project.artwork;
+        if (links && links.length) project.links = links;
         project.all_platforms = !!req.body.all_platforms_change;
 
         project.save((err, saved) => {
             var message_update = "Done";
             if (req.body.artwork_file_change) {
-                cloud.v2.api.delete_resources_by_prefix("discography/" + saved.id, (err, result) => {
-                    console.log(err || result);
+                cloud.v2.api.delete_resources_by_prefix("discography/" + saved.id, (err1, result) => {
                     message_update += err ? ": error occurred, could not save artwork" : ": artwork saved";
                     var public_id = "discography/"+ saved.id +"/"+ saved.title.replace(/ /g, "-");
-                    cloud.v2.uploader.upload(req.body.artwork_file_change, { public_id }, (err, result) => {
-                        if (err) return res.send(err);
+                    cloud.v2.uploader.upload(req.body.artwork_file_change, { public_id }, (err2, result) => {
+                        if (err1 || err2) return res.send((err1 || err2).message);
                         saved.artwork = result.secure_url;
                         saved.save();
                     });

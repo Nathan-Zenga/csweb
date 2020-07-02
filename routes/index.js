@@ -46,7 +46,7 @@ router.post('/homepage/content', (req, res) => {
 router.post('/homepage/image/save', (req, res) => {
     cloud.v2.uploader.upload(req.body.homepage_image, { public_id: `homepage/images/${req.body.filename.replace(/ /g, "_")}` }, (err, result) => {
         Homepage_image.find((err, images) => {
-            if (err) return res.send(err);
+            if (err) return res.send(err.message);
             var length = images.length;
             var newImage = new Homepage_image({ url: result.secure_url, p_id: result.public_id, index: req.body.index });
             newImage.save((err, saved) => {

@@ -80,7 +80,7 @@ module.exports.saveMedia = (body, doc, cb) => {
             } else {
                 var public_id = "article/"+ doc.id +"/"+ field + ( parseInt(i)+1 );
                 cloud.v2.uploader.upload(mediaStr, { public_id, resource_type: "auto" }, (err, result) => {
-                    if (err) return console.error(err), callback2("Error occurred whilst uploading image");
+                    if (err) return callback2(err.message || "Error occurred whilst uploading image");
                     if (body.headline_image_thumb === mediaStr) doc.headline_image_thumb = result.secure_url;
                     doc[field].splice(i, 1, result.secure_url);
                     console.log("Uploaded image / video to cloud...");
@@ -88,7 +88,7 @@ module.exports.saveMedia = (body, doc, cb) => {
                 });
             }
         }, err => {
-            if (err) return console.error(err), callback1(err);
+            if (err) return callback1(err.message);
             console.log(`All media from ${field} field saved...`);
             callback1();
         });

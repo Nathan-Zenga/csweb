@@ -16,7 +16,7 @@ router.get('/member/delete', (req, res) => {
     MailingList.findById(id, (err, doc) => {
         if (!src.match(/^email_unsub_link[A-Za-z0-9]{24}$/g) || src.slice(-24) !== id || err || !doc) return res.send("Invalid entry");
         post({ url: res.locals.location_origin + req.originalUrl, json: { id } }, (err, response) => {
-            if (err) return console.error(err), res.send(err.message || "Error occurred");
+            if (err) return res.send(err.message || "Error occurred");
             var result = response.body === "Nothing selected" ? "You don't exist on our records." : "You are now unsubscribed. Sorry to see you go!";
             res.send(result + "<br><br> - CS");
         })
@@ -50,7 +50,7 @@ router.post('/update', (req, res) => {
 router.post('/send/mail', (req, res) => {
     var { email, subject, message } = req.body, sentCount = 0;
     MailingList.find(email !== "all" ? { email } : {}, (err, members) => {
-        if (err || !members.length) return console.error(err), res.send(err ? "Error occurred" : "Member(s) not found");
+        if (err || !members.length) return res.send(err ? err.message || "Error occurred" : "Member(s) not found");
 
         const oauth2Client = new OAuth2( OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, "https://developers.google.com/oauthplayground" );
         oauth2Client.setCredentials({ refresh_token: OAUTH_REFRESH_TOKEN });
@@ -62,7 +62,7 @@ router.post('/send/mail', (req, res) => {
                         let attachments = [{ path: 'public/img/cs-logo.png', cid: 'logo' }];
                         res.locals.socials.forEach((s, i) => attachments.push({ path: `public/img/socials/${s.name}.png`, cid: `social_icon_${i}` }));
                         nodemailer.createTransport(transportOpts).sendMail({ from: "CS <info@thecs.co>", to: member.email, subject, html, attachments }, err => {
-                            if (err) return console.error(err), cb(err);
+                            if (err) return cb(err);
                             sentCount += 1;
                             console.log("The message was sent!");
                             cb();
@@ -84,7 +84,7 @@ router.post('/send/mail', (req, res) => {
                         tls: { rejectUnauthorized: true }
                     });
                 }).catch(err => {
-                    if (NODE_ENV === "production") return console.error(err), cb(err);
+                    if (NODE_ENV === "production") return cb(err);
                     mailTransporter({
                         host: 'smtp.ethereal.email',
                         port: 587,
@@ -93,7 +93,6 @@ router.post('/send/mail', (req, res) => {
                     });
                 });
             }, err => {
-                if (err) console.error(err);
                 res.send(`Message sent to ${sentCount}/${members.length} members.${err ? err.message ? " "+err.message : " Error occurred" : ""}`);
             });
         });

@@ -25,7 +25,7 @@ router.post('/article/new', (req, res) => {
     article.save((err, saved) => {
         Article.find({ _id: { $ne: saved._id } }).sort({index: 1, created_at: -1}).exec((err, articles) => {
             articles.forEach(a => { a.index += 1; a.save() });
-            saveMedia(req.body, saved, (err, msg) => res.send(err || `Done${msg ? ". "+msg : ""}`));
+            saveMedia(req.body, saved, (err, msg) => res.send(err.message || `Done${msg ? ". "+msg : ""}`));
         })
     })
 });
@@ -56,7 +56,7 @@ router.post('/article/edit', (req, res) => {
         if (headline_image_thumb) article.headline_image_thumb = headline_image_thumb;
 
         article.save((err, saved) => {
-            if (err) return console.error(err), res.send("Error occurred whilst saving article");
+            if (err) return res.send(err.message || "Error occurred whilst saving article");
             var fields = ["headline_images", "textbody_media"].filter(f => req.body[f]);
             if (fields.length) {
                 each(fields, (field, cb) => {
@@ -66,9 +66,9 @@ router.post('/article/edit', (req, res) => {
                         cb();
                     })
                 }, err => {
-                    if (err) return console.error(err), res.send("Error occurred whilst deleting article media");
+                    if (err) return res.send(err.message || "Error occurred whilst deleting article media");
                     saveMedia(req.body, saved, err => {
-                        if (err) return console.error(err), res.send("Error occurred whilst saving article media");
+                        if (err) return res.send(err.message || "Error occurred whilst saving article media");
                         res.send("Article updated successfully");
                     });
                 });
