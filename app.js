@@ -49,7 +49,8 @@ app.use('/mailing-list', require('./routes/mailing-list'));
 app.use('/map', require('./routes/map'));
 
 app.get("*", (req, res) => {
-    res.status(404).render('error', { title: "Error 404", pagename: "error" });
+    const html = `<h1>PAGE ${/(events|shop)$/.test(req.path) ? "IN CONSTRUCTION" : "NOT FOUND"}</h1>`;
+    res.status(404).render('error', { title: "Error 404", pagename: "error", html });
 });
 
 // Set port + listen for requests
