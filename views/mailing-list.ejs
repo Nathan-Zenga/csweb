@@ -40,24 +40,12 @@
         </form>
     </div>
     <script>
-        var showMessage = function(result, container, reload) {
-            var $msg = $('<div class="msg" style><div class="text">'+ result.replace(/\n/g, "<br>") +'</div></div>');
-            $msg.css("display", "none").appendTo(container).fadeIn().delay(2000).fadeOut(function(){
-                $(this).remove();
-                if (reload) location.reload();
-            });
-        };
         $("form").submit(function(e) {
             e.preventDefault();
-            var data = {};
-            $(this).serializeArray().forEach(function(field) {
-                var name = field.name;
-                data[name] = field.value;
-            });
-            $.post(this.action, data, function(result) {
+            $.post(this.action, $(this).serializeArray(), function(result) {
+                alert(result);
                 e.target.reset();
-                showMessage(result, e.target);
             });
-        })
+        });
     </script>
 <%_ include partials/footer _%>
