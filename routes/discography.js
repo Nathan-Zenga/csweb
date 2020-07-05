@@ -10,22 +10,22 @@ router.get('/', (req, res) => {
 });
 
 router.post('/project/new', (req, res) => {
-    var { title, artist, year, artwork_file, artwork_url, links, all_platforms } = req.body;
-    links = links instanceof Array ? links : [links].filter(e => e);
-    var project = new Project({ title, artist, year, artwork: artwork_url, links, all_platforms: !!all_platforms });
+    const { title, artist, year, artwork_file, artwork_url, link_name, link_url, all_platforms } = req.body;
+    const link_names = (link_name instanceof Array ? link_name : [link_name]).filter(e => e);
+    const link_urls = (link_url instanceof Array ? link_url : [link_url]).filter(e => e);
+    if (link_names.length !== link_urls.length) return res.send("Number of specified link names + urls don't match");
+
+    const project = new Project({ title, artist, year, artwork: artwork_url, all_platforms: !!all_platforms });
+    link_names.forEach((name, i) => { project.links.push({ name: link_names[i], url: link_urls[i] }) });
 
     project.save((err, saved) => {
-        var message_update = "Done";
-        if (artwork_file) {
-            var public_id = "discography/"+ saved.id +"/"+ saved.title.replace(/ /g, "-");
-            cloud.v2.uploader.upload(artwork_file, { public_id }, (err, result) => {
-                if (err) return res.status(500).send(err.message);
-                message_update += ": artwork saved";
-                saved.artwork = result.secure_url;
-                saved.save();
-            });
-        }
-        res.send(message_update);
+        if (!artwork_file) return res.send("Done");
+        var public_id = "discography/"+ saved.id +"/"+ saved.title.replace(/ /g, "-");
+        cloud.v2.uploader.upload(artwork_file, { public_id }, (err, result) => {
+            if (err) return res.status(500).send(err.message);
+            saved.artwork = result.secure_url;
+            saved.save(() => res.send("Done - artwork saved"));
+        });
     });
 });
 
