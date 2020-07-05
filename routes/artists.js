@@ -44,23 +44,20 @@ router.post('/edit', (req, res) => {
 
         if (artist_name) artist.name = artist_name;
         if (artist_bio) artist.bio = artist_bio;
-        if (profile_image) {
-            cloud.v2.api.delete_resources_by_prefix("artists/" + artist_id, err => {
+        artist.socials = [];
+        social_media_names.forEach((name, i) => { artist.socials.push({ name: social_media_names[i], url: social_media_urls[i] }) });
+        artist.save((err, saved) => {
+            if (!profile_image) return res.send("Artist updated successfully: " + saved.name);
+            cloud.v2.api.delete_resources_by_prefix("artists/" + saved.id, err => {
                 if (err) return res.status(500).send(err.message || "Error occurred whilst uploading");
-                var public_id = "artists/"+ artist_id +"/"+ artist.name.replace(/ /g, "-");
+                var public_id = "artists/"+ saved.id +"/"+ saved.name.replace(/ /g, "-");
                 cloud.v2.uploader.upload(profile_image, { public_id }, (err, result) => {
                     if (err) return res.status(500).send(err.message);
-                    artist.profile_image = result.secure_url;
+                    saved.profile_image = result.secure_url;
+                    saved.save((err, saved) => { res.send("Artist updated successfully: " + saved.name) });
                 });
             });
-        }
-
-        artist.socials = [];
-        social_media_names.forEach((name, i) => {
-            artist.socials.push({ name: social_media_names[i], url: social_media_urls[i] });
         });
-
-        artist.save((err, saved) => { res.send("Artist updated successfully: " + saved.name) });
     })
 });
 
