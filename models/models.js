@@ -14,7 +14,7 @@ module.exports.Project = model('Project', Schema({
     artist: String,
     year: Number,
     artwork: String,
-    links: [String],
+    links: [{ name: String, url: String }],
     all_platforms: { type: Boolean, default: false }
 }));
 
