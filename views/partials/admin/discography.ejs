@@ -1,7 +1,8 @@
 <form method="post" action="/discography/project/new">
     <label>ARTWORK</label>
-    <div class="artwork-upload input-group row" style="display: block">
-        <div class="col-sm-6 col-xs-9"><input type="file" name="artwork_file" id="artwork_file" accept=".jpg,.jpeg,.png,.bmp" required></div>
+    <div class="input-group file-upload-container row" style="display: block">
+        <div class="col-sm-6 col-xs-9"><input type="file" id="artwork_file" accept=".jpg,.jpeg,.png,.bmp" required></div>
+        <input type="hidden" name="artwork_file">
         <div class="col-sm-6 col-xs-3"><button class="clear-uploads" data-id="artwork_file">CLEAR</button></div>
         <div class="col-sm-12"><input type="url" name="artwork_url" id="artwork_url" placeholder="Or enter the image URL"></div>
     </div>

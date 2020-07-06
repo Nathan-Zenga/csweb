@@ -115,62 +115,26 @@
             e.preventDefault();
             $("#"+this.dataset.id).val("").change();
         });
-        $("#articles form").submit(function(e) {
-            e.preventDefault();
-            $.post(this.action, $(this).serializeArray(), function(result) {
-                e.target.reset();
-                showMessage(result);
-            });
-        });
 
-        var artwork_file = "";
         $(":input[id*=all_platforms]").change(function() {
             $(this).closest("form").find(".link-item").not(":first").remove()
                    .end().find(":input[type=url]").val("").attr({ required: !this.checked })
                    .end().find(":input").attr({ disabled: this.checked })
         });
-        $(".artwork-upload :input").change(function() {
-            $(this).closest(".artwork-upload").find(":input").not(this).val("").attr("required", false);
-            $(this).attr("required", true);
-        });
-        $(".artwork-upload :file").change(function() {
+
+        $(".file-upload-container :file").change(function() {
             var files = this.files;
-            artwork_file = "";
+            var $image_data = $(this).closest(".file-upload-container").find(":hidden").val("");
             if (files && files.length) {
-                var $submitInput = $(this).closest("form").children("input:submit");
-                $submitInput.attr("disabled", true);
+                var $submitInput = $(this).closest("form").children("input:submit").attr("disabled", true);
                 readDataURLs(files, function(e) {
-                    artwork_file = e.target.result;
+                    $image_data.val(e.target.result);
                     $submitInput.attr("disabled", false);
                 });
             }
         });
-        $(".artwork-upload :input[type=url]").change(function() {
-            if (this.value.trim() && artwork_file) artwork_file = "";
-        });
-        $("#discography form").submit(function(e) {
-            e.preventDefault();
-            var data = Object.assign([], $(this).serializeArray());
-            if (artwork_file) data.push({ name: "artwork_file", value: artwork_file });
 
-            $.post(this.action, data, function(result) {
-                e.target.reset();
-                showMessage(result);
-            });
-        });
-
-        $("#profile_image, #profile_image_change").change(function() {
-            var files = this.files;
-            var $profile_image = $(this).closest(".file-upload-container").find(":hidden").val("");
-            if (files.length) {
-                var $submitInput = $(this).closest("form").children("input:submit");
-                readDataURLs(files, function(e) {
-                    $profile_image.val(e.target.result);
-                    $submitInput.attr("disabled", false);
-                });
-            }
-        });
-        $(".input-group .input-item :input").on("change keyup", function() {
+       $(".input-group .input-item :input").on("change keyup", function() {
             var $groupInputs = $(this).closest(".input-item").find(":input");
             var notEmpty = $groupInputs.filter(function() { return this.value }).length > 0;
             $groupInputs.attr("required", notEmpty);
@@ -193,13 +157,14 @@
             $("#edit select[id*='_id']").change(function() {
                 var $form = $(this).closest("form");
                 var id = this.value;
-                var result = docs.filter(function(item) { return id == item._id })[0] || {};
+                var result = (docs || []).filter(function(item) { return id == item._id })[0] || {};
+                $form.find(".clear-uploads").click();
 
                 $form.find("#artist_name_edit").val(result.name);
                 $form.find("#artist_bio_edit").val(result.bio);
                 var $group = $form.find(".social-media-input-group");
                 $group.find(".social-media-input").find(":input").val("").end().not(":first").remove();
-                result.socials.forEach(function(social, i) {
+                (result.socials || []).forEach(function(social, i) {
                     if (i == 0) $group.empty();
                     var $clone = $("#artists .social-media-input").clone(true);
                     $clone.find(".social-media-name").val(social.name).end()
@@ -233,7 +198,9 @@
                 (result.links || []).forEach(function(link, i) {
                     if (i == 0) $group.empty();
                     var $clone = $("#discography .link-item").clone(true);
-                    $clone.find(":input[type=url]").addClass("edit").attr("name", "links_edit").val(link).end().appendTo($group);
+                    $clone.find(".link-name").val(link.name).end()
+                          .find(".link-url").val(link.url).end()
+                          .appendTo($group);
                 });
 
                 $form.find("#all_platforms_change").attr("checked", result.all_platforms);
@@ -265,38 +232,13 @@
                 );
             });
         });
-        $("#artists form, #edit-artist form").submit(function(e) {
-            e.preventDefault();
-            var data = Object.assign([], $(this).serializeArray());
-            var $profile_image = $(this).closest(".file-upload-container").find(":hidden");
-            if ($profile_image.val()) data.push({ name: "profile_image", value: $profile_image.val() });
 
-            $.post(this.action, data, function(result) {
-                showMessage(result);
-                e.target.reset();
-            }).fail(function(err, status, codeMessage) {
-                showMessage(codeMessage + (err ? ": " + err : ""));
-            });
-        });
-
-        $("#edit-article form").submit(function(e) {
+        $("#artists form, #edit-artist form, #articles form, #edit-article form, "+
+        "#discography form, #edit-project form").submit(function(e) {
             e.preventDefault();
             $.post(this.action, $(this).serializeArray(), function(result) {
-                e.target.reset();
                 showMessage(result);
-            }).fail(function(err, status, codeMessage) {
-                showMessage(codeMessage + (err ? ": " + err : ""));
-            });
-        });
-
-        $("#edit-project form").submit(function(e) {
-            e.preventDefault();
-            var data = Object.assign([], $(this).serializeArray());
-            if (artwork_file) data.push({name: "artwork_file_change", value: artwork_file});
-
-            $.post(this.action, data, function(result) {
                 e.target.reset();
-                showMessage(result);
             }).fail(function(err, status, codeMessage) {
                 showMessage(codeMessage + (err ? ": " + err : ""));
             });

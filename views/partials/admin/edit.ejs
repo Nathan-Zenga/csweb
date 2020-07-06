@@ -132,30 +132,41 @@
                     <%_ }) _%>
                 </select>
                 <label>ARTWORK</label>
-                <div class="artwork-upload input-group row" style="display: block">
-                    <div class="col-sm-6 col-xs-9"><input type="file" name="artwork_file_change" id="artwork_file_change" accept=".jpg,.jpeg,.png,.bmp"></div>
+                <div class="input-group file-upload-container row" style="display: block">
+                    <div class="col-sm-6 col-xs-9"><input type="file" id="artwork_file_change" accept=".jpg,.jpeg,.png,.bmp"></div>
+                    <input type="hidden" name="artwork_file">
                     <div class="col-sm-6 col-xs-3"><button class="clear-uploads" data-id="artwork_file_change">CLEAR</button></div>
-                    <div class="col-sm-12"><input type="url" name="artwork_url_edit" id="artwork_url_edit" placeholder="Or enter the image URL"></div>
+                    <div class="col-sm-12"><input type="url" name="artwork_url" id="artwork_url_edit" placeholder="Or enter the image URL"></div>
                 </div>
                 <label>TITLE</label>
-                <input type="text" name="title_edit" id="title_edit">
+                <input type="text" name="title" id="title_edit">
                 <label>ARTIST</label>
-                <input type="text" name="artist_edit" id="artist_edit">
+                <input type="text" name="artist" id="artist_edit">
                 <label>YEAR</label>
                 <%_ var thisYear = new Date().getFullYear(); _%>
-                <input type="number" name="year_edit" id="year_edit" min="2000" max="<%= thisYear %>" value="<%= thisYear %>">
+                <input type="number" name="year" id="year_edit" min="2000" max="<%= thisYear %>" value="<%= thisYear %>">
                 <label>LINKS (OPTIONAL)</label>
                 <div class="link-item-group input-group row" style="display: block">
                     <div class="link-item input-item">
-                        <div class="row"><input type="url" name="links_edit" class="link" placeholder="Enter URL"></div>
-                        <div class="row" style="text-align: right; margin: -1em 0 1em;">
+                        <div class="col-sm-4">
+                            <select name="link_name" class="link-name">
+                                <option value="">Choose link name</option>
+                                <%_ ["Twitter", "Instagram", "Facebook", "Spotify", "SoundCloud", "Apple Music", "Tidal", "Bandcamp", "Deezer", "Google Play", "Linktree"].forEach(social => { _%>
+                                <option value="<%= social.toLowerCase().replace(/[ _]/g, '') %>"><%= social %></option>
+                                <%_ }) _%>
+                            </select>
+                        </div>
+                        <div class="col-sm-8">
+                            <input type="url" name="link_url" class="link-url" placeholder="Enter URL">
+                        </div>
+                        <div class="col-sm-12" style="text-align: right; margin-top: -1em;">
                             <button class="add">ADD</button>
                             <button class="remove">REMOVE</button>
                         </div>
                     </div>
                 </div>
-                <label><span>In case you think entering every link is unnecessary</span></label>
-                <input type="checkbox" name="all_platforms_change" id="all_platforms_change"> <b>ALL PLATFORMS?</b> <br>
+                <label><span>Check the box in case entering every link is unnecessary</span></label>
+                <input type="checkbox" name="all_platforms" id="all_platforms_change"> <b>ALL PLATFORMS?</b> <br>
                 <input type="submit" value="UPDATE PROJECT">
             </form>
         </div>
