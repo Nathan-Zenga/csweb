@@ -48,7 +48,7 @@ router.post('/update', (req, res) => {
 });
 
 router.post('/send/mail', (req, res) => {
-    var { email, subject, message } = req.body, sentCount = 0;
+    const { email, subject, message } = req.body, sentCount = [];
     MailingList.find(email !== "all" ? { email } : {}, (err, members) => {
         if (err || !members.length) return res.status(err ? 500 : 404).send(err ? err.message || "Error occurred" : "Member(s) not found");
 
@@ -62,8 +62,8 @@ router.post('/send/mail', (req, res) => {
                         let attachments = [{ path: 'public/img/cs-logo.png', cid: 'logo' }];
                         res.locals.socials.forEach((s, i) => attachments.push({ path: `public/img/socials/${s.name}.png`, cid: `social_icon_${i}` }));
                         nodemailer.createTransport(transportOpts).sendMail({ from: "CS <info@thecs.co>", to: member.email, subject, html, attachments }, err => {
-                            if (err) return cb(err);
-                            sentCount += 1;
+                            if (err) return cb(err.message);
+                            sentCount.push(member.email);
                             console.log("The message was sent!");
                             cb();
                         })
@@ -84,7 +84,7 @@ router.post('/send/mail', (req, res) => {
                         tls: { rejectUnauthorized: true }
                     });
                 }).catch(err => {
-                    if (NODE_ENV === "production") return cb(err);
+                    if (NODE_ENV === "production") return cb(err.message || err);
                     mailTransporter({
                         host: 'smtp.ethereal.email',
                         port: 587,
@@ -93,7 +93,8 @@ router.post('/send/mail', (req, res) => {
                     });
                 });
             }, err => {
-                res.send(`Message sent to ${sentCount}/${members.length} members.${err ? err.message ? " "+err.message : " Error occurred" : ""}`);
+                if (err) return res.status(500).send(`${err.message}\nUnable to send to:\n - ${members.filter(m => !sentCount.includes(m.email)).join("\n - ")}`);
+                res.send(`Message sent to ${email === "all" ? "everyone" : members[0].firstname+" "+members[0].lastname}`);
             });
         });
     })
