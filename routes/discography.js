@@ -20,7 +20,7 @@ router.post('/project/new', (req, res) => {
 
     project.save((err, saved) => {
         if (!artwork_file) return res.send("Done");
-        var public_id = "discography/"+ saved.id +"/"+ saved.title.replace(/ /g, "-");
+        const public_id = ("discography/"+ saved.id +"/"+ saved.title.replace(/ /g, "-")).replace(/[ ?&#\\%<>]/g, "_");
         cloud.v2.uploader.upload(artwork_file, { public_id }, (err, result) => {
             if (err) return res.status(500).send(err.message);
             saved.artwork = result.secure_url;
@@ -63,7 +63,7 @@ router.post('/project/edit', (req, res) => {
             if (!artwork_file) return res.send("Done");
             cloud.v2.api.delete_resources_by_prefix("discography/" + saved.id, (err1, result) => {
                 message_update += err ? ": error occurred, could not save artwork" : ": artwork saved";
-                var public_id = "discography/"+ saved.id +"/"+ saved.title.replace(/ /g, "-");
+                const public_id = ("discography/"+ saved.id +"/"+ saved.title.replace(/ /g, "-")).replace(/[ ?&#\\%<>]/g, "_");
                 cloud.v2.uploader.upload(artwork_file, { public_id }, (err2, result) => {
                     if (err1 || err2) return res.status(500).send((err1 || err2).message);
                     saved.artwork = result.secure_url;

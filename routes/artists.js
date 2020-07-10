@@ -23,7 +23,7 @@ router.post('/new', (req, res) => {
 
     artist.save((err, saved) => {
         if (profile_image) {
-            var public_id = "artists/"+ saved.id +"/"+ saved.name.replace(/ /g, "-");
+            const public_id = ("artists/"+ saved.id +"/"+ saved.name.replace(/ /g, "-")).replace(/[ ?&#\\%<>]/g, "_");
             cloud.v2.uploader.upload(profile_image, { public_id }, (err, result) => {
                 if (err) return res.status(500).send(err.message || "Error occurred whilst uploading");
                 saved.profile_image = result.secure_url;
@@ -50,7 +50,7 @@ router.post('/edit', (req, res) => {
             if (!profile_image) return res.send("Artist updated successfully: " + saved.name);
             cloud.v2.api.delete_resources_by_prefix("artists/" + saved.id, err => {
                 if (err) return res.status(500).send(err.message || "Error occurred whilst uploading");
-                var public_id = "artists/"+ saved.id +"/"+ saved.name.replace(/ /g, "-");
+                var public_id = ("artists/"+ saved.id +"/"+ saved.name.replace(/ /g, "-")).replace(/[ ?&#\\%<>]/g, "_");
                 cloud.v2.uploader.upload(profile_image, { public_id }, (err, result) => {
                     if (err) return res.status(500).send(err.message);
                     saved.profile_image = result.secure_url;
