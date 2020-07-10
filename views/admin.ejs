@@ -246,59 +246,6 @@
             });
         });
 
-        $("#artists form, #articles form, #discography form, #locations form, #mail form, #homepage_content_form, " +
-          "#edit-artist form, #edit-article form, #reorder-article form #edit-project form" +
-          "#edit-location form, #edit-member form, #reorder-homepage-image form").submit(function(e) {
-            e.preventDefault();
-            var btnController = new submitBtnController(this);
-
-            $.post(this.action, $(this).serializeArray(), function(result) {
-                showMessage(result);
-                e.target.reset();
-            }).fail(function(err, status, codeMessage) {
-                showMessage(codeMessage + (err ? ": " + err : ""));
-            }).always(function() {
-                btnController.finish();
-            });
-        });
-
-        $("#homepage_images_form").submit(function(e) {
-            e.preventDefault();
-            var data = { homepage_image };
-            $(this).serializeArray().forEach(function(field) { var name = field.name; data[name] = field.value; });
-            var btnController = new submitBtnController(this);
-            var max = value = parseInt($(form).find("#homepage_image_index").attr("max")) + 1;
-
-            $.post(this.action, data, function(result) {
-                e.target.reset();
-                $(e.target).find("#homepage_image_index").attr({ max, value }).val(value);
-                showMessage(result);
-            }).fail(function(err, status, codeMessage) {
-                showMessage(codeMessage + (err ? ": " + err : ""));
-            }).always(function() {
-                btnController.finish();
-            });
-        });
-
-        $("#remove form").submit(function(e) {
-            e.preventDefault();
-            var form = this;
-            var data = $(form).serializeArray();
-            var btnController = new submitBtnController(form);
-
-            $.post(form.action, data, function(result) {
-                showMessage(result);
-                $(form).find(":input:checked, :input:checked + span, :input:checked + span + br").slideUp(function() {
-                    $(this).remove();
-                    data.forEach(function(field) { $("option[value="+ field.value +"]").remove() });
-                });
-            }).fail(function(err, status, codeMessage) {
-                showMessage(codeMessage + (err ? ": " + err : ""));
-            }).always(function() {
-                btnController.finish();
-            });
-        });
-
         $(".text-emphasis-styles > button").click(function(e) {
             e.preventDefault();
             var $textarea = $("#"+this.parentNode.dataset.id);
@@ -317,19 +264,49 @@
             $(this).closest(".sidebar").find(".nav-pills a[href='"+ this.value +"']").click()
         });
 
-        var homepage_image = "", homepage_image_filename = "";
-        $("#homepage_image_input").change(function() {
+        $("#homepage_image_file").change(function() {
             var $form = $(this).closest("form");
             var files = this.files;
-            if (files && files.length === 1) {
-                var $submitInput = $(this).closest("form").children("input:submit");
-                $submitInput.attr("disabled", true);
-                readDataURLs(files, function(e) {
-                    homepage_image = e.target.result;
-                    $form.find("#homepage_image_filename").val(files[0].name);
-                    $submitInput.attr("disabled", false);
+            $form.find("#homepage_image_filename").val(files && files.length ? files[0].name.replace(/\.[a-zA-Z0-9]{3,4}$/gi, "") : "");
+        });
+
+        $("#artists form, #articles form, #discography form, #locations form, #mail form, " +
+          "#homepage_content_form, #homepage_images_form, " +
+          "#edit-artist form, #edit-article form, #reorder-article form, #edit-project form, " +
+          "#edit-location form, #edit-member form, #reorder-homepage-image form").submit(function(e) {
+            e.preventDefault();
+            var form = this;
+            var btnController = new submitBtnController(form);
+            var max = value = parseInt($(form).find("#homepage_image_index").attr("max")) + 1;
+
+            $.post(form.action, $(form).serializeArray(), function(result) {
+                showMessage(result);
+                $(form).find("#homepage_image_index").attr({ max, value }).val(value);
+                form.reset();
+            }).fail(function(err, status, codeMessage) {
+                alert(codeMessage + (err ? ": " + err.responseText : ""));
+            }).always(function() {
+                btnController.finish();
+            });
+        });
+
+        $("#remove form").submit(function(e) {
+            e.preventDefault();
+            var form = this;
+            var data = $(form).serializeArray();
+            var btnController = new submitBtnController(form);
+
+            $.post(form.action, data, function(result) {
+                showMessage(result);
+                $(form).find(":input:checked, :input:checked + span, :input:checked + span + br").slideUp(function() {
+                    $(this).remove();
+                    data.forEach(function(field) { $("option[value="+ field.value +"]").remove() });
                 });
-            }
+            }).fail(function(err, status, codeMessage) {
+                alert(codeMessage + (err ? ": " + err.responseText : ""));
+            }).always(function() {
+                btnController.finish();
+            });
         });
     </script>
 <%_ include partials/footer _%>

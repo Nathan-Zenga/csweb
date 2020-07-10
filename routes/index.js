@@ -44,11 +44,13 @@ router.post('/homepage/content', (req, res) => {
 });
 
 router.post('/homepage/image/save', (req, res) => {
-    cloud.v2.uploader.upload(req.body.homepage_image, { public_id: `homepage/images/${req.body.filename.replace(/ /g, "_")}` }, (err, result) => {
+    const { filename, image, index } = req.body;
+    const public_id = `homepage/images/${filename.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
+    cloud.v2.uploader.upload(image, { public_id }, (err, result) => {
         Homepage_image.find((err, images) => {
             if (err) return res.status(500).send(err.message);
-            var length = images.length;
-            var newImage = new Homepage_image({ url: result.secure_url, p_id: result.public_id, index: req.body.index });
+            const { length } = images;
+            const newImage = new Homepage_image({ url: result.secure_url, p_id: result.public_id, index });
             newImage.save((err, saved) => {
                 if (err) return res.status(500).send(err.message);
                 if (saved.index === length + 1) return res.send("Image saved");

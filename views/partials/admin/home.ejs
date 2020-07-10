@@ -82,9 +82,13 @@
 
 <form method="POST" action="/homepage/image/save" id="homepage_images_form">
     <label for="homepage_image_input">HOMEPAGE IMAGE UPLOAD</label><br>
-    <input type="file" name="image" id="homepage_image_input" accept="image/*" required>
+    <div class="input-group file-upload-container row" style="display: block">
+        <div class="col-sm-6 col-xs-9"><input type="file" id="homepage_image_file" accept="image/*" required></div>
+        <input type="hidden" name="image">
+        <div class="col-sm-6 col-xs-3"><button class="clear-uploads" data-id="homepage_image_file">CLEAR</button></div>
+    </div>
 
-    <label for="homepage_image_filename">FILE NAME <span>(Automatically appears when you upload images, but feel free to rename)</span></label>
+    <label for="homepage_image_filename">IMAGE NAME <span>(Automatically appears when you upload images, but feel free to rename)</span></label>
     <input type="text" name="filename" id="homepage_image_filename" required>
 
     <%_ var newPosition = homepage_images.length + 1; _%>
