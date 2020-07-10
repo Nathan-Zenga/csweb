@@ -56,6 +56,19 @@
             var reload = confirm(result + "\n\nRefresh page?");
             if (reload) location.reload();
         };
+        function submitBtnController(form) {
+            var $submitBtn = this.submitBtn = $(form).find("input[type=submit]").attr("disabled", true);
+            this.originalVal = this.submitBtn.val();
+            var progressVal = this.submitBtn.val("SUBMITTING").val();
+            this.interval = setInterval(function() {
+                var val = $submitBtn.val(), ellipsis = $submitBtn.val().includes("...");
+                $submitBtn.val(ellipsis ? progressVal : val + ".");
+            }, 500);
+        };
+        submitBtnController.prototype.finish = function() {
+            clearInterval(this.interval);
+            this.submitBtn.val(this.originalVal).attr("disabled", false);
+        };
 
         $("#headline_images, #headline_images_change").change(function() {
             var $form = $(this).closest("form");
@@ -233,51 +246,56 @@
             });
         });
 
-        $("#artists form, #edit-artist form, #articles form, #edit-article form, "+
-        "#discography form, #edit-project form").submit(function(e) {
+        $("#artists form, #articles form, #discography form, #locations form, #mail form, #homepage_content_form, " +
+          "#edit-artist form, #edit-article form, #reorder-article form #edit-project form" +
+          "#edit-location form, #edit-member form, #reorder-homepage-image form").submit(function(e) {
             e.preventDefault();
+            var btnController = new submitBtnController(this);
+
             $.post(this.action, $(this).serializeArray(), function(result) {
                 showMessage(result);
                 e.target.reset();
             }).fail(function(err, status, codeMessage) {
                 showMessage(codeMessage + (err ? ": " + err : ""));
+            }).always(function() {
+                btnController.finish();
             });
         });
 
-        $("#locations form, #mail form, #homepage_content_form, " +
-          "#edit-location form, #edit-member form, #reorder-homepage-image form, #reorder-article form").submit(function(e) {
+        $("#homepage_images_form").submit(function(e) {
             e.preventDefault();
-            var form = this;
-            var data = Object.assign([], $(form).serializeArray());
-            var $submitBtn = $(form).find("input[type=submit]");
-            var refresh = !!$(form).closest("#edit-location").length;
+            var data = { homepage_image };
+            $(this).serializeArray().forEach(function(field) { var name = field.name; data[name] = field.value; });
+            var btnController = new submitBtnController(this);
             var max = value = parseInt($(form).find("#homepage_image_index").attr("max")) + 1;
-            $submitBtn.attr("disabled", true);
 
-            $.post(form.action, data, function(result) {
+            $.post(this.action, data, function(result) {
                 e.target.reset();
-                $(form).find("#homepage_image_index").attr({ max, value }).val(value);
-                showMessage(result, e.target, refresh);
+                $(e.target).find("#homepage_image_index").attr({ max, value }).val(value);
+                showMessage(result);
             }).fail(function(err, status, codeMessage) {
                 showMessage(codeMessage + (err ? ": " + err : ""));
             }).always(function() {
-                $submitBtn.attr("disabled", false);
+                btnController.finish();
             });
         });
 
         $("#remove form").submit(function(e) {
             e.preventDefault();
             var form = this;
-            var data = Object.assign([], $(form).serializeArray());
+            var data = $(form).serializeArray();
+            var btnController = new submitBtnController(form);
 
-            $.post(form.action, $(form).serializeArray(), function(result) {
-                showMessage(result, e.target);
+            $.post(form.action, data, function(result) {
+                showMessage(result);
                 $(form).find(":input:checked, :input:checked + span, :input:checked + span + br").slideUp(function() {
                     $(this).remove();
                     data.forEach(function(field) { $("option[value="+ field.value +"]").remove() });
                 });
             }).fail(function(err, status, codeMessage) {
                 showMessage(codeMessage + (err ? ": " + err : ""));
+            }).always(function() {
+                btnController.finish();
             });
         });
 
@@ -312,21 +330,6 @@
                     $submitInput.attr("disabled", false);
                 });
             }
-        });
-        $("#homepage_images_form").submit(function(e) {
-            e.preventDefault();
-            var data = { homepage_image };
-            $(this).serializeArray().forEach(function(field) {
-                var name = field.name;
-                data[name] = field.value;
-            });
-
-            $.post(this.action, data, function(result) {
-                e.target.reset();
-                showMessage(result, e.target);
-            }).fail(function(err, status, codeMessage) {
-                showMessage(codeMessage + (err ? ": " + err : ""));
-            });
         });
     </script>
 <%_ include partials/footer _%>
