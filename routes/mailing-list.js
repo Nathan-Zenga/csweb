@@ -1,11 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const nodemailer = require('nodemailer');
 const { post } = require('request');
 const { each } = require('async');
-const { OAuth2 } = require("googleapis").google.auth;
-const { OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, OAUTH_REFRESH_TOKEN, NODE_ENV } = process.env;
 const { MailingList } = require('../models/models');
+const MailingListMailTransporter = require('../config/mailingListMailTransporter');
 
 router.get('/sign-up', (req, res) => {
     res.render('mailing-list', { title: "Sign Up", pagename: "sign-up" })
@@ -24,8 +22,8 @@ router.get('/member/delete', (req, res) => {
 });
 
 router.post('/new', (req, res) => {
-    var { firstname, lastname, email, size_top, size_bottom, extra_info } = req.body;
-    var newMember = new MailingList({ firstname, lastname, email, size_top, size_bottom, extra_info });
+    const { firstname, lastname, email, size_top, size_bottom, extra_info } = req.body;
+    const newMember = new MailingList({ firstname, lastname, email, size_top, size_bottom, extra_info });
 
     MailingList.findOne({ email }, (err, member) => {
         if (err || member) return res.status(err ? 500 : 200).send(err || "Already registered");
@@ -34,7 +32,7 @@ router.post('/new', (req, res) => {
 });
 
 router.post('/update', (req, res) => {
-    var { member_id, firstname, lastname, email, size_top, size_bottom, extra_info } = req.body;
+    const { member_id, firstname, lastname, email, size_top, size_bottom, extra_info } = req.body;
     MailingList.findById(member_id, (err, member) => {
         if (err || !member) return res.status(err ? 500 : 404).send(err ? err.message || "Error occurred" : "Member not found");
         if (firstname)   member.firstname = firstname;
@@ -49,59 +47,38 @@ router.post('/update', (req, res) => {
 
 router.post('/send/mail', (req, res) => {
     const { email, subject, message } = req.body, sentCount = [];
-    MailingList.find(email !== "all" ? { email } : {}, (err, members) => {
+    MailingList.find(email === "all" ? {} : { email: email || "null" }, (err, members) => {
         if (err || !members.length) return res.status(err ? 500 : 404).send(err ? err.message || "Error occurred" : "Member(s) not found");
+        const transporter = new MailingListMailTransporter({ req, res });
 
-        const oauth2Client = new OAuth2( OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, "https://developers.google.com/oauthplayground" );
-        oauth2Client.setCredentials({ refresh_token: OAUTH_REFRESH_TOKEN });
-
-        nodemailer.createTestAccount((err, acc) => {
-            each(members, (member, cb) => {
-                let mailTransporter = transportOpts => {
-                    res.render('templates/mail', { message, member }, (err, html) => {
-                        let attachments = [{ path: 'public/img/cs-logo.png', cid: 'logo' }];
-                        res.locals.socials.forEach((s, i) => attachments.push({ path: `public/img/socials/${s.name}.png`, cid: `social_icon_${i}` }));
-                        nodemailer.createTransport(transportOpts).sendMail({ from: "CS <info@thecs.co>", to: member.email, subject, html, attachments }, err => {
-                            if (err) return cb(err.message);
-                            sentCount.push(member.email);
-                            console.log("The message was sent!");
-                            cb();
-                        })
-                    })
-                };
-
-                oauth2Client.getAccessToken().then(response => {
-                    mailTransporter({
-                        service: 'gmail', /* port: 465, secure: true, */
-                        auth: {
-                            type: "OAuth2",
-                            user: "info@thecs.co",
-                            clientId: OAUTH_CLIENT_ID,
-                            clientSecret: OAUTH_CLIENT_SECRET,
-                            refreshToken: OAUTH_REFRESH_TOKEN,
-                            accessToken: response.token
-                        },
-                        tls: { rejectUnauthorized: true }
-                    });
-                }).catch(err => {
-                    if (NODE_ENV === "production") return cb(err.message || err);
-                    mailTransporter({
-                        host: 'smtp.ethereal.email',
-                        port: 587,
-                        secure: false,
-                        auth: { user: acc.user, pass: acc.pass }
-                    });
-                });
-            }, err => {
-                if (err) return res.status(500).send(`${err.message}\nUnable to send to:\n - ${members.filter(m => !sentCount.includes(m.email)).join("\n - ")}`);
-                res.send(`Message sent to ${email === "all" ? "everyone" : members[0].firstname+" "+members[0].lastname}`);
+        each(members, (member, cb) => {
+            transporter.setRecipient(member);
+            transporter.sendMail({ subject, message }, err => {
+                if (err) return cb(err.message || err);
+                sentCount.push(member.email);
+                console.log("The message was sent!");
+                cb();
             });
-        });
+        }, error => {
+            if (!error) return res.send(`Message sent to ${email === "all" ? "everyone" : members[0].firstname+" "+members[0].lastname}`);
+            new MailingList({ firstname: "CS", lastname: "Records", email: "info@thecs.co" }).save((err, saved) => {
+                const remainingRecipients = members.filter(m => !sentCount.includes(m.email)).map(m => `${m.firstname} ${m.lastname} (${m.email})`);
+                new MailingListMailTransporter({ req, res }, saved).sendMail({
+                    subject: "Error Notification",
+                    message: "Unable to send the latest email to the following members:\n\n- "+ remainingRecipients.join("\n- ")
+                }, err1 => {
+                    MailingList.deleteOne({ _id: saved.id }, err2 => {
+                        if (err1 || err2) return res.status(500).send(`${(err1 || err2).message || err1 || err2}\n\nUnable to send to:\n- ${remainingRecipients.join("\n- ")}`);
+                        res.status(500).send(error.message + "\n\nCheck your inbox");
+                    })
+                })
+            })
+        })
     })
 });
 
 router.post('/member/delete', (req, res) => {
-    var ids = Object.values(req.body);
+    const ids = Object.values(req.body);
     if (ids.length) {
         MailingList.deleteMany({_id : { $in: ids }}, (err, result) => {
             if (err || !result.deletedCount) return res.status(err ? 500 : 404).send(err || "Member(s) not found");
