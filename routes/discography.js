@@ -30,16 +30,15 @@ router.post('/project/new', (req, res) => {
 });
 
 router.post('/project/delete', (req, res) => {
-    var ids = Object.values(req.body);
-    if (ids.length) {
-        Project.deleteMany({_id : { $in: ids }}, (err, result) => {
-            if (err || !result.deletedCount) return res.status(err ? 500 : 404).send(err ? err.message || "Error occurred" : "Project(s) not found");
-            ids.forEach(id => {
-                cloud.v2.api.delete_resources_by_prefix("discography/" + id, (err, result) => { console.log(err || result) });
-            })
-            res.send("Project"+ (ids.length > 1 ? "s" : "") +" removed successfully")
+    const ids = Object.values(req.body);
+    if (!ids.length) return res.send("Nothing selected");
+    Project.deleteMany({_id : { $in: ids }}, (err, result) => {
+        if (err || !result.deletedCount) return res.status(err ? 500 : 404).send(err ? err.message || "Error occurred" : "Project(s) not found");
+        ids.forEach(id => {
+            cloud.v2.api.delete_resources_by_prefix("discography/" + id, (err, result) => { console.log(err || result) });
         })
-    } else { res.send("Nothing selected") }
+        res.send("Project"+ (ids.length > 1 ? "s" : "") +" removed successfully")
+    })
 });
 
 router.post('/project/edit', (req, res) => {
@@ -61,11 +60,11 @@ router.post('/project/edit', (req, res) => {
 
         project.save((err, saved) => {
             if (!artwork_file) return res.send("Done");
-            cloud.v2.api.delete_resources_by_prefix("discography/" + saved.id, (err1, result) => {
-                message_update += err ? ": error occurred, could not save artwork" : ": artwork saved";
+            cloud.v2.api.delete_resources_by_prefix("discography/" + saved.id, err => {
+                if (err) return res.status(500).send(err.message || "Error occurred whilst updating artwork");
                 const public_id = ("discography/"+ saved.id +"/"+ saved.title.replace(/ /g, "-")).replace(/[ ?&#\\%<>]/g, "_");
-                cloud.v2.uploader.upload(artwork_file, { public_id }, (err2, result) => {
-                    if (err1 || err2) return res.status(500).send((err1 || err2).message);
+                cloud.v2.uploader.upload(artwork_file, { public_id }, (err, result) => {
+                    if (err) return res.status(500).send(err.message || "Error occurred whilst updating artwork");
                     saved.artwork = result.secure_url;
                     saved.save(() => res.send("Done - artwork saved"));
                 });
