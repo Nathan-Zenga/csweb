@@ -11,24 +11,28 @@
             <li><a data-toggle="pill" href="#remove">REMOVE</a></li>
         </ul>
         <div class="tab-content container">
-            <div id="home" class="tab-pane fade in active">
+            <div id="home" class="creation tab-pane fade in active">
             <%_ include partials/admin/home _%>
             </div>
 
-            <div id="articles" class="tab-pane fade">
+            <div id="articles" class="creation tab-pane fade">
             <%_ include partials/admin/articles _%>
             </div>
 
-            <div id="discography" class="tab-pane fade">
+            <div id="discography" class="creation tab-pane fade">
             <%_ include partials/admin/discography _%>
             </div>
 
-            <div id="artists" class="tab-pane fade">
+            <div id="artists" class="creation tab-pane fade">
             <%_ include partials/admin/artists _%>
             </div>
 
-            <div id="locations" class="tab-pane fade">
+            <div id="locations" class="creation tab-pane fade">
             <%_ include partials/admin/locations _%>
+            </div>
+
+            <div id="mail" class="creation tab-pane fade">
+            <%_ include partials/admin/mail _%>
             </div>
 
             <div id="edit" class="tab-pane fade">
@@ -37,10 +41,6 @@
 
             <div id="remove" class="tab-pane fade">
             <%_ include partials/admin/remove _%>
-            </div>
-
-            <div id="mail" class="tab-pane fade">
-            <%_ include partials/admin/mail _%>
             </div>
         </div>
     </div>
@@ -257,10 +257,7 @@
             $form.find("#homepage_image_filename").val(files && files.length ? files[0].name.replace(/\.[a-zA-Z0-9]{3,4}$/gi, "") : "");
         });
 
-        $("#artists form, #articles form, #discography form, #locations form, #mail form, " +
-          "#homepage_content_form, #homepage_images_form, " +
-          "#edit-artist form, #edit-article form, #reorder-article form, #edit-project form, " +
-          "#edit-location form, #edit-member form, #reorder-homepage-image form").submit(function(e) {
+        $(".creation form, #edit form").submit(function(e) {
             e.preventDefault();
             var form = this;
             var btnController = new submitBtnController(form);
