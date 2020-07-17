@@ -45,11 +45,12 @@ app.use('/', require('./routes/index'));
 app.use('/news', require('./routes/news'));
 app.use('/artists', require('./routes/artists'));
 app.use('/discography', require('./routes/discography'));
+app.use('/shop', require('./routes/shop'));
 app.use('/mailing-list', require('./routes/mailing-list'));
 app.use('/map', require('./routes/map'));
 
 app.get("*", (req, res) => {
-    const html = `<h1>PAGE ${/(events|shop)$/.test(req.path) ? "IN CONSTRUCTION" : "NOT FOUND"}</h1>`;
+    const html = `<h1>PAGE ${/(events)$/i.test(req.path) ? "IN CONSTRUCTION" : "NOT FOUND"}</h1>`;
     res.status(404).render('error', { title: "Error 404", pagename: "error", html });
 });
 
