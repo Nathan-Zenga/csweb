@@ -1,5 +1,5 @@
 <style>
-    .stripe-form-container {
+    #payment-form-container {
         font-size: 16px;
         -webkit-font-smoothing: antialiased;
         display: flex;
@@ -10,22 +10,9 @@
     }
 
     form {
-        width: 30vw;
-        min-width: 500px;
         align-self: center;
         border-radius: 7px;
         padding: 40px;
-    }
-
-    input {
-        border-radius: 6px;
-        margin-bottom: 6px;
-        padding: 12px;
-        border: 1px solid rgba(50, 50, 93, 0.1);
-        height: 44px;
-        font-size: 16px;
-        width: 100%;
-        background: white;
     }
 
     .result-message {
@@ -159,12 +146,6 @@
         100% {
             -webkit-transform: rotate(360deg);
             transform: rotate(360deg);
-        }
-    }
-
-    @media only screen and (max-width: 600px) {
-        form {
-            width: 80vw;
         }
     }
 </style>
