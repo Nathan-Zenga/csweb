@@ -11,7 +11,7 @@ header *[class*="-container"] {
 	text-align: center;
 }
 
-#nav-button {
+#nav-toggle {
 	margin-bottom: 2em;
 	padding: 0;
 	background: none;

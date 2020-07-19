@@ -24,7 +24,7 @@ $(function() {
         }
     });
 
-    $("#nav-button").click(function() {
+    $("#nav-toggle").click(function() {
         $(this).toggleClass("nav-open");
         var navOpen = $(this).hasClass("nav-open");
         $("nav").stop().slideToggle(function() { if(!navOpen) $(this).css("display", "") });
