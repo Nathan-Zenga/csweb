@@ -1,41 +1,41 @@
 <%_ include partials/header _%>
-	<section>
-		<div class="banner-container content-container">
-			<div class="banner content">
-				<%_ if (content) { _%>
-				<div class="banner-item" style="left: 100%">
-					<div class="banner-text"><%= content.banner_text %></div>
-					<%_ content.banner_media.forEach(url => { _%>
-					<img class="banner-item-media" src="<%= url %>">
-					<%_ }) _%>
-				</div>
-				<%_ } _%>
-			</div>
-		</div>
-	</section>
-	<section class="homepage-images-section container">
-		<%_ images.forEach(img => { _%>
-		<div class="homepage-images content-container col-md-4 col-sm-6"><div class="image content" style="background-image: url(<%= img.url %>)"></div></div>
-		<%_ }) _%>
-	</section>
+    <section>
+        <div class="banner-container content-container">
+            <div class="banner content">
+                <%_ if (content) { _%>
+                <div class="banner-item" style="left: 100%">
+                    <div class="banner-text"><%= content.banner_text %></div>
+                    <%_ content.banner_media.forEach(url => { _%>
+                    <img class="banner-item-media" src="<%= url %>">
+                    <%_ }) _%>
+                </div>
+                <%_ } _%>
+            </div>
+        </div>
+    </section>
+    <section class="homepage-images-section container">
+        <%_ images.forEach(img => { _%>
+        <div class="homepage-images content-container col-md-4 col-sm-6"><div class="image content" style="background-image: url(<%= img.url %>)"></div></div>
+        <%_ }) _%>
+    </section>
 
-	<%_ if (content) { _%>
-	<section class="homepage-footnote-text container"><%- content.footnote_text %></section>
-	<%_ } _%>
+    <%_ if (content) { _%>
+    <section class="homepage-footnote-text container"><%- content.footnote_text %></section>
+    <%_ } _%>
 
-	<script>
-		(function banner_autoplay() {
-			$(".banner-item").animate({ left: "-=100" }, 1000, "linear", function() {
-				var $last = $(".banner-item:last");
-				var offsetLeft = $last.offset().left;
-				var width = parseInt($last.css("width")) + 50;
-				if ((offsetLeft + width) < window.innerWidth) $last.clone().css("left", "100%").appendTo(".banner");
-				var $first = $(".banner-item:first");
-				offsetLeft = $first.offset().left;
-				width = parseInt($first.css("width"));
-				if ((offsetLeft + width) < 0) $first.remove();
-				banner_autoplay();
-			});
-		})();
-	</script>
+    <script>
+        (function banner_autoplay() {
+            $(".banner-item").animate({ left: "-=100" }, 1000, "linear", function() {
+                var $last = $(".banner-item:last");
+                var offsetLeft = $last.offset().left;
+                var width = parseInt($last.css("width")) + 50;
+                if ((offsetLeft + width) < window.innerWidth) $last.clone().css("left", "100%").appendTo(".banner");
+                var $first = $(".banner-item:first");
+                offsetLeft = $first.offset().left;
+                width = parseInt($first.css("width"));
+                if ((offsetLeft + width) < 0) $first.remove();
+                banner_autoplay();
+            });
+        })();
+    </script>
 <%_ include partials/footer _%>
