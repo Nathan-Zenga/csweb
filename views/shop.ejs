@@ -1,5 +1,39 @@
 <%_ include partials/header _%>
-    <div class="content-container">
-        <!-- TODO -->
+    <div class="container">
+        <div class="product-thumb thumb content-container col-md-4 col-sm-6">
+            <div class="content">
+                <div class="img-wrapper" style="padding: 0;">
+                    <div class="img" style="background-image: url('https://instagram.flhr1-1.fna.fbcdn.net/v/t51.2885-15/e35/p480x480/107378259_754006605356586_6456912375318715287_n.jpg?_nc_ht=instagram.flhr1-1.fna.fbcdn.net&_nc_cat=106&_nc_ohc=uCGZqbdqxXUAX8_5czX&oh=3f0ffaa266eb9a92de3d79e070295d7e&oe=5F3C66D7&ig_cache_key=MjM1MTI1Mzc0MDY5Njk0MjM4MA%3D%3D.2');"></div>
+                </div>
+                <div class="text">
+                    <p style="font-size: 1.5em;">The Lotus Moonstone E.P.</p>
+                    <p style="font-size: 2em; text-align: right">£<%= (30).toFixed(2) %></p>
+                    <p>12' LP collectors item</p>
+                </div>
+                <div class="cart-options">
+                    <form class="add-to-cart" action="/shop/cart/add">
+                        <input type="hidden" name="product_id" value="id">
+                        <input type="hidden" name="name" value="name">
+                        <input type="hidden" name="price" value="price">
+                        <input type="hidden" name="category" value="category">
+                        <input type="submit" value="ADD TO CART">
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+    <script>
+        $(".add-to-cart").submit(function(e) {
+            e.preventDefault();
+            var $submitBtn = $(e.target).find("input[type=submit]");
+            var initialVal = $submitBtn.val();
+            var btnControl = new submitBtnController(this);
+            $.post(this.action, $(this).serializeArray(), function(result) {
+                alert(result);
+                btnControl.finish();
+                $submitBtn.val("ADDED!");
+                setTimeout(function() { $submitBtn.val(initialVal) }, 1500);
+            })
+        })
+    </script>
 <%_ include partials/footer _%>
