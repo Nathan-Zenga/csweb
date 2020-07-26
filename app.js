@@ -6,6 +6,7 @@ const path = require('path'); // core module
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MemoryStore = require('memorystore')(session);
+const stripe = require('stripe')(process.env.STRIPE_SK);
 const { Homepage_content } = require('./models/models');
 
 mongoose.connect(process.env.CSDB, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -38,7 +39,12 @@ app.use((req, res, next) => {
         res.locals.socials = contents && contents.length ? contents[0].socials : [];
         res.locals.location_origin = `https://${req.hostname}`;
         res.locals.cart = req.session.cart;
-        next();
+        if (!req.session.paymentIntentID) return next();
+        stripe.paymentIntents.cancel(req.session.paymentIntentID, err => {
+            if (err) console.log(err.message || err);
+            req.session.paymentIntentID = undefined;
+            next();
+        });
     })
 });
 

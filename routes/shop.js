@@ -44,6 +44,7 @@ router.post("/checkout/create-payment-intent", async (req, res) => {
         }
     });
 
+    req.session.paymentIntentID = paymentIntent.id;
     res.send({ clientSecret: paymentIntent.client_secret });
 });
 
