@@ -37,6 +37,7 @@ app.use((req, res, next) => {
     Homepage_content.find((err, contents) => {
         res.locals.socials = contents && contents.length ? contents[0].socials : [];
         res.locals.location_origin = `https://${req.hostname}`;
+        res.locals.cart = req.session.cart;
         next();
     })
 });

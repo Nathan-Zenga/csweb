@@ -28,8 +28,9 @@
             var $submitBtn = $(e.target).find("input[type=submit]");
             var initialVal = $submitBtn.val();
             var btnControl = new submitBtnController(this);
-            $.post(this.action, $(this).serializeArray(), function(result) {
-                alert(result);
+            $.post(this.action, $(this).serializeArray(), function(item_count) {
+                $("#cart-icon").toggleClass("visible", item_count > 0);
+                $("#cart-item-count").text(item_count);
                 btnControl.finish();
                 $submitBtn.val("ADDED!");
                 setTimeout(function() { $submitBtn.val(initialVal) }, 1500);

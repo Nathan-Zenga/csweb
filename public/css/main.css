@@ -622,3 +622,22 @@ article.full .textbody-media iframe:not([src*=youtu]) {
 #sign-up-page label {
     color: white;
 }
+
+#cart-icon {
+    position: fixed;
+    right: 0;
+    bottom: 20px;
+    background-color: white;
+    color: black;
+    padding: 5px 10px;
+}
+
+#cart-icon #cart-img {
+    padding: 5px 10px;
+    font-size: 1.5em;
+}
+
+#cart-icon #cart-item-count {
+    text-align: center;
+    font-weight: bold;
+}
