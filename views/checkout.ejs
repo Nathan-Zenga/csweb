@@ -1,95 +1,114 @@
 <%_ include partials/header _%>
     <!-- Display a payment form -->
     <div class="content-container #payment-form-container">
-        <form id="payment-form">
+        <form id="payment-details-form" action="/shop/checkout/create-payment-intent">
+            <div class="input-group row" style="display: block">
+                <div class="col-sm-6">
+                    <label for="firstname">FIRST NAME</label>
+                    <input type="text" name="firstname" id="firstname" required>
+                </div>
+                <div class="col-sm-6">
+                    <label for="lastname">LAST NAME</label>
+                    <input type="text" name="lastname" id="lastname" required>
+                </div>
+            </div>
+            <label for="email">EMAIL</label>
+            <input type="email" name="email" id="email" required>
+            <label for="address">ADDRESS</label>
+            <input type="text" name="address" id="address" placeholder="Street / PO Box" required>
+            <div class="input-group row" style="display: block">
+                <div class="col-sm-6">
+                    <label for="city">CITY</label>
+                    <input type="text" name="city" id="city" required>
+                </div>
+                <div class="col-sm-6">
+                    <label for="postcode">POST / ZIP CODE <span>(OPTIONAL)</span></label>
+                    <input type="text" name="postcode" id="postcode" required>
+                </div>
+            </div>
+            <input type="submit" value="CONTINUE TO PAYMENT">
+        </form>
+
+        <form id="payment-form" style="display: none;">
+            <label for="card-element">ENTER PAYMENT DETAILS</label>
             <div id="card-element"></div>
-            <button id="submit">
+            <button type="submit" id="submit-payment-btn" style="width: auto">
                 <div class="spinner hidden" id="spinner"></div>
-                <span id="button-text">Pay</span>
+                <span id="button-text">PAY</span>
             </button>
             <p id="card-error" role="alert"></p>
-            <p class="result-message hidden">
+            <p id="result-message" class="hidden">
                 Payment succeeded, see the result in your
                 <a href="" target="_blank">Stripe dashboard.</a> Refresh the page to pay again.
             </p>
         </form>
     </div>
 
-	<script src="https://js.stripe.com/v3/"></script>
-    <script defer>
-        $(function() {
+    <style> form + form { padding-top: 0; margin-top: -2em; } </style>
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        $("#payment-details-form").submit(function(e) {
+            e.preventDefault();
             var stripe = Stripe("<%= pk %>");
-            var warning = "An updated version of your browser is required to make payments.\nPlease update your current browser or use a different one";
-            // The items the customer wants to buy
-            var purchase = { items: [{ id: "xl-tshirt", price: 2000 }] };
-
-            $("#payment-form button").attr("disabled", true);
-            if (!fetch || typeof fetch != "function") { alert(warning); throw warning }
-            fetch("/shop/checkout/create-payment-intent", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(purchase)
-            }).then(function (result) {
-                return result.json();
-            }).then(function (data) {
-                var elements = stripe.elements();
-                var card = elements.create("card", { style: {
-                    base: { // input fields
-                        color: "#32325d",
-                        fontFamily: 'Arial, sans-serif',
-                        fontSmoothing: "antialiased",
-                        fontSize: "16px",
-                        "::placeholder": {
-                            color: "#32325d"
+            $.post(this.action, $(this).serializeArray(), function(data) {
+                $("input", e.target).attr("disabled", true).filter(":submit").remove();
+                $("#submit-payment-btn").attr("disabled", true).end().show(0, function() {
+                    var elements = stripe.elements();
+                    var card = elements.create("card", { style: {
+                        base: { // input fields
+                            color: "#32325d",
+                            fontFamily: 'Arial, sans-serif',
+                            fontSmoothing: "antialiased",
+                            fontSize: "16px",
+                            "::placeholder": {
+                                color: "#32325d"
+                            }
+                        },
+                        invalid: { // input fields (invalid)
+                            fontFamily: 'Arial, sans-serif',
+                            color: "#fa755a",
+                            iconColor: "#fa755a"
                         }
-                    },
-                    invalid: { // input fields (invalid)
-                        fontFamily: 'Arial, sans-serif',
-                        color: "#fa755a",
-                        iconColor: "#fa755a"
-                    }
-                }});
-                // Stripe injects an iframe into the DOM
-                card.mount("#card-element");
-                card.on("change", function (e) {
-                    // Disable the Pay button if there are no card details in the Element
-                    $("#payment-form button").attr("disabled", e.empty);
-                    $("#card-error").prop("textContent", e.error ? e.error.message : "");
-                });
+                    }});
+                    card.mount("#card-element"); // Stripe injects an iframe into the DOM
+                    card.on("change", function(e) {
+                        // Disable the Pay button if there are no card details in the Element
+                        $("#submit-payment-btn").attr("disabled", e.empty);
+                        $("#card-error").prop("textContent", e.error ? e.error.message : "");
+                    });
 
-                $("#payment-form").submit(function (e) {
-                    e.preventDefault();
-                    // Complete payment when the submit button is clicked
-                    loading(true);
-                    stripe.confirmCardPayment(data.clientSecret, { payment_method: { card }})
-                        .then(function (result) {
-                            // Show error to your customer
-                            if (result.error) return showError(result.error.message);
-                            // The payment succeeded!
-                            orderComplete(result.paymentIntent.id);
-                        });
+                    $("#payment-form").submit(function(e) {
+                        e.preventDefault();
+                        // Complete payment when the submit button is clicked
+                        loading(true);
+                        $("#submit-payment-btn").attr("disabled", true);
+                        stripe.confirmCardPayment(data.clientSecret, { payment_method: { card }})
+                            .then(function(result) {
+                                // Show error to your customer
+                                if (result.error) return showError(result.error.message);
+                                // The payment succeeded!
+                                loading(false);
+                                $("#result-message").removeClass("hidden").find("a").attr( "href", "https://dashboard.stripe.com/test/payments/" + result.paymentIntent.id );
+                                $("#submit-payment-btn").attr("disabled", false);
+                            });
+                    });
                 });
             });
 
             /* ------- UI helpers ------- */
-            // Shows a success message when the payment is complete
-            var orderComplete = function (paymentIntentId) {
-                loading(false);
-                $(".result-message a").removeClass("hidden").attr( "href", "https://dashboard.stripe.com/test/payments/" + paymentIntentId );
-                $("#payment-form button").attr("disabled", true);
-            };
             // Show the customer the error from Stripe if their card fails to charge
-            var showError = function (errorMsgText) {
+            var showError = function(errorMsgText) {
                 loading(false);
                 var errorMsg = $("#card-error").get(0);
                 errorMsg.textContent = errorMsgText;
-                setTimeout(function () { errorMsg.textContent = "" }, 4000);
+                setTimeout(function() { errorMsg.textContent = "" }, 4000);
             };
 
             // Show a spinner on payment submission
-            var loading = function (isLoading) {
+            var loading = function(isLoading) {
                 // Disable the button and show a spinner
-                $("#payment-form button").attr("disabled", isLoading);
+                $("#submit-payment-btn").attr("disabled", isLoading);
                 $("#spinner").toggleClass("hidden", !isLoading);
                 $("#button-text").toggleClass("hidden", isLoading);
             };
