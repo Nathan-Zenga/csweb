@@ -1,45 +1,47 @@
 <%_ include partials/header _%>
     <!-- Display a payment form -->
-    <div class="content-container #payment-form-container">
-        <form id="payment-details-form" action="/shop/checkout/create-payment-intent">
-            <div class="input-group row" style="display: block">
-                <div class="col-sm-6">
-                    <label for="firstname">FIRST NAME</label>
-                    <input type="text" name="firstname" id="firstname" required>
+    <div class="content-container" id="payment-form-container">
+        <div class="content container">
+            <form id="payment-details-form" action="/shop/checkout/create-payment-intent">
+                <div class="input-group row" style="display: block">
+                    <div class="col-sm-6">
+                        <label for="firstname">FIRST NAME</label>
+                        <input type="text" name="firstname" id="firstname" required>
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="lastname">LAST NAME</label>
+                        <input type="text" name="lastname" id="lastname" required>
+                    </div>
                 </div>
-                <div class="col-sm-6">
-                    <label for="lastname">LAST NAME</label>
-                    <input type="text" name="lastname" id="lastname" required>
+                <label for="email">EMAIL</label>
+                <input type="email" name="email" id="email" required>
+                <label for="address">ADDRESS</label>
+                <input type="text" name="address" id="address" placeholder="Street / PO Box" required>
+                <div class="input-group row" style="display: block">
+                    <div class="col-sm-6">
+                        <label for="city">CITY</label>
+                        <input type="text" name="city" id="city" required>
+                    </div>
+                    <div class="col-sm-6">
+                        <label for="postcode">POST / ZIP CODE <span>(OPTIONAL)</span></label>
+                        <input type="text" name="postcode" id="postcode" required>
+                    </div>
                 </div>
-            </div>
-            <label for="email">EMAIL</label>
-            <input type="email" name="email" id="email" required>
-            <label for="address">ADDRESS</label>
-            <input type="text" name="address" id="address" placeholder="Street / PO Box" required>
-            <div class="input-group row" style="display: block">
-                <div class="col-sm-6">
-                    <label for="city">CITY</label>
-                    <input type="text" name="city" id="city" required>
-                </div>
-                <div class="col-sm-6">
-                    <label for="postcode">POST / ZIP CODE <span>(OPTIONAL)</span></label>
-                    <input type="text" name="postcode" id="postcode" required>
-                </div>
-            </div>
-            <input type="submit" value="CONTINUE TO PAYMENT">
-        </form>
+                <input type="submit" value="CONTINUE TO PAYMENT">
+            </form>
 
-        <form id="payment-form" style="display: none;">
-            <label for="card-element">ENTER PAYMENT DETAILS</label>
-            <div id="card-element"></div>
-            <input type="submit" id="submit-payment-btn" value="PAY">
+            <form id="payment-form" style="display: none;">
+                <label for="card-element">ENTER PAYMENT DETAILS</label>
+                <div id="card-element"></div>
+                <input type="submit" id="submit-payment-btn" value="PAY">
 
-            <p id="card-error" role="alert"></p>
-            <p id="result-message" class="hidden">
-                Payment succeeded, see the result in your
-                <a href="" target="_blank">Stripe dashboard.</a> Refresh the page to pay again.
-            </p>
-        </form>
+                <p id="card-error" role="alert"></p>
+                <p id="result-message" class="hidden">
+                    Payment succeeded, see the result in your
+                    <a href="" target="_blank">Stripe dashboard.</a> Refresh the page to pay again.
+                </p>
+            </form>
+        </div>
     </div>
 
     <style> form + form { padding-top: 0; margin-top: -2em; } </style>
