@@ -86,14 +86,17 @@
                         stripe.confirmCardPayment(data.clientSecret, { payment_method: { card }})
                             .then(function(result) {
                                 btnControl.finish();
+                                $("#submit-payment-btn").attr("disabled", false);
                                 // Show error to your customer
                                 if (result.error) return showError(result.error.message);
                                 // The payment succeeded!
                                 $("#result-message").removeClass("hidden").find("a").attr( "href", "https://dashboard.stripe.com/test/payments/" + result.paymentIntent.id );
-                                $("#submit-payment-btn").attr("disabled", false);
                             });
                     });
                 });
+            }).fail(function(err, status, codeMessage) {
+                btnControl.finish();
+                alert(codeMessage + (err ? ": " + err.responseText : ""));
             });
 
             var showError = function(errorMsgText) {

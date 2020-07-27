@@ -33,19 +33,21 @@ router.post("/cart/remove", (req, res) => {
 
 router.post("/checkout/create-payment-intent", async (req, res) => {
     const { firstname, lastname, email, cart, address, city, postcode } = Object.assign(req.body, req.session);
-    const paymentIntent = await stripe.paymentIntents.create({ // Create a PaymentIntent with the order details
-        receipt_email: email,
-        description: cart.map(p => `${p.name} (£${(p.price / 100).toFixed(2)} X ${p.qty})`).join("\r\n"),
-        amount: cart.map(p => p.price).reduce((sum, val) => sum + val),
-        currency: "gbp",
-        shipping: {
-            name: firstname + " " + lastname,
-            address: { line1: address, city, postal_code: postcode }
-        }
-    });
+    try {
+        const paymentIntent = await stripe.paymentIntents.create({ // Create a PaymentIntent with the order details
+            receipt_email: email,
+            description: cart.map(p => `${p.name} (£${(p.price / 100).toFixed(2)} X ${p.qty})`).join("\r\n"),
+            amount: cart.map(p => p.price).reduce((sum, val) => sum + val),
+            currency: "gbp",
+            shipping: {
+                name: firstname + " " + lastname,
+                address: { line1: address, city, postal_code: postcode }
+            }
+        });
 
-    req.session.paymentIntentID = paymentIntent.id;
-    res.send({ clientSecret: paymentIntent.client_secret });
+        req.session.paymentIntentID = paymentIntent.id;
+        res.send({ clientSecret: paymentIntent.client_secret });
+    } catch(err) { res.status(400).send(err.message || err) }
 });
 
 module.exports = router;
