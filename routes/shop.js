@@ -14,7 +14,6 @@ router.get("/cart", (req, res) => {
 });
 
 router.post("/cart/add", (req, res) => {
-    if (!req.session.cart) req.session.cart = [];
     const { product_id, name, price, category } = req.body;
     const cartItemIndex = req.session.cart.findIndex(item => item.product_id === product_id);
 

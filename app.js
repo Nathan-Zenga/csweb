@@ -38,11 +38,12 @@ app.use((req, res, next) => {
     Homepage_content.find((err, contents) => {
         res.locals.socials = contents && contents.length ? contents[0].socials : [];
         res.locals.location_origin = `https://${req.hostname}`;
-        res.locals.cart = req.session.cart || [];
+        res.locals.cart = req.session.cart = req.session.cart || [];
         if (!req.session.paymentIntentID) return next();
         stripe.paymentIntents.retrieve(req.session.paymentIntentID, (err, pi) => {
             if (err) return console.log(err.message || err), next();
             req.session.paymentIntentID = undefined;
+            req.session.cart = pi && pi.status === "succeeded" ? [] : req.session.cart;
             if (!pi || pi.status === "succeeded") return next();
             stripe.paymentIntents.cancel(pi.id, err => {
                 if (err) console.log(err.message || err);
