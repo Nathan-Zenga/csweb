@@ -40,10 +40,14 @@ app.use((req, res, next) => {
         res.locals.location_origin = `https://${req.hostname}`;
         res.locals.cart = req.session.cart || [];
         if (!req.session.paymentIntentID) return next();
-        stripe.paymentIntents.cancel(req.session.paymentIntentID, err => {
-            if (err) console.log(err.message || err);
+        stripe.paymentIntents.retrieve(req.session.paymentIntentID, (err, pi) => {
+            if (err) return console.log(err.message || err), next();
             req.session.paymentIntentID = undefined;
-            next();
+            if (!pi || pi.status === "succeeded") return next();
+            stripe.paymentIntents.cancel(pi.id, err => {
+                if (err) console.log(err.message || err);
+                next();
+            });
         });
     })
 });
