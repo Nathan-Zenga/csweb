@@ -10,7 +10,7 @@ router.get("/checkout", (req, res) => {
 });
 
 router.get("/cart", (req, res) => {
-    res.render('checkout', { title: "Checkout", pagename: "checkout", cart: req.session.cart || [] })
+    res.render('checkout', { title: "Checkout", pagename: "checkout" })
 });
 
 router.post("/cart/add", (req, res) => {

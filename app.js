@@ -38,7 +38,7 @@ app.use((req, res, next) => {
     Homepage_content.find((err, contents) => {
         res.locals.socials = contents && contents.length ? contents[0].socials : [];
         res.locals.location_origin = `https://${req.hostname}`;
-        res.locals.cart = req.session.cart;
+        res.locals.cart = req.session.cart || [];
         if (!req.session.paymentIntentID) return next();
         stripe.paymentIntents.cancel(req.session.paymentIntentID, err => {
             if (err) console.log(err.message || err);

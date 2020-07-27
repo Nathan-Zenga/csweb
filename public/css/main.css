@@ -630,6 +630,14 @@ article.full .textbody-media iframe:not([src*=youtu]) {
     background-color: white;
     color: black;
     padding: 5px 10px;
+    -webkit-transform: translateX(100%);
+    transform: translateX(100%);
+    transition: .5s transform;
+}
+
+#cart-icon.visible {
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
 }
 
 #cart-icon #cart-img {

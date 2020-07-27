@@ -1,9 +1,7 @@
-        <%_ if (cart && cart.length) { _%>
-        <div id="cart-icon">
+        <div id="cart-icon" class="<%- cart && cart.length ? 'visible' : '' %>">
             <div id="cart-img"><i class='fas fa-shopping-basket'></i></div>
             <div id="cart-item-count"><%- cart.length %></div>
         </div>
-        <%_ } _%>
     </main>
     <footer>
         <%_ socials.forEach(link => { _%>
