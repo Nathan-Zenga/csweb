@@ -32,10 +32,8 @@
         <form id="payment-form" style="display: none;">
             <label for="card-element">ENTER PAYMENT DETAILS</label>
             <div id="card-element"></div>
-            <button type="submit" id="submit-payment-btn" style="width: auto">
-                <div class="spinner hidden" id="spinner"></div>
-                <span id="button-text">PAY</span>
-            </button>
+            <input type="submit" id="submit-payment-btn" value="PAY">
+
             <p id="card-error" role="alert"></p>
             <p id="result-message" class="hidden">
                 Payment succeeded, see the result in your
@@ -51,19 +49,18 @@
         $("#payment-details-form").submit(function(e) {
             e.preventDefault();
             var stripe = Stripe("<%= pk %>");
+            var btnControl = new submitBtnController(this);
             $.post(this.action, $(this).serializeArray(), function(data) {
                 $("input", e.target).attr("disabled", true).filter(":submit").remove();
-                $("#submit-payment-btn").attr("disabled", true).end().show(0, function() {
-                    var elements = stripe.elements();
-                    var card = elements.create("card", { style: {
+                $("#submit-payment-btn").attr("disabled", true);
+                $("#payment-form").show(0, function() {
+                    var card = stripe.elements().create("card", { style: {
                         base: { // input fields
                             color: "#32325d",
                             fontFamily: 'Arial, sans-serif',
                             fontSmoothing: "antialiased",
                             fontSize: "16px",
-                            "::placeholder": {
-                                color: "#32325d"
-                            }
+                            "::placeholder": { color: "#32325d" }
                         },
                         invalid: { // input fields (invalid)
                             fontFamily: 'Arial, sans-serif',
@@ -77,18 +74,19 @@
                         $("#submit-payment-btn").attr("disabled", e.empty);
                         $("#card-error").prop("textContent", e.error ? e.error.message : "");
                     });
+                    btnControl.finish();
 
                     $("#payment-form").submit(function(e) {
                         e.preventDefault();
                         // Complete payment when the submit button is clicked
-                        loading(true);
+                        var btnControl = new submitBtnController(this);
                         $("#submit-payment-btn").attr("disabled", true);
                         stripe.confirmCardPayment(data.clientSecret, { payment_method: { card }})
                             .then(function(result) {
+                                btnControl.finish();
                                 // Show error to your customer
                                 if (result.error) return showError(result.error.message);
                                 // The payment succeeded!
-                                loading(false);
                                 $("#result-message").removeClass("hidden").find("a").attr( "href", "https://dashboard.stripe.com/test/payments/" + result.paymentIntent.id );
                                 $("#submit-payment-btn").attr("disabled", false);
                             });
@@ -96,21 +94,11 @@
                 });
             });
 
-            /* ------- UI helpers ------- */
-            // Show the customer the error from Stripe if their card fails to charge
             var showError = function(errorMsgText) {
-                loading(false);
+                // Show the customer the error from Stripe if their card fails to charge
                 var errorMsg = $("#card-error").get(0);
                 errorMsg.textContent = errorMsgText;
                 setTimeout(function() { errorMsg.textContent = "" }, 4000);
-            };
-
-            // Show a spinner on payment submission
-            var loading = function(isLoading) {
-                // Disable the button and show a spinner
-                $("#submit-payment-btn").attr("disabled", isLoading);
-                $("#spinner").toggleClass("hidden", !isLoading);
-                $("#button-text").toggleClass("hidden", isLoading);
             };
         })
     </script>
