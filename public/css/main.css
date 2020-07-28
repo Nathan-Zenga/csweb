@@ -628,6 +628,7 @@ article.full .textbody-media iframe:not([src*=youtu]) {
     right: 0;
     bottom: 20px;
     background-color: white;
+    text-align: center;
     color: black;
     padding: 5px 10px;
     -webkit-transform: translateX(100%);
@@ -640,12 +641,15 @@ article.full .textbody-media iframe:not([src*=youtu]) {
     transform: translateX(0);
 }
 
-#cart-icon #cart-img {
-    padding: 5px 10px;
+#cart-icon #cart-img,
+#cart-icon #cart-item-count {
     font-size: 1.5em;
 }
 
 #cart-icon #cart-item-count {
-    text-align: center;
     font-weight: bold;
+}
+
+#cart-icon #cart-view-link {
+    display: block;
 }
