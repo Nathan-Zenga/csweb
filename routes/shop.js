@@ -27,11 +27,15 @@ router.post("/cart/add", (req, res) => {
 });
 
 router.post("/cart/remove", (req, res) => {
-    // TODO
+    const { product_id, increment } = req.body;
+    const cartItemIndex = req.session.cart.findIndex(item => item.product_id === product_id);
+    if (increment) req.session.cart[cartItemIndex].qty += parseInt(increment);
+    if (!increment || req.session.cart[cartItemIndex].qty < 1) req.session.cart.splice(cartItemIndex, 1);
+    res.send(`${req.session.cart.length}`);
 });
 
 router.post("/checkout/create-payment-intent", async (req, res) => {
-    const { firstname, lastname, email, cart, address, city, postcode } = Object.assign(req.body, req.session);
+    const { firstname, lastname, email, address, city, postcode, cart } = Object.assign(req.body, req.session);
     try {
         const paymentIntent = await stripe.paymentIntents.create({ // Create a PaymentIntent with the order details
             receipt_email: email,
@@ -43,10 +47,10 @@ router.post("/checkout/create-payment-intent", async (req, res) => {
                 address: { line1: address, city, postal_code: postcode }
             }
         });
+    } catch(err) { return res.status(400).send(err.message) }
 
         req.session.paymentIntentID = paymentIntent.id;
         res.send({ clientSecret: paymentIntent.client_secret });
-    } catch(err) { res.status(400).send(err.message || err) }
 });
 
 module.exports = router;
