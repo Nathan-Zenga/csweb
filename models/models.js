@@ -56,3 +56,9 @@ module.exports.Homepage_image = model('Homepage_image', Schema({
     url: String,
     index: Number
 }));
+
+module.exports.Product = model('Product', Schema({
+    name: String,
+    price: Number,
+    stock_qty: Number
+}));

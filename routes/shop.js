@@ -1,17 +1,18 @@
 const router = require('express').Router();
 const stripe = require('stripe')(process.env.STRIPE_SK);
+const { Product } = require('../models/models');
 
 router.get("/", (req, res) => {
-    res.render('shop', { title: "Shop", pagename: "shop" })
+    Product.find((err, products) => { res.render('shop', { title: "Shop", pagename: "shop", products }) })
 });
 
 router.get("/checkout", (req, res) => {
     res.render('checkout', { title: "Checkout", pagename: "checkout", pk: process.env.STRIPE_PK })
 });
 
-router.get("/cart", (req, res) => {
-    res.render('checkout', { title: "Checkout", pagename: "checkout" })
-});
+// router.get("/cart", (req, res) => {
+//     res.render('cart', { title: "Cart", pagename: "cart", cart: req.session.cart })
+// });
 
 router.post("/cart/add", (req, res) => {
     const { product_id, name, price, category } = req.body;
@@ -49,8 +50,8 @@ router.post("/checkout/create-payment-intent", async (req, res) => {
         });
     } catch(err) { return res.status(400).send(err.message) }
 
-        req.session.paymentIntentID = paymentIntent.id;
-        res.send({ clientSecret: paymentIntent.client_secret });
+    req.session.paymentIntentID = paymentIntent.id;
+    res.send({ clientSecret: paymentIntent.client_secret });
 });
 
 module.exports = router;
