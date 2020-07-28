@@ -16,7 +16,7 @@
                         <input type="hidden" name="name" value="The Lotus Moonstone E.P.">
                         <input type="hidden" name="price" value=3000>
                         <input type="hidden" name="category" value="merch">
-                        <input type="submit" value="ADD TO CART">
+                        <input type="submit" data-value="ADD TO CART" value="ADD TO CART">
                     </form>
                 </div>
             </div>
@@ -26,14 +26,14 @@
         $(".add-to-cart").submit(function(e) {
             e.preventDefault();
             var $submitBtn = $(e.target).find("input[type=submit]");
-            var initialVal = $submitBtn.val();
+            var initialVal = $submitBtn.data("value");
             var btnControl = new submitBtnController(this);
             $.post(this.action, $(this).serializeArray(), function(item_count) {
                 $("#cart-icon").toggleClass("visible", item_count > 0);
                 $("#cart-item-count").text(item_count);
                 btnControl.finish();
                 $submitBtn.val("ADDED!");
-                setTimeout(function() { $submitBtn.val(initialVal) }, 1500);
+                setTimeout(function() { $submitBtn.val(initialVal) }, 2000);
             })
         })
     </script>
