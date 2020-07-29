@@ -22,6 +22,7 @@ router.get('/member/delete', (req, res) => {
 });
 
 router.post('/new', (req, res) => {
+    for (const k in req.body) if (typeof req.body[k] == "string") req.body[k] = req.body[k].replace(/<script(.*?)>(<\/script>)?/gi, "");
     const { firstname, lastname, email, size_top, size_bottom, extra_info } = req.body;
     const newMember = new MailingList({ firstname, lastname, email, size_top, size_bottom, extra_info });
 
