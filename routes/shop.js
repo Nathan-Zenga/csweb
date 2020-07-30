@@ -15,13 +15,13 @@ router.get("/cart", (req, res) => {
 });
 
 router.post("/cart/add", (req, res) => {
-    const { product_id, name, price, category } = req.body;
+    const { product_id, name, price, img_url } = req.body;
     const cartItemIndex = req.session.cart.findIndex(item => item.product_id === product_id);
 
     if (cartItemIndex >= 0) {
         req.session.cart[cartItemIndex].qty += 1;
     } else {
-        req.session.cart.unshift({ product_id, name, price, category, qty: 1 });
+        req.session.cart.unshift({ product_id, name, price: parseInt(price), img_url, qty: 1 });
     }
 
     res.send(`${req.session.cart.length}`);
