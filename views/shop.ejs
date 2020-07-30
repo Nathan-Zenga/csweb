@@ -11,7 +11,7 @@
                 <div class="text">
                     <p style="font-size: 1.5em;"><%= item.name %></p>
                     <p style="font-size: 2em; text-align: right">£<%= (item.price / 100).toFixed(2) %></p>
-                    <p>12' LP collectors item</p>
+                    <p><%= item.info.replace(/\r?\n/g, "<br>") %></p>
                 </div>
                 <div class="cart-options">
                     <form class="add-to-cart" action="/shop/cart/add">

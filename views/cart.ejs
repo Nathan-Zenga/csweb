@@ -8,7 +8,7 @@
                     <div class="item-info col-sm-7">
                         <p class="item-name" style="font-weight: bold"><%- item.name %></p>
                         <p class="item-price" style="font-weight: bold">£<span><%- (item.price / 100).toFixed(2) %></span></p>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti accusamus laborum quas culpa officiis fugit, est repellat. Veniam aspernatur laborum modi aut vel sed minima esse facilis, et voluptate non.</p>
+                        <p><%= item.info.replace(/\r?\n/g, "<br>") %></p>
                     </div>
                     <div class="item-qty-control col-sm-2">
                         <div class="col-sm-12 col-xs-3 col-sm-push-0 col-xs-push-6">

@@ -61,5 +61,6 @@ module.exports.Product = model('Product', Schema({
     name: String,
     price: Number,
     image: String,
+    info: String,
     stock_qty: Number
 }));

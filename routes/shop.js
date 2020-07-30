@@ -18,8 +18,8 @@ router.get("/cart", (req, res) => {
 });
 
 router.post("/stock/add", (req, res) => {
-    const { name, price, stock, image_file, image_url } = req.body;
-    new Product({ name, price: parseInt(price) * 100, stock, image: image_url }).save((err, saved) => {
+    const { name, price, stock_qty, info, image_file, image_url } = req.body;
+    new Product({ name, price: parseInt(price) * 100, stock_qty, info, image: image_url }).save((err, saved) => {
         if (!image_file) return res.send("Product saved in stock");
         const public_id = ("shop/stock/" + saved.name.replace(/ /g, "-")).replace(/[ ?&#\\%<>]/g, "_");
         cloud.v2.uploader.upload(image_file, { public_id }, (err, result) => {
@@ -31,14 +31,15 @@ router.post("/stock/add", (req, res) => {
 });
 
 router.post('/stock/edit', (req, res) => {
-    const { product_id, name, price, stock, image_file, image_url } = req.body;
+    const { product_id, name, price, stock_qty, info, image_file, image_url } = req.body;
     Product.findById(product_id, (err, product) => {
         if (err || !product) return res.status(err ? 500 : 404).send(err ? err.message || "Error occurred" : "Product not found");
 
         const prefix = ("shop/stock/" + product.name.replace(/ /g, "-")).replace(/[ ?&#\\%<>]/g, "_");
         if (name)      product.name = name;
         if (price)     product.price = price;
-        if (stock)     product.stock = stock;
+        if (info)      product.info = info;
+        if (stock_qty) product.stock_qty = stock_qty;
         if (image_url) product.image = image_url;
 
         product.save((err, saved) => {
@@ -76,13 +77,13 @@ router.post("/stock/remove", (req, res) => {
 });
 
 router.post("/cart/add", (req, res) => {
-    const { product_id, name, price, img_url } = req.body;
+    const { product_id, name, price, img_url, info } = req.body;
     const cartItemIndex = req.session.cart.findIndex(item => item.product_id === product_id);
 
     if (cartItemIndex >= 0) {
         req.session.cart[cartItemIndex].qty += 1;
     } else {
-        req.session.cart.unshift({ product_id, name, price: parseInt(price), img_url, qty: 1 });
+        req.session.cart.unshift({ product_id, name, info, price: parseInt(price), img_url, qty: 1 });
     }
 
     res.send(`${req.session.cart.length}`);
