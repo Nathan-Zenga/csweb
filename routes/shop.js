@@ -7,6 +7,7 @@ router.get("/", (req, res) => {
 });
 
 router.get("/checkout", (req, res) => {
+    if (!req.session.cart.length) return res.status(302).redirect(req.get("referrer"));
     res.render('checkout', { title: "Checkout", pagename: "checkout", pk: process.env.STRIPE_PK })
 });
 
@@ -28,11 +29,17 @@ router.post("/cart/add", (req, res) => {
 });
 
 router.post("/cart/remove", (req, res) => {
+    const { product_id } = req.body;
+    const cartItemIndex = req.session.cart.findIndex(item => item.product_id === product_id);
+    req.session.cart.splice(cartItemIndex, 1);
+    res.send(`${req.session.cart.length}`);
+});
+
+router.post("/cart/increment", (req, res) => {
     const { product_id, increment } = req.body;
     const cartItemIndex = req.session.cart.findIndex(item => item.product_id === product_id);
-    if (increment) req.session.cart[cartItemIndex].qty += parseInt(increment);
-    if (!increment || req.session.cart[cartItemIndex].qty < 1) req.session.cart.splice(cartItemIndex, 1);
-    res.send(`${req.session.cart.length}`);
+    req.session.cart[cartItemIndex].qty = Math.max(1, req.session.cart[cartItemIndex].qty + parseInt(increment));
+    res.send(`${req.session.cart[cartItemIndex].qty}`);
 });
 
 router.post("/checkout/create-payment-intent", async (req, res) => {
@@ -41,7 +48,7 @@ router.post("/checkout/create-payment-intent", async (req, res) => {
         const paymentIntent = await stripe.paymentIntents.create({ // Create a PaymentIntent with the order details
             receipt_email: email,
             description: cart.map(p => `${p.name} (£${(p.price / 100).toFixed(2)} X ${p.qty})`).join("\r\n"),
-            amount: cart.map(p => p.price).reduce((sum, val) => sum + val),
+            amount: cart.map(p => p.price * p.qty).reduce((sum, val) => sum + val),
             currency: "gbp",
             shipping: {
                 name: firstname + " " + lastname,
