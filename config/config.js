@@ -1,4 +1,4 @@
-const { Article, Project, Artist, Location, MailingList, Homepage_content, Homepage_image } = require('../models/models');
+const { Article, Project, Artist, Location, MailingList, Homepage_content, Homepage_image, Product } = require('../models/models');
 const cloud = require('cloudinary');
 const mongoose = require('mongoose');
 const { each, forEachOf } = require('async');
@@ -16,7 +16,9 @@ module.exports.Collections = cb => {
                     MailingList.find().sort({ lastname: 1 }).exec((err, members) => {
                         Homepage_content.find((err, homepage_contents) => {
                             Homepage_image.find().sort({index: 1}).exec((err, homepage_images) => {
-                                cb({ articles, artists, projects, locations, members, homepage_contents, homepage_images });
+                                Product.find((err, products) => {
+                                    cb({ articles, artists, projects, locations, members, homepage_contents, homepage_images, products });
+                                })
                             })
                         })
                     })

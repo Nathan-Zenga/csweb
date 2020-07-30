@@ -18,20 +18,20 @@ router.get('/admin', (req, res) => {
 
 router.post('/search', (req, res) => {
     Collections(db => {
-        var { articles, artists, projects, locations, members } = db;
-        res.send([...articles, ...artists, ...projects, ...locations, ...members]);
+        const { articles, artists, projects, locations, members, products } = db;
+        res.send([...articles, ...artists, ...projects, ...locations, ...members, ...products]);
     })
 });
 
 router.post('/homepage/content', (req, res) => {
     Homepage_content.find((err, contents) => {
-        var content = !contents.length ? new Homepage_content() : contents[0];
+        const content = !contents.length ? new Homepage_content() : contents[0];
         if (req.body.banner_text)   content.banner_text = req.body.banner_text;
         if (req.body.footnote_text) content.footnote_text = req.body.footnote_text;
         if (req.body.socials_name && req.body.socials_url) {
-            var names = (req.body.socials_name instanceof Array ? req.body.socials_name : [req.body.socials_name]).filter(e => e);
-            var urls = (req.body.socials_url instanceof Array ? req.body.socials_url : [req.body.socials_url]).filter(e => e);
-            var socials = [];
+            const names = (req.body.socials_name instanceof Array ? req.body.socials_name : [req.body.socials_name]).filter(e => e);
+            const urls = (req.body.socials_url instanceof Array ? req.body.socials_url : [req.body.socials_url]).filter(e => e);
+            const socials = [];
             names.forEach((name, i) => { socials.push({name, url: urls[i] })});
             if (content.socials instanceof Array) {
                 content.socials = content.socials.filter(s => req.body.socials_name !== s.name).concat(socials);
@@ -61,29 +61,27 @@ router.post('/homepage/image/save', (req, res) => {
 });
 
 router.post('/homepage/image/delete', (req, res) => {
-    var p_ids = Object.values(req.body);
-    if (p_ids.length) {
-        p_ids.forEach(p_id => {
-            cloud.v2.api.delete_resources([ p_id ], err => {
-                if (err) return res.status(500).send(err.message);
-                Homepage_image.deleteOne({ p_id }, err => res.send(err ? err.message : "Image removed"))
-            })
-        });
-    } else { res.send("Nothing selected") }
+    const p_ids = Object.values(req.body);
+    if (!p_ids.length) return res.send("Nothing selected");
+    p_ids.forEach(p_id => {
+        cloud.v2.api.delete_resources([ p_id ], err => {
+            if (err) return res.status(500).send(err.message);
+            Homepage_image.deleteOne({ p_id }, err => res.send(err ? err.message : "Image removed"))
+        })
+    });
 });
 
 router.post('/homepage/image/reorder', (req, res) => {
-    var { id, index } = req.body;
+    const { id, index } = req.body;
     indexReorder(Homepage_image, { id, newIndex: index }, () => res.send("Re-ordering process done"));
 });
 
 router.post('/cs/links/delete', (req, res) => {
-    var names = Object.values(req.body);
+    const names = Object.values(req.body);
     Homepage_content.findOne((err, content) => {
-        if (content && names.length) {
-            content.socials = content.socials.filter(x => !names.includes(x.name));
-            content.save(err => res.send(err ? err.message : "Link"+ (names.length > 1 ? "s" : "") +" removed successfully"));
-        } else { res.send("Nothing selected") }
+        if (!(content && names.length)) return res.send("Nothing selected");
+        content.socials = content.socials.filter(x => !names.includes(x.name));
+        content.save(err => res.send(err ? err.message : "Link"+ (names.length > 1 ? "s" : "") +" removed successfully"));
     })
 });
 
