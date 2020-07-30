@@ -663,3 +663,52 @@ article.full .textbody-media iframe:not([src*=youtu]) {
 #cart-icon #cart-view-link {
     display: block;
 }
+
+.cart-item {
+    margin-bottom: 2em;
+    min-height: 200px;
+}
+
+.cart-item .item-img {
+    background-size: contain;
+    background-position: top center;
+    background-repeat: no-repeat;
+    height: 200px;
+}
+
+@media (max-width: 767px) {
+    .cart-item > * {
+        margin-bottom: 1.5em;
+    }
+
+    .cart-item .item-name, .cart-item .item-price {
+        text-align: center;
+    }
+}
+
+.cart-item .item-info {
+    padding: 0 15px;
+}
+
+.cart-item .item-qty-control {
+    font-weight: bold;
+    text-align: center;
+}
+
+.cart-item .item-qty-control form, .cart-item .item-qty-control button {
+    margin-bottom: 0;
+}
+
+.cart-item .item-qty-control button {
+    padding: 10px 20px
+}
+
+@media (min-width: 768px) {
+    .cart-item .item-qty-control .remove-btn {
+        margin-top: 20px;
+    }
+}
+
+#price-total {
+    font-size: 1.5em
+}

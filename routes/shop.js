@@ -10,9 +10,9 @@ router.get("/checkout", (req, res) => {
     res.render('checkout', { title: "Checkout", pagename: "checkout", pk: process.env.STRIPE_PK })
 });
 
-// router.get("/cart", (req, res) => {
-//     res.render('cart', { title: "Cart", pagename: "cart", cart: req.session.cart })
-// });
+router.get("/cart", (req, res) => {
+    res.render('cart', { title: "Cart", pagename: "cart", cart: req.session.cart })
+});
 
 router.post("/cart/add", (req, res) => {
     const { product_id, name, price, category } = req.body;
