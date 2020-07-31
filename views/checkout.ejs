@@ -1,6 +1,5 @@
 <%_ include partials/header _%>
     <%_ include partials/stripe-checkout-css _%>
-    <!-- Display a payment form -->
     <div class="content-container" id="payment-form-container">
         <div class="content container">
             <form id="payment-details-form" action="/shop/checkout/create-payment-intent">
@@ -92,6 +91,8 @@
                                 if (result.error) return showError(result.error.message);
                                 // The payment succeeded!
                                 $("#result-message").removeClass("hidden").find("a").attr( "href", "https://dashboard.stripe.com/test/payments/" + result.paymentIntent.id );
+                                $("#cart-item-count").text(0);
+                                if (confirm("Payment succeeded! Reload page?")) location.reload();
                             });
                     });
                 });
