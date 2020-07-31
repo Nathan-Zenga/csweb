@@ -19,11 +19,11 @@ router.get("/cart", (req, res) => {
 
 router.post("/stock/add", (req, res) => {
     const { name, price, stock_qty, info, image_file, image_url } = req.body;
-    new Product({ name, price: parseInt(price) * 100, stock_qty, info, image: image_url }).save((err, saved) => {
+    new Product({ name, price: parseInt(price) * 100, stock_qty, info }).save((err, saved) => {
         if (err) return res.status(500).send(err.message);
-        if (!image_file) return res.send("Product saved in stock");
+        if (!image_url && !image_file) return res.send("Product saved in stock");
         const public_id = ("shop/stock/" + saved.name.replace(/ /g, "-")).replace(/[ ?&#\\%<>]/g, "_");
-        cloud.v2.uploader.upload(image_file, { public_id }, (err, result) => {
+        cloud.v2.uploader.upload(image_url || image_file, { public_id }, (err, result) => {
             if (err) return res.status(500).send(err.message);
             saved.image = result.secure_url;
             saved.save(() => { res.send("Product saved in stock") });
@@ -38,18 +38,17 @@ router.post('/stock/edit', (req, res) => {
 
         const prefix = ("shop/stock/" + product.name.replace(/ /g, "-")).replace(/[ ?&#\\%<>]/g, "_");
         if (name)      product.name = name;
-        if (price)     product.price = price;
+        if (price)     product.price = parseInt(price) * 100;
         if (info)      product.info = info;
         if (stock_qty) product.stock_qty = stock_qty;
-        if (image_url) product.image = image_url;
 
         product.save((err, saved) => {
             if (err) return res.status(500).send(err.message || "Error occurred whilst saving product");
-            if (!image_file) return res.send("Product details updated successfully");
+            if (!image_url && !image_file) return res.send("Product details updated successfully");
             const public_id = ("shop/stock/" + saved.name.replace(/ /g, "-")).replace(/[ ?&#\\%<>]/g, "_");
             cloud.v2.api.delete_resources([prefix], err => {
                 if (err) return res.status(500).send(err.message);
-                cloud.v2.uploader.upload(image_file, { public_id }, (err, result) => {
+                cloud.v2.uploader.upload(image_url || image_file, { public_id }, (err, result) => {
                     if (err) return res.status(500).send(err.message);
                     saved.image = result.secure_url;
                     saved.save(() => { res.send("Product details updated successfully") });
@@ -115,7 +114,7 @@ router.post("/checkout/create-payment-intent", async (req, res) => {
     try {
         const paymentIntent = await stripe.paymentIntents.create({ // Create a PaymentIntent with the order details
             receipt_email: email,
-            description: cart.map(p => `${p.name} (£${(p.price / 100).toFixed(2)} X ${p.qty})`).join("\r\n"),
+            description: cart.map(p => `${p.name} (£${(p.price / 100).toFixed(2)} X ${p.qty})`).join(", \r\n"),
             amount: cart.map(p => p.price * p.qty).reduce((sum, val) => sum + val),
             currency: "gbp",
             shipping: {
