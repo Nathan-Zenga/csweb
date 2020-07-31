@@ -277,7 +277,7 @@
 
             $.post(form.action, $(form).serializeArray(), function(result) {
                 showMessage(result);
-                $(form).find("#homepage_image_index").attr({ max, value }).val(value);
+                $(form).find("#homepage_image_index").attr({ max, value }).val(value).end().find(".clear-uploads").click();
                 form.reset();
             }).fail(function(err, status, codeMessage) {
                 alert(codeMessage + (err ? ": " + err.responseText : ""));
