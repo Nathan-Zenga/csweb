@@ -49,8 +49,10 @@ app.use((req, res, next) => {
                     req.session.cart.forEach(item => {
                         const index = products.findIndex(p => p.id === item.id);
                         if (index >= 0) {
-                            products[index].stock_qty -= item.qty;
-                            products[index].save();
+                            const product = products[index];
+                            product.stock_qty -= item.qty;
+                            if (product.stock_qty < 0) product.stock_qty = 0;
+                            product.save();
                         }
                     });
                     req.session.cart = [];
