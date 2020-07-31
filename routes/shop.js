@@ -109,23 +109,22 @@ router.post("/cart/increment", (req, res) => {
     res.send(`${currentItem.qty}`);
 });
 
-router.post("/checkout/create-payment-intent", async (req, res) => {
+router.post("/checkout/create-payment-intent", (req, res) => {
     const { firstname, lastname, email, address, city, postcode, cart } = Object.assign(req.body, req.session);
-    try {
-        const paymentIntent = await stripe.paymentIntents.create({ // Create a PaymentIntent with the order details
-            receipt_email: email,
-            description: cart.map(p => `${p.name} (£${(p.price / 100).toFixed(2)} X ${p.qty})`).join(", \r\n"),
-            amount: cart.map(p => p.price * p.qty).reduce((sum, val) => sum + val),
-            currency: "gbp",
-            shipping: {
-                name: firstname + " " + lastname,
-                address: { line1: address, city, postal_code: postcode }
-            }
-        });
-
-        req.session.paymentIntentID = paymentIntent.id;
-        res.send({ clientSecret: paymentIntent.client_secret });
-    } catch(err) { res.status(400).send(err.message) }
+    stripe.paymentIntents.create({ // Create a PaymentIntent with the order details
+        receipt_email: email,
+        description: cart.map(p => `${p.name} (£${(p.price / 100).toFixed(2)} X ${p.qty})`).join(", \r\n"),
+        amount: cart.map(p => p.price * p.qty).reduce((sum, val) => sum + val),
+        currency: "gbp",
+        shipping: {
+            name: firstname + " " + lastname,
+            address: { line1: address, city, postal_code: postcode }
+        }
+    }, (err, pi) => {
+        if (err) return res.status(400).send(err.message);
+        req.session.paymentIntentID = pi.id;
+        res.send({ clientSecret: pi.client_secret });
+    });
 });
 
 module.exports = router;
