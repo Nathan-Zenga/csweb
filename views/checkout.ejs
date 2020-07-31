@@ -47,6 +47,7 @@
 
     <script src="https://js.stripe.com/v3/"></script>
     <script>
+        window.onbeforeunload = function() { return true };
         $("#payment-details-form").one("submit", function(e) {
             e.preventDefault();
             var stripe = Stripe("<%= pk %>");
@@ -86,6 +87,7 @@
                             btnControl.finish();
                             $("#submit-payment-btn").attr("disabled", false);
                             if (res.error) return showError(res.error.message);
+                            window.onbeforeunload = null;
                             $("#cart-item-count").text(0);
                             $.post("/shop/checkout/payment-intent/complete").fail(function(err, status, codeMessage) {
                                 console.log(codeMessage + (err ? ": " + err.responseText : ""));
