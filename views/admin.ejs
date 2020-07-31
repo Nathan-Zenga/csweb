@@ -226,8 +226,8 @@
                 $form.find("#extra_info_edit").val(result.extra_info);
 
                 $form.find("#product_name_edit").val(result.name);
-                $form.find("#price_edit").val(result.price);
-                $form.find("#stock_qty_edit").val(parseInt(result.stock_qty) / 100);
+                $form.find("#price_edit").val(parseInt(result.price) / 100);
+                $form.find("#stock_qty_edit").val(result.stock_qty);
                 $form.find("#product_info_edit").val(result.info);
             });
 
