@@ -2,11 +2,11 @@
     <div class="container">
         <%_ if (!products.length) { _%>
         <div style="padding: 50px 10px; text-align: center;"><h1>STOCKING UP<br>MERCH COMING SOON</h1></div>
-        <%_ } products.forEach(item => { _%>
+        <%_ } products.forEach(item => { var soldOut = item.stock_qty < 1; _%>
         <div class="product-thumb thumb content-container col-md-4 col-sm-6">
             <div class="content">
                 <div class="img-wrapper" style="padding: 0;">
-                    <div class="img" style="background-image: url('<%- item.image %>');"></div>
+                    <div class="img" style="background-image: url('<%- item.image %>');<%= soldOut ? 'opacity:.5' : '' %>"></div>
                 </div>
                 <div class="text">
                     <p style="font-size: 1.5em;"><%= item.name %></p>
@@ -15,11 +15,8 @@
                 </div>
                 <div class="cart-options">
                     <form class="add-to-cart" action="/shop/cart/add">
-                        <input type="hidden" name="product_id" value="<%= item._id %>">
-                        <input type="hidden" name="name" value="<%= item.name %>">
-                        <input type="hidden" name="price" value="<%= item.price %>">
-                        <input type="hidden" name="img_url" value="<%= item.image %>">
-                        <input type="submit" data-value="ADD TO CART" value="ADD TO CART">
+                        <input type="hidden" name="id" value="<%= item._id %>">
+                        <input type="submit" style="<%= soldOut ? 'opacity:.5' : '' %>" data-value="<%= !soldOut ? 'ADD TO CART' : 'SOLD OUT' %>" value="<%= !soldOut ? 'ADD TO CART' : 'SOLD OUT' %>"<%= soldOut ? 'disabled' : '' %>>
                     </form>
                 </div>
             </div>
@@ -35,6 +32,9 @@
             $.post(this.action, $(this).serializeArray(), function(item_count) {
                 $("#cart-icon").toggleClass("visible", item_count > 0);
                 $("#cart-item-count").text(item_count);
+            }).fail(function(err) {
+                alert(err.responseText);
+            }).always(function() {
                 btnControl.finish();
                 $submitBtn.val("ADDED!");
                 setTimeout(function() { $submitBtn.val(initialVal) }, 2000);

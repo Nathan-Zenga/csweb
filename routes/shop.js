@@ -20,6 +20,7 @@ router.get("/cart", (req, res) => {
 router.post("/stock/add", (req, res) => {
     const { name, price, stock_qty, info, image_file, image_url } = req.body;
     new Product({ name, price: parseInt(price) * 100, stock_qty, info, image: image_url }).save((err, saved) => {
+        if (err) return res.status(500).send(err.message);
         if (!image_file) return res.send("Product saved in stock");
         const public_id = ("shop/stock/" + saved.name.replace(/ /g, "-")).replace(/[ ?&#\\%<>]/g, "_");
         cloud.v2.uploader.upload(image_file, { public_id }, (err, result) => {
@@ -77,30 +78,36 @@ router.post("/stock/remove", (req, res) => {
 });
 
 router.post("/cart/add", (req, res) => {
-    const { product_id, name, price, img_url, info } = req.body;
-    const cartItemIndex = req.session.cart.findIndex(item => item.product_id === product_id);
+    Product.findById(req.body.id, (err, product) => {
+        const { id, name, price, image, info, stock_qty } = product;
+        if (!product || stock_qty < 1) return res.status(!product ? 404 : 400).send("Item currently not in stock");
+        const cartItemIndex = req.session.cart.findIndex(item => item.id === id);
+        const currentItem = req.session.cart[cartItemIndex];
 
-    if (cartItemIndex >= 0) {
-        req.session.cart[cartItemIndex].qty += 1;
-    } else {
-        req.session.cart.unshift({ product_id, name, info, price: parseInt(price), img_url, qty: 1 });
-    }
+        if (cartItemIndex >= 0) {
+            currentItem.qty += 1;
+            if (currentItem.qty > stock_qty) currentItem.qty = stock_qty;
+        } else {
+            req.session.cart.unshift({ id, name, price, image, info, stock_qty, qty: 1 });
+        }
 
-    res.send(`${req.session.cart.length}`);
+        res.send(`${req.session.cart.length}`);
+    })
 });
 
 router.post("/cart/remove", (req, res) => {
-    const { product_id } = req.body;
-    const cartItemIndex = req.session.cart.findIndex(item => item.product_id === product_id);
+    const cartItemIndex = req.session.cart.findIndex(item => item.id === req.body.id);
     req.session.cart.splice(cartItemIndex, 1);
     res.send(`${req.session.cart.length}`);
 });
 
 router.post("/cart/increment", (req, res) => {
-    const { product_id, increment } = req.body;
-    const cartItemIndex = req.session.cart.findIndex(item => item.product_id === product_id);
-    req.session.cart[cartItemIndex].qty = Math.max(1, req.session.cart[cartItemIndex].qty + parseInt(increment));
-    res.send(`${req.session.cart[cartItemIndex].qty}`);
+    const { id, increment } = req.body;
+    const cartItemIndex = req.session.cart.findIndex(item => item.id === id);
+    const currentItem = req.session.cart[cartItemIndex];
+    const newQuantity = currentItem.qty + parseInt(increment);
+    currentItem.qty = (newQuantity < 1) ? 1 : (newQuantity > currentItem.stock_qty) ? currentItem.stock_qty : newQuantity;
+    res.send(`${currentItem.qty}`);
 });
 
 router.post("/checkout/create-payment-intent", async (req, res) => {
@@ -116,10 +123,10 @@ router.post("/checkout/create-payment-intent", async (req, res) => {
                 address: { line1: address, city, postal_code: postcode }
             }
         });
-    } catch(err) { return res.status(400).send(err.message) }
 
-    req.session.paymentIntentID = paymentIntent.id;
-    res.send({ clientSecret: paymentIntent.client_secret });
+        req.session.paymentIntentID = paymentIntent.id;
+        res.send({ clientSecret: paymentIntent.client_secret });
+    } catch(err) { res.status(400).send(err.message) }
 });
 
 module.exports = router;

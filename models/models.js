@@ -62,5 +62,5 @@ module.exports.Product = model('Product', Schema({
     price: Number,
     image: String,
     info: String,
-    stock_qty: Number
+    stock_qty: { type: Number, min: [0, "No negative values allowed for stock quantity"] }
 }));
