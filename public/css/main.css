@@ -640,7 +640,9 @@ article.full .textbody-media iframe:not([src*=youtu]) {
     background-color: white;
     text-align: center;
     color: black;
-    padding: 5px 10px;
+    padding: 10px 10px;
+    border-radius: 7px 0 0 7px;
+    font-weight: bold;
     -webkit-transform: translateX(100%);
     transform: translateX(100%);
     transition: .5s transform;
@@ -654,10 +656,6 @@ article.full .textbody-media iframe:not([src*=youtu]) {
 #cart-icon #cart-img,
 #cart-icon #cart-item-count {
     font-size: 1.5em;
-}
-
-#cart-icon #cart-item-count {
-    font-weight: bold;
 }
 
 #cart-icon #cart-view-link {
