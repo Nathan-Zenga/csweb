@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const MemoryStore = require('memorystore')(session);
 const stripe = require('stripe')(process.env.STRIPE_SK);
-const { Homepage_content } = require('./models/models');
+const { Homepage_content, Product } = require('./models/models');
 
 mongoose.connect(process.env.CSDB, { useNewUrlParser: true, useUnifiedTopology: true });
 mongoose.connection.once('open', () => { console.log("Connected to DB") });
@@ -26,7 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Express session
 app.use(session({
     secret: 'secret',
-    name: 'session' + Math.round(Math.random() * 10000),
+    name: 'sesh' + Math.round(Math.random() * 10000),
     saveUninitialized: true,
     resave: true,
     cookie: { secure: false },
@@ -43,12 +43,25 @@ app.use((req, res, next) => {
         stripe.paymentIntents.retrieve(req.session.paymentIntentID, (err, pi) => {
             if (err) return console.log(err.message || err), next();
             req.session.paymentIntentID = undefined;
-            req.session.cart = pi && pi.status === "succeeded" ? [] : req.session.cart;
-            if (!pi || pi.status === "succeeded") return next();
-            stripe.paymentIntents.cancel(pi.id, err => {
-                if (err) console.log(err.message || err);
-                next();
-            });
+            if (!pi) return next();
+            if (pi.status === "succeeded") {
+                Product.find((err, products) => {
+                    req.session.cart.forEach(item => {
+                        const index = products.findIndex(p => p.id === item.id);
+                        if (index >= 0) {
+                            products[index].stock_qty -= item.qty;
+                            products[index].save();
+                        }
+                    });
+                    req.session.cart = [];
+                    next();
+                })
+            } else {
+                stripe.paymentIntents.cancel(pi.id, err => {
+                    if (err) console.log(err.message || err);
+                    next();
+                });
+            }
         });
     })
 });
