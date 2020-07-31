@@ -43,27 +43,11 @@ app.use((req, res, next) => {
         stripe.paymentIntents.retrieve(req.session.paymentIntentID, (err, pi) => {
             if (err) return console.log(err.message || err), next();
             req.session.paymentIntentID = undefined;
-            if (!pi) return next();
-            if (pi.status === "succeeded") {
-                Product.find((err, products) => {
-                    req.session.cart.forEach(item => {
-                        const index = products.findIndex(p => p.id === item.id);
-                        if (index >= 0) {
-                            const product = products[index];
-                            product.stock_qty -= item.qty;
-                            if (product.stock_qty < 0) product.stock_qty = 0;
-                            product.save();
-                        }
-                    });
-                    req.session.cart = [];
-                    next();
-                })
-            } else {
-                stripe.paymentIntents.cancel(pi.id, err => {
-                    if (err) console.log(err.message || err);
-                    next();
-                });
-            }
+            if (!pi || pi.status === "succeeded") return next();
+            stripe.paymentIntents.cancel(pi.id, err => {
+                if (err) console.log(err.message || err);
+                next();
+            });
         });
     })
 });

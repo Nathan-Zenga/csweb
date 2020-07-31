@@ -109,7 +109,7 @@ router.post("/cart/increment", (req, res) => {
     res.send(`${currentItem.qty}`);
 });
 
-router.post("/checkout/create-payment-intent", (req, res) => {
+router.post("/checkout/payment-intent/create", (req, res) => {
     const { firstname, lastname, email, address, city, postcode, cart } = Object.assign(req.body, req.session);
     stripe.paymentIntents.create({ // Create a PaymentIntent with the order details
         receipt_email: email,
@@ -125,6 +125,27 @@ router.post("/checkout/create-payment-intent", (req, res) => {
         req.session.paymentIntentID = pi.id;
         res.send({ clientSecret: pi.client_secret });
     });
+});
+
+router.post("/checkout/payment-intent/complete", (req, res) => {
+    stripe.paymentIntents.retrieve(req.session.paymentIntentID, (err, pi) => {
+        if (err || !pi) return res.status(err ? 500 : 404).send("Error occurred");
+        if (pi.status === "succeeded") {
+            Product.find((err, products) => {
+                req.session.cart.forEach(item => {
+                    const index = products.findIndex(p => p.id === item.id);
+                    if (index >= 0) {
+                        const product = products[index];
+                        product.stock_qty -= item.qty;
+                        if (product.stock_qty < 0) product.stock_qty = 0;
+                        product.save();
+                    }
+                });
+                req.session.cart = [];
+                res.end();
+            })
+        }
+    })
 });
 
 module.exports = router;

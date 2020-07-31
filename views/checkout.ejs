@@ -2,7 +2,7 @@
     <%_ include partials/stripe-checkout-css _%>
     <div class="content-container" id="payment-form-container">
         <div class="content container">
-            <form id="payment-details-form" action="/shop/checkout/create-payment-intent">
+            <form id="payment-details-form" action="/shop/checkout/payment-intent/create">
                 <div class="input-group row" style="display: block">
                     <div class="col-sm-6">
                         <label for="firstname">FIRST NAME</label>
@@ -37,8 +37,7 @@
 
                 <p id="card-error" role="alert"></p>
                 <p id="result-message" class="hidden">
-                    Payment succeeded, see the result in your
-                    <a href="" target="_blank">Stripe dashboard.</a> Refresh the page to pay again.
+                    Payment succeeded!<br><br>A reciept has been forwarded to your email address.<br><br>Thank you for your purchase!
                 </p>
             </form>
         </div>
@@ -48,7 +47,7 @@
 
     <script src="https://js.stripe.com/v3/"></script>
     <script>
-        $("#payment-details-form").submit(function(e) {
+        $("#payment-details-form").one("submit", function(e) {
             e.preventDefault();
             var stripe = Stripe("<%= pk %>");
             var btnControl = new submitBtnController(this);
@@ -78,22 +77,27 @@
                     });
                     btnControl.finish();
 
-                    $("#payment-form").submit(function(e) {
+                    $("#payment-form").one("submit", function(e) {
                         e.preventDefault();
                         // Complete payment when the submit button is clicked
                         var btnControl = new submitBtnController(this);
                         $("#submit-payment-btn").attr("disabled", true);
-                        stripe.confirmCardPayment(data.clientSecret, { payment_method: { card }})
-                            .then(function(result) {
-                                btnControl.finish();
-                                $("#submit-payment-btn").attr("disabled", false);
-                                // Show error to your customer
-                                if (result.error) return showError(result.error.message);
-                                // The payment succeeded!
-                                $("#result-message").removeClass("hidden").find("a").attr( "href", "https://dashboard.stripe.com/test/payments/" + result.paymentIntent.id );
-                                $("#cart-item-count").text(0);
-                                if (confirm("Payment succeeded! Reload page?")) location.reload();
+                        stripe.confirmCardPayment(data.clientSecret, { payment_method: { card } }).then(function(res) {
+                            btnControl.finish();
+                            $("#submit-payment-btn").attr("disabled", false);
+                            if (res.error) return showError(res.error.message);
+                            $("#cart-item-count").text(0);
+                            $.post("/shop/checkout/payment-intent/complete").fail(function(err, status, codeMessage) {
+                                console.log(codeMessage + (err ? ": " + err.responseText : ""));
+                            }).always(function() {
+                                $("html, body").animate({ scrollTop: 0 }, function() {
+                                    $("#payment-form-container form").fadeOut(function() {
+                                        var css = { display: "none", padding: "2em 0", textAlign: "center", fontWeight: "bold" };
+                                        $(".content").append($("#result-message").clone().removeClass("hidden").css(css).fadeIn());
+                                    });
+                                });
                             });
+                        });
                     });
                 });
             }).fail(function(err, status, codeMessage) {
