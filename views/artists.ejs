@@ -17,5 +17,5 @@
         </div>
     </div>
     <%_ }) _%>
-    <script> $(".social-icon").one("error", function() { $(this).remove() }); </script>
+    <script> $(".social-icon").one("error", function() { $(this).parent().hide() }); </script>
 <%_ include partials/footer _%>
