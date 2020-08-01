@@ -66,25 +66,6 @@ a:hover {
     }
 }
 
-.centre, .centreX, .centreY {
-    position: relative;
-}
-
-.centre {
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.centreX {
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-.centreY {
-    top: 50%;
-    transform: translateY(-50%);
-}
-
 .row {
     margin: 0;
 }

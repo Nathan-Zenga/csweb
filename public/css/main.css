@@ -136,6 +136,10 @@ input, textarea, select {
     width: 100%;
     margin-bottom: 2em;
     background-color: white;
+    -webkit-transition-property: background-color, opacity;
+    -webkit-transition-duration: .5s;
+    transition-property: background-color, opacity;
+    transition-duration: .5s;
 }
 
 textarea {
@@ -149,6 +153,10 @@ input[type=text], input[type=number], input[type=url], input[type=email] {
 
 input[type=text], input[type=number], input[type=url], input[type=email], textarea, select {
     padding: 10px;
+}
+
+input:not([type=submit]):disabled, textarea:disabled, select:disabled {
+    background-color: rgb(220, 220, 220);
 }
 
 input[type=checkbox], input[type=radio] {
@@ -171,6 +179,8 @@ input[type=submit], button[type=submit] {
 button {
     padding: 5px 12px;
     margin-bottom: 1em;
+    -webkit-transition: .5s opacity;
+    transition: .5s opacity;
 }
 
 button + button {
@@ -186,16 +196,8 @@ label span {
 }
 
 @media (min-width: 768px) {
-    .input-group > *[class*=col-] {
-        padding: 0 10px;
-    }
-
-    .input-group > *[class*=col-]:nth-child(odd) {
-        padding-left: 0;
-    }
-
-    .input-group > *[class*=col-]:nth-child(even) {
-        padding-right: 0;
+    .input-group > *[class*=col-]:not(:first-child) {
+        padding-left: 20px;
     }
 }
 
@@ -644,6 +646,7 @@ article.full .textbody-media iframe:not([src*=youtu]) {
     border-radius: 7px 0 0 7px;
     font-weight: bold;
     -webkit-transform: translateX(100%);
+    -webkit-transition: .5s transform;
     transform: translateX(100%);
     transition: .5s transform;
 }
