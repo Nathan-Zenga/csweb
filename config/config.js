@@ -8,24 +8,17 @@ const { each, forEachOf } = require('async');
  * @param {function} cb callback with passed document collections as arguments
  * @callback cb
  */
-module.exports.Collections = cb => {
-    Article.find().sort({ index: 1 }).exec((err, articles) => {
-        Artist.find((err, artists) => {
-            Project.find().sort({ year: -1 }).exec((err, projects) => {
-                Location.find((err, locations) => {
-                    MailingList.find().sort({ lastname: 1 }).exec((err, members) => {
-                        Homepage_content.find((err, homepage_contents) => {
-                            Homepage_image.find().sort({index: 1}).exec((err, homepage_images) => {
-                                Product.find((err, products) => {
-                                    cb({ articles, artists, projects, locations, members, homepage_contents, homepage_images, products });
-                                })
-                            })
-                        })
-                    })
-                })
-            })
-        })
-    })
+module.exports.Collections = async cb => {
+    const docs = {};
+    docs.articles = await Article.find().sort({ index: 1 }).exec();
+    docs.artists = await Artist.find();
+    docs.projects = await Project.find().sort({ year: -1 }).exec();
+    docs.locations = await Location.find();
+    docs.members = await MailingList.find().sort({ lastname: 1 }).exec();
+    docs.homepage_contents = await Homepage_content.find();
+    docs.homepage_images = await Homepage_image.find().sort({index: 1}).exec();
+    docs.products = await Product.find();
+    cb(docs);
 };
 
 /**
