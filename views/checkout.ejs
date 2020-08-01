@@ -36,9 +36,6 @@
                 <input type="submit" id="submit-payment-btn" value="PAY">
 
                 <p id="card-error" role="alert"></p>
-                <p id="result-message" class="hidden">
-                    Payment succeeded!<br><br>A reciept has been forwarded to your email address.<br><br>Thank you for your purchase!
-                </p>
             </form>
         </div>
     </div>
@@ -48,7 +45,7 @@
     <script src="https://js.stripe.com/v3/"></script>
     <script>
         window.onbeforeunload = function() { return true };
-        $("#payment-details-form").one("submit", function(e) {
+        $("#payment-details-form").submit(function(e) {
             e.preventDefault();
             var stripe = Stripe("<%= pk %>");
             var btnControl = new submitBtnController(this);
@@ -56,6 +53,7 @@
                 $("input", e.target).attr("disabled", true).filter(":submit").remove();
                 $("#submit-payment-btn").attr("disabled", true);
                 $("#payment-form").show(0, function() {
+                    $("html, body").animate({ scrollTop: $(this).offset().top - 50 });
                     var card = stripe.elements().create("card", { style: {
                         base: { // input fields
                             color: "#32325d",
@@ -78,24 +76,25 @@
                     });
                     btnControl.finish();
 
-                    $("#payment-form").one("submit", function(e) {
+                    $("#payment-form").submit(function(e) {
                         e.preventDefault();
                         // Complete payment when the submit button is clicked
                         var btnControl = new submitBtnController(this);
                         $("#submit-payment-btn").attr("disabled", true);
                         stripe.confirmCardPayment(data.clientSecret, { payment_method: { card } }).then(function(res) {
-                            btnControl.finish();
                             $("#submit-payment-btn").attr("disabled", false);
-                            if (res.error) return showError(res.error.message);
+                            if (res.error) return btnControl.finish(), showError(res.error.message);
                             window.onbeforeunload = null;
                             $("#cart-item-count").text(0);
                             $.post("/shop/checkout/payment-intent/complete").fail(function(err, status, codeMessage) {
                                 console.log(codeMessage + (err ? ": " + err.responseText : ""));
                             }).always(function() {
+                                btnControl.finish();
                                 $("html, body").animate({ scrollTop: 0 }, function() {
                                     $("#payment-form-container form").fadeOut(function() {
                                         var css = { display: "none", padding: "2em 0", textAlign: "center", fontWeight: "bold" };
-                                        $(".content").append($("#result-message").clone().removeClass("hidden").css(css).fadeIn());
+                                        var msg = "Payment succeeded!<br><br>A reciept has been forwarded to your email address.<br><br>Thank you for your purchase!";
+                                        $(".content").html($("<p>").css(css).html(msg).get(0).outerHTML).children().fadeIn();
                                     });
                                 });
                             });
