@@ -19,7 +19,7 @@ router.get("/cart", (req, res) => {
 
 router.post("/stock/add", (req, res) => {
     const { name, price, stock_qty, info, image_file, image_url } = req.body;
-    new Product({ name, price: parseInt(price) * 100, stock_qty, info }).save((err, saved) => {
+    new Product({ name, price, stock_qty, info }).save((err, saved) => {
         if (err) return res.status(500).send(err.message);
         if (!image_url && !image_file) return res.send("Product saved in stock");
         const public_id = ("shop/stock/" + saved.name.replace(/ /g, "-")).replace(/[ ?&#\\%<>]/g, "_");
@@ -38,7 +38,7 @@ router.post('/stock/edit', (req, res) => {
 
         const prefix = ("shop/stock/" + product.name.replace(/ /g, "-")).replace(/[ ?&#\\%<>]/g, "_");
         if (name)      product.name = name;
-        if (price)     product.price = parseInt(price) * 100;
+        if (price)     product.price = price;
         if (info)      product.info = info;
         if (stock_qty) product.stock_qty = stock_qty;
 
