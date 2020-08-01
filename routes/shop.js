@@ -110,7 +110,7 @@ router.post("/cart/increment", (req, res) => {
 });
 
 router.post("/checkout/payment-intent/create", (req, res) => {
-    const { firstname, lastname, email, address, city, postcode, cart } = Object.assign(req.body, req.session);
+    const { firstname, lastname, email, address_l1, address_l2, city, postcode, cart } = Object.assign(req.body, req.session);
     stripe.paymentIntents.create({ // Create a PaymentIntent with the order details
         receipt_email: email,
         description: cart.map(p => `${p.name} (£${(p.price / 100).toFixed(2)} X ${p.qty})`).join(", \r\n"),
@@ -118,7 +118,7 @@ router.post("/checkout/payment-intent/create", (req, res) => {
         currency: "gbp",
         shipping: {
             name: firstname + " " + lastname,
-            address: { line1: address, city, postal_code: postcode }
+            address: { line1: address_l1, line2: address_l2 || null, city, postal_code: postcode }
         }
     }, (err, pi) => {
         if (err) return res.status(400).send(err.message);
