@@ -9,7 +9,7 @@ router.get("/", (req, res) => {
 });
 
 router.get("/checkout", (req, res) => {
-    if (!req.session.cart.length) return res.status(302).redirect(req.get("referrer"));
+    if (!req.session.cart.length) return res.redirect(req.get("referrer"));
     res.render('checkout', { title: "Checkout", pagename: "checkout", pk: process.env.STRIPE_PK })
 });
 
@@ -142,6 +142,7 @@ router.post("/checkout/payment-intent/complete", (req, res) => {
                     }
                 });
                 req.session.cart = [];
+                req.session.paymentIntentID = undefined;
                 res.end();
             })
         }

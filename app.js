@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const MemoryStore = require('memorystore')(session);
 const stripe = require('stripe')(process.env.STRIPE_SK);
-const { Homepage_content, Product } = require('./models/models');
+const { Homepage_content } = require('./models/models');
 
 mongoose.connect(process.env.CSDB, { useNewUrlParser: true, useUnifiedTopology: true });
 mongoose.connection.once('open', () => { console.log("Connected to DB") });
@@ -42,9 +42,10 @@ app.use((req, res, next) => {
         if (!req.session.paymentIntentID) return next();
         stripe.paymentIntents.retrieve(req.session.paymentIntentID, (err, pi) => {
             if (err) return console.log(err.message || err), next();
-            req.session.paymentIntentID = undefined;
+            // id used in payment completion request if true
+            if (!(pi && pi.status === "succeeded")) req.session.paymentIntentID = undefined;
             if (!pi || pi.status === "succeeded") return next();
-            stripe.paymentIntents.cancel(pi.id, err => {
+            stripe.paymentIntents.cancel(pi.id, { cancellation_reason: "requested_by_customer" }, err => {
                 if (err) console.log(err.message || err);
                 next();
             });
