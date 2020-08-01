@@ -54,5 +54,6 @@ app.get("*", (req, res) => {
 });
 
 // Set port + listen for requests
-var port = process.env.PORT || 4001;
-app.listen(port, () => { console.log('Server started on port '+ port) });
+const port = process.env.PORT || 4001;
+const production = process.env.NODE_ENV === "production";
+app.listen(port, () => { console.log(`Server started${!production ? " on port " + port : ""}`) });
