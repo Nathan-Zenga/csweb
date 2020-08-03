@@ -3,6 +3,7 @@ const stripe = require('stripe')(process.env.STRIPE_SK);
 const cloud = require('cloudinary');
 const { each } = require('async');
 const { Product } = require('../models/models');
+const MailingListMailTransporter = require('../config/mailingListMailTransporter');
 
 router.get("/", (req, res) => {
     Product.find((err, products) => { res.render('shop', { title: "Shop", pagename: "shop", products }) })
@@ -105,7 +106,9 @@ router.post("/cart/increment", (req, res) => {
     const cartItemIndex = req.session.cart.findIndex(item => item.id === id);
     const currentItem = req.session.cart[cartItemIndex];
     const newQuantity = currentItem.qty + parseInt(increment);
-    currentItem.qty = (newQuantity < 1) ? 1 : (newQuantity > currentItem.stock_qty) ? currentItem.stock_qty : newQuantity;
+    const ltMin = newQuantity < 1;
+    const gtMax = newQuantity > currentItem.stock_qty;
+    currentItem.qty = ltMin ? 1 : gtMax ? currentItem.stock_qty : newQuantity;
     res.send(`${currentItem.qty}`);
 });
 
@@ -118,7 +121,7 @@ router.post("/checkout/payment-intent/create", (req, res) => {
         currency: "gbp",
         shipping: {
             name: firstname + " " + lastname,
-            address: { line1: address_l1, line2: address_l2 || null, city, postal_code: postcode }
+            address: { line1: address_l1, line2: address_l2, city, postal_code: postcode }
         }
     }, (err, pi) => {
         if (err) return res.status(400).send(err.message);
@@ -129,23 +132,32 @@ router.post("/checkout/payment-intent/create", (req, res) => {
 
 router.post("/checkout/payment-intent/complete", (req, res) => {
     stripe.paymentIntents.retrieve(req.session.paymentIntentID, (err, pi) => {
-        if (err || !pi) return res.status(err ? 500 : 404).send("Error occurred");
-        if (pi.status === "succeeded") {
-            Product.find((err, products) => {
-                req.session.cart.forEach(item => {
-                    const index = products.findIndex(p => p.id === item.id);
-                    if (index >= 0) {
-                        const product = products[index];
-                        product.stock_qty -= item.qty;
-                        if (product.stock_qty < 0) product.stock_qty = 0;
-                        product.save();
-                    }
-                });
-                req.session.cart = [];
-                req.session.paymentIntentID = undefined;
+        if (err || !pi) return res.status(err ? 500 : 400).send("Error occurred");
+        if (pi.status !== "succeeded") return res.status(500).send(pi.status.replace(/_/g, " "));
+        Product.find((err, products) => {
+            req.session.cart.forEach(item => {
+                const product = products.filter(p => p.id === item.id)[0];
+                if (product) {
+                    product.stock_qty -= item.qty;
+                    if (product.stock_qty < 0) product.stock_qty = 0;
+                    product.save();
+                }
+            });
+            const cart = req.session.cart.map(p => `${p.name} (£${(p.price / 100).toFixed(2)} X ${p.qty})`).join(", \r\n");
+            req.session.cart = [];
+            req.session.paymentIntentID = undefined;
+            if (process.env.NODE_ENV !== "production") return res.end();
+            const transporter = new MailingListMailTransporter({ req, res }, pi.receipt_email);
+            transporter.sendMail({
+                subject: "Purchase Nofication: Payment Successful",
+                message: `Hi ${pi.shipping.name},\n\n` +
+                    `Your payment was successful. Below is a summary of your purchase:\n\n${cart}\n\n` +
+                    "Thank you for shopping with us!\n\n- CS"
+            }, err => {
+                if (err) return res.status(500).send(err.message);
                 res.end();
-            })
-        }
+            });
+        })
     })
 });
 
