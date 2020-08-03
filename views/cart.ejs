@@ -7,7 +7,7 @@
                     <div class="item-img col-sm-3" style="background-image:url('<%- item.image %>')"></div>
                     <div class="item-info col-sm-7">
                         <p class="item-name" style="font-weight: bold"><%- item.name %></p>
-                        <p class="item-price" style="font-weight: bold">£<span><%- (item.price / 100).toFixed(2) %></span></p>
+                        <p class="item-price" style="font-weight: bold"><%- currency_symbol %><span><%- ((item.price / 100) * fx_rate).toFixed(2) %></span></p>
                         <p><%= item.info.replace(/\r?\n/g, "<br>") %></p>
                     </div>
                     <div class="item-qty-control col-sm-2">
@@ -46,7 +46,7 @@
             </div>
             <br><br>
             <div class="row" style="text-align: center; font-weight: bold">
-                <p id="price-total">Total: £<span><%- (!cart.length ? 0 : cart.map(p => p.price * p.qty).reduce((sum, val) => sum + val) / 100).toFixed(2) %></span></p>
+                <p id="price-total">Total: <%- currency_symbol %><span></span></p>
                 <%- !cart.length ? '' : '<p id="checkout-link"><a href="/shop/checkout"><button>PROCEED TO CHECKOUT</button></a></p>' %>
             </div>
         </div>
@@ -57,7 +57,7 @@
             $.post(this.action, $(this).serializeArray(), function(quantity) {
                 $(e.target).closest(".cart-item").find(".qty-count").text(quantity);
                 if ($(e.target).is(".item-remove-form")) $(e.target).closest(".cart-item").add("#checkout-link").addClass("deleted").hide(function() { $(this).remove() });
-                var prices = $(".cart-item:not(.deleted) .item-price span").map(function(i, item) { return parseInt(item.innerText) * 100 }).get();
+                var prices = $(".cart-item:not(.deleted) .item-price span").map(function(i, item) { return parseFloat(item.innerText) * 100 }).get();
                 var quantities = $(".cart-item:not(.deleted) .qty-count").map(function(i, qty) { return parseInt(qty.innerText) }).get();
                 try {
                     var total = prices.map(function(price, i) { return price * quantities[i] }).reduce(function(sum, val) { return sum + val });
@@ -71,5 +71,15 @@
                 if (prev_value === $("#price-total span").text()) alert("Max / min item quantity limit reached");
             })
         });
+        $("#price-total span").text(function() {
+            var total = 0, result = 0, length = $(".cart-item").length;
+            if (length) result = $(".cart-item").get().map(function(e) {
+                var price = parseFloat($(e).find(".item-price span").text());
+                var qty = parseFloat($(e).find(".qty-count").text());
+                total += price * qty;
+                return total;
+            }).reduce(function(sum, val) { return sum + val });
+            return result.toFixed(2);
+        })
     </script>
 <%_ include partials/footer _%>

@@ -39,6 +39,9 @@ app.use((req, res, next) => {
         res.locals.socials = contents && contents.length ? contents[0].socials : [];
         res.locals.location_origin = `https://${req.hostname}`;
         res.locals.cart = req.session.cart = req.session.cart || [];
+        res.locals.fx_rate = req.session.fx_rate = req.session.fx_rate || 1;
+        res.locals.currency = req.session.currency = req.session.currency || "gbp";
+        res.locals.currency_symbol = req.session.currency_symbol = req.session.currency_symbol || "£";
         if (!req.session.paymentIntentID) return next();
         stripe.paymentIntents.retrieve(req.session.paymentIntentID, (err, pi) => {
             if (err) return console.log(err.message || err), next();

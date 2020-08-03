@@ -1,12 +1,15 @@
 const router = require('express').Router();
 const stripe = require('stripe')(process.env.STRIPE_SK);
 const cloud = require('cloudinary');
+const { exchangeRates } = require('exchange-rates-api');
 const { each } = require('async');
 const { Product } = require('../models/models');
 const MailingListMailTransporter = require('../config/mailingListMailTransporter');
+const curr_symbols = require('../config/curr_symbols');
 
-router.get("/", (req, res) => {
-    Product.find((err, products) => { res.render('shop', { title: "Shop", pagename: "shop", products }) })
+router.get("/", async (req, res) => {
+    if (!req.session.rates) req.session.rates = await exchangeRates().latest().fetch();
+    Product.find((err, products) => { res.render('shop', { title: "Shop", pagename: "shop", products, curr_symbols, rates: req.session.rates }) })
 });
 
 router.get("/checkout", (req, res) => {
@@ -16,6 +19,16 @@ router.get("/checkout", (req, res) => {
 
 router.get("/cart", (req, res) => {
     res.render('cart', { title: "Cart", pagename: "cart", cart: req.session.cart })
+});
+
+router.post("/fx", (req, res) => {
+    exchangeRates().latest().base("GBP").symbols(req.body.currency).fetch().then(rate => {
+        const symbol = curr_symbols[req.body.currency];
+        req.session.fx_rate = rate;
+        req.session.currency = req.body.currency.toLowerCase();
+        req.session.currency_symbol = symbol;
+        res.send({ rate, symbol });
+    }).catch(err => res.status(500).send(err.message));
 });
 
 router.post("/stock/add", (req, res) => {
@@ -38,10 +51,16 @@ router.post('/stock/edit', (req, res) => {
         if (err || !product) return res.status(err ? 500 : 404).send(err ? err.message || "Error occurred" : "Product not found");
 
         const prefix = ("shop/stock/" + product.name.replace(/ /g, "-")).replace(/[ ?&#\\%<>]/g, "_");
-        if (name)      product.name = name;
-        if (price)     product.price = price;
-        if (info)      product.info = info;
-        if (stock_qty) product.stock_qty = stock_qty;
+        if (name) product.name = name;
+        if (price) product.price = price;
+        if (info) product.info = info;
+        if (stock_qty) {
+            product.stock_qty = stock_qty;
+            req.session.cart = req.session.cart.map(item => {
+                if (item.id === product.id) item.stock_qty = stock_qty;
+                return item;
+            });
+        };
 
         product.save((err, saved) => {
             if (err) return res.status(500).send(err.message || "Error occurred whilst saving product");
@@ -113,12 +132,13 @@ router.post("/cart/increment", (req, res) => {
 });
 
 router.post("/checkout/payment-intent/create", (req, res) => {
-    const { firstname, lastname, email, address_l1, address_l2, city, postcode, cart } = Object.assign(req.body, req.session);
+    const { firstname, lastname, email, address_l1, address_l2, city, postcode } = req.body;
+    const { cart, currency, currency_symbol, fx_rate } = req.session;
     stripe.paymentIntents.create({ // Create a PaymentIntent with the order details
         receipt_email: email,
-        description: cart.map(p => `${p.name} (£${(p.price / 100).toFixed(2)} X ${p.qty})`).join(", \r\n"),
-        amount: cart.map(p => p.price * p.qty).reduce((sum, val) => sum + val),
-        currency: "gbp",
+        description: cart.map(p => `${p.name} (${currency_symbol}${((p.price / 100) * fx_rate).toFixed(2)} X ${p.qty})`).join(", \r\n"),
+        amount: cart.map(p => (parseFloat(((p.price / 100) * fx_rate).toFixed(2)) * 100) * p.qty).reduce((sum, val) => sum + val),
+        currency,
         shipping: {
             name: firstname + " " + lastname,
             address: { line1: address_l1, line2: address_l2, city, postal_code: postcode }
@@ -143,7 +163,7 @@ router.post("/checkout/payment-intent/complete", (req, res) => {
                     product.save();
                 }
             });
-            const cart = req.session.cart.map(p => `${p.name} (£${(p.price / 100).toFixed(2)} X ${p.qty})`).join(", \r\n");
+            const cart = req.session.cart.map(p => `${p.name} (${req.session.currency}${(p.price / 100).toFixed(2)} X ${p.qty})`).join(", \r\n");
             req.session.cart = [];
             req.session.paymentIntentID = undefined;
             if (process.env.NODE_ENV !== "production") return res.end();
@@ -152,6 +172,7 @@ router.post("/checkout/payment-intent/complete", (req, res) => {
                 subject: "Purchase Nofication: Payment Successful",
                 message: `Hi ${pi.shipping.name},\n\n` +
                     `Your payment was successful. Below is a summary of your purchase:\n\n${cart}\n\n` +
+                    `If you have not yet recieved your receipt via email, you can view it here instead:\n${pi.charges.data[0].receipt_url}\n\n` +
                     "Thank you for shopping with us!\n\n- CS"
             }, err => {
                 if (err) return res.status(500).send(err.message);
