@@ -69,6 +69,8 @@
                 $("#cart-item-count").text($(".cart-item:not(.deleted)").length);
                 if ($("#cart-item-count").text() == 0) $("#cart-icon").removeClass("visible");
                 if (prev_value === $("#price-total span").text()) alert("Max / min item quantity limit reached");
+            }).fail(function(err) {
+                alert(err.responseText);
             })
         });
         $("#price-total span").text(function() {

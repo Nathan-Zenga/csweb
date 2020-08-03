@@ -116,6 +116,7 @@ router.post("/cart/add", (req, res) => {
 
 router.post("/cart/remove", (req, res) => {
     const cartItemIndex = req.session.cart.findIndex(item => item.id === req.body.id);
+    if (cartItemIndex === -1) return res.status(400).send("Item not found, or the cart is empty");
     req.session.cart.splice(cartItemIndex, 1);
     res.send(`${req.session.cart.length}`);
 });
@@ -124,6 +125,7 @@ router.post("/cart/increment", (req, res) => {
     const { id, increment } = req.body;
     const cartItemIndex = req.session.cart.findIndex(item => item.id === id);
     const currentItem = req.session.cart[cartItemIndex];
+    if (!currentItem) return res.status(400).send("Item not found, or the cart is empty");
     const newQuantity = currentItem.qty + parseInt(increment);
     const ltMin = newQuantity < 1;
     const gtMax = newQuantity > currentItem.stock_qty;
