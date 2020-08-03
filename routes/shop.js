@@ -133,11 +133,11 @@ router.post("/cart/increment", (req, res) => {
 
 router.post("/checkout/payment-intent/create", (req, res) => {
     const { firstname, lastname, email, address_l1, address_l2, city, postcode } = req.body;
-    const { cart, currency, currency_symbol, fx_rate } = req.session;
+    const { cart, currency, currency_symbol, converted_price } = req.session;
     stripe.paymentIntents.create({ // Create a PaymentIntent with the order details
         receipt_email: email,
-        description: cart.map(p => `${p.name} (${currency_symbol}${((p.price / 100) * fx_rate).toFixed(2)} X ${p.qty})`).join(", \r\n"),
-        amount: cart.map(p => (parseFloat(((p.price / 100) * fx_rate).toFixed(2)) * 100) * p.qty).reduce((sum, val) => sum + val),
+        description: cart.map(p => `${p.name} (${currency_symbol}${converted_price(p.price).toFixed(2)} X ${p.qty})`).join(", \r\n"),
+        amount: cart.map(p => (parseFloat(converted_price(p.price).toFixed(2)) * 100) * p.qty).reduce((sum, val) => sum + val),
         currency,
         shipping: {
             name: firstname + " " + lastname,

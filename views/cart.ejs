@@ -7,7 +7,7 @@
                     <div class="item-img col-sm-3" style="background-image:url('<%- item.image %>')"></div>
                     <div class="item-info col-sm-7">
                         <p class="item-name" style="font-weight: bold"><%- item.name %></p>
-                        <p class="item-price" style="font-weight: bold"><%- currency_symbol %><span><%- ((item.price / 100) * fx_rate).toFixed(2) %></span></p>
+                        <p class="item-price" style="font-weight: bold"><%- currency_symbol %><span><%- converted_price(item.price).toFixed(2) %></span></p>
                         <p><%= item.info.replace(/\r?\n/g, "<br>") %></p>
                     </div>
                     <div class="item-qty-control col-sm-2">
