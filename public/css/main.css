@@ -142,6 +142,12 @@ input, textarea, select {
     transition-duration: .5s;
 }
 
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
 textarea {
     min-width: 100%;
     max-width: 100%;

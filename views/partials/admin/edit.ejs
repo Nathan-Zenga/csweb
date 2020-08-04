@@ -1,6 +1,6 @@
 <div class="col-md-3 sidebar" id="edit-sidebar">
     <div class="mb-view-md section-dropdown-options" style="font-weight: bold; max-width: 250px; margin: 0 auto">
-        <label>SELECT OPTION</label>
+        <label>SELECT OPTION <i class="fas fa-chevron-down"></i></label>
         <select>
             <option value="#edit-artist">ARTIST</option>
             <option value="#edit-article">ARTICLE</option>
@@ -28,7 +28,7 @@
 
         <div id="edit-artist" class="tab-pane fade in active">
             <form method="post" action="/artists/edit">
-                <label>CHOOSE ARTIST</label>
+                <label>CHOOSE ARTIST <i class="fas fa-chevron-down"></i></label>
                 <select name="artist_id" id="artist_id" required>
                     <option value=""></option>
                     <%_ artists.forEach(artist => { _%>
@@ -74,7 +74,7 @@
 
         <div id="edit-article" class="tab-pane fade">
             <form method="post" action="/news/article/edit">
-                <label>CHOOSE ARTICLE</label>
+                <label>CHOOSE ARTICLE <i class="fas fa-chevron-down"></i></label>
                 <select name="article_id" id="article_id" required>
                     <option value=""></option>
                     <%_ articles.forEach(article => { _%>
@@ -126,7 +126,7 @@
 
         <div id="edit-project" class="tab-pane fade">
             <form action="/discography/project/edit">
-                <label>CHOOSE PROJECT</label>
+                <label>CHOOSE PROJECT <i class="fas fa-chevron-down"></i></label>
                 <select name="project_id" id="project_id" required>
                     <option value=""></option>
                     <%_ projects.forEach(project => { _%>
@@ -175,7 +175,7 @@
 
         <div id="edit-location" class="tab-pane fade">
             <form method="post" action="/map/location/edit">
-                <label>CHOOSE LOCATION</label>
+                <label>CHOOSE LOCATION <i class="fas fa-chevron-down"></i></label>
                 <select name="location_id" id="location_id" required>
                     <option value=""></option>
                     <%_ locations.forEach(location => { _%>
@@ -204,7 +204,7 @@
 
         <div id="edit-member" class="tab-pane fade">
             <form method="POST" action="/mailing-list/update">
-                <label>CHOOSE MEMBER</label>
+                <label>CHOOSE MEMBER <i class="fas fa-chevron-down"></i></label>
                 <select name="member_id" id="member_id">
                     <option value=""></option>
                     <%_ members.forEach(member => { _%>
@@ -252,7 +252,7 @@
 
         <div id="edit-product" class="tab-pane fade">
             <form method="post" action="/shop/stock/edit">
-                <label>CHOOSE PRODUCT</label>
+                <label>CHOOSE PRODUCT <i class="fas fa-chevron-down"></i></label>
                 <select name="product_id" id="product_id">
                     <option value=""></option>
                     <%_ products.forEach(item => { _%>
