@@ -43,8 +43,8 @@ app.use((req, res, next) => {
         res.locals.currency = req.session.currency = req.session.currency || "gbp";
         res.locals.currency_symbol = req.session.currency_symbol = req.session.currency_symbol || "£";
         res.locals.converted_price = req.session.converted_price = price => {
-            const value = parseFloat(price / 100);
-            return req.session.currency === "EUR" ? value / req.session.fx_rate : value * req.session.fx_rate;
+            const value = parseFloat(price / 100), {currency, fx_rate} = req.session;
+            return Function(`return (${value} ${currency === "EUR" ? "/" : "*"} ${fx_rate})`)();
         };
         if (!req.session.paymentIntentID) return next();
         stripe.paymentIntents.retrieve(req.session.paymentIntentID, (err, pi) => {
