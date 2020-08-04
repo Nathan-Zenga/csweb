@@ -5,7 +5,7 @@ const { exchangeRates } = require('exchange-rates-api');
 const { each } = require('async');
 const { Product } = require('../models/models');
 const MailingListMailTransporter = require('../config/mailingListMailTransporter');
-const curr_symbols = require('../config/curr_symbols');
+const curr_symbols = require('../config/currSymbols');
 
 router.get("/", async (req, res) => {
     if (!req.session.rates) req.session.rates = await exchangeRates().latest().fetch();
