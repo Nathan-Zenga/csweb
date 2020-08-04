@@ -14,7 +14,7 @@ router.get("/", async (req, res) => {
 
 router.get("/checkout", (req, res) => {
     if (!req.session.cart.length) return res.redirect(req.get("referrer"));
-    res.render('checkout', { title: "Checkout", pagename: "checkout", pk: process.env.STRIPE_PK })
+    res.render('checkout', { title: "Checkout", pagename: "checkout" })
 });
 
 router.get("/cart", (req, res) => {
@@ -148,7 +148,7 @@ router.post("/checkout/payment-intent/create", (req, res) => {
     }, (err, pi) => {
         if (err) return res.status(400).send(err.message);
         req.session.paymentIntentID = pi.id;
-        res.send({ clientSecret: pi.client_secret });
+        res.send({ clientSecret: pi.client_secret, pk: process.env.STRIPE_PK });
     });
 });
 

@@ -48,9 +48,9 @@
         window.onbeforeunload = function() { return true };
         $("#payment-details-form").submit(function(e) {
             e.preventDefault();
-            var stripe = Stripe("<%= pk %>");
             var btnControl = new submitBtnController(this);
             $.post(this.action, $(this).serializeArray(), function(data) {
+                var stripe = Stripe(data.pk);
                 $("input", e.target).attr("disabled", true).filter(":submit").remove();
                 $("#submit-payment-btn").attr("disabled", true);
                 $("#payment-form").show(0, function() {
