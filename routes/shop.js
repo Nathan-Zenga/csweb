@@ -135,12 +135,12 @@ router.post("/cart/increment", (req, res) => {
 
 router.post("/checkout/payment-intent/create", (req, res) => {
     const { firstname, lastname, email, address_l1, address_l2, city, postcode } = req.body;
-    const { cart, currency, currency_symbol, converted_price } = req.session;
+    const { cart, currency_symbol, converted_price } = req.session;
     stripe.paymentIntents.create({ // Create a PaymentIntent with the order details
         receipt_email: email,
         description: cart.map(p => `${p.name} (${currency_symbol}${converted_price(p.price).toFixed(2)} X ${p.qty})`).join(", \r\n"),
-        amount: cart.map(p => (parseFloat(converted_price(p.price).toFixed(2)) * 100) * p.qty).reduce((sum, val) => sum + val),
-        currency,
+        amount: cart.map(p => p.price * p.qty).reduce((sum, val) => sum + val),
+        currency: "gbp",
         shipping: {
             name: firstname + " " + lastname,
             address: { line1: address_l1, line2: address_l2, city, postal_code: postcode }
@@ -165,7 +165,6 @@ router.post("/checkout/payment-intent/complete", (req, res) => {
                     product.save();
                 }
             });
-            const cart = req.session.cart.map(p => `${p.name} (${req.session.currency}${(p.price / 100).toFixed(2)} X ${p.qty})`).join(", \r\n");
             req.session.cart = [];
             req.session.paymentIntentID = undefined;
             if (process.env.NODE_ENV !== "production") return res.end();
@@ -173,7 +172,7 @@ router.post("/checkout/payment-intent/complete", (req, res) => {
             transporter.sendMail({
                 subject: "Purchase Nofication: Payment Successful",
                 message: `Hi ${pi.shipping.name},\n\n` +
-                    `Your payment was successful. Below is a summary of your purchase:\n\n${cart}\n\n` +
+                    `Your payment was successful. Below is a summary of your purchase:\n\n${pi.charges.data[0].description}\n\n` +
                     `If you have not yet recieved your receipt via email, you can view it here instead:\n${pi.charges.data[0].receipt_url}\n\n` +
                     "Thank you for shopping with us!\n\n- CS"
             }, err => {
