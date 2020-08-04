@@ -30,7 +30,7 @@
             <form method="post" action="/artists/edit">
                 <label>CHOOSE ARTIST <i class="fas fa-chevron-down"></i></label>
                 <select name="artist_id" id="artist_id" required>
-                    <option value=""></option>
+                    <option value="">-</option>
                     <%_ artists.forEach(artist => { _%>
                     <option value="<%= artist._id %>"><%= artist.name %></option>
                     <%_ }) _%>
@@ -76,7 +76,7 @@
             <form method="post" action="/news/article/edit">
                 <label>CHOOSE ARTICLE <i class="fas fa-chevron-down"></i></label>
                 <select name="article_id" id="article_id" required>
-                    <option value=""></option>
+                    <option value="">-</option>
                     <%_ articles.forEach(article => { _%>
                     <option value="<%= article._id %>"><%= article.headline %></option>
                     <%_ }) _%>
@@ -128,7 +128,7 @@
             <form action="/discography/project/edit">
                 <label>CHOOSE PROJECT <i class="fas fa-chevron-down"></i></label>
                 <select name="project_id" id="project_id" required>
-                    <option value=""></option>
+                    <option value="">-</option>
                     <%_ projects.forEach(project => { _%>
                     <option value="<%= project._id %>"><%= project.title %></option>
                     <%_ }) _%>
@@ -177,7 +177,7 @@
             <form method="post" action="/map/location/edit">
                 <label>CHOOSE LOCATION <i class="fas fa-chevron-down"></i></label>
                 <select name="location_id" id="location_id" required>
-                    <option value=""></option>
+                    <option value="">-</option>
                     <%_ locations.forEach(location => { _%>
                     <option value="<%= location._id %>"><%= location.name +" - "+ location.city +", "+ location.country %></option>
                     <%_ }) _%>
@@ -206,7 +206,7 @@
             <form method="POST" action="/mailing-list/update">
                 <label>CHOOSE MEMBER <i class="fas fa-chevron-down"></i></label>
                 <select name="member_id" id="member_id">
-                    <option value=""></option>
+                    <option value="">-</option>
                     <%_ members.forEach(member => { _%>
                     <option value="<%= member._id %>"><%= member.firstname + " " + member.lastname %></option>
                     <%_ }) _%>
@@ -254,7 +254,7 @@
             <form method="post" action="/shop/stock/edit">
                 <label>CHOOSE PRODUCT <i class="fas fa-chevron-down"></i></label>
                 <select name="product_id" id="product_id">
-                    <option value=""></option>
+                    <option value="">-</option>
                     <%_ products.forEach(item => { _%>
                     <option value="<%= item._id %>"><%= item.name %></option>
                     <%_ }) _%>
