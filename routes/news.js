@@ -1,5 +1,4 @@
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router();
 const cloud = require('cloudinary');
 const { each } = require('async');
 const { Article } = require('../models/models');

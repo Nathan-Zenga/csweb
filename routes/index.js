@@ -1,5 +1,4 @@
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router();
 const cloud = require('cloudinary');
 const { indexReorder, Collections } = require('../config/config');
 const { Homepage_content, Homepage_image } = require('../models/models');

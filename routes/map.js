@@ -1,5 +1,4 @@
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router();
 const { Location } = require('../models/models');
 const geocoder = require('node-geocoder')({
     provider: 'google',
