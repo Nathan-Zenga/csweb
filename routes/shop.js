@@ -98,8 +98,8 @@ router.post("/stock/remove", (req, res) => {
 
 router.post("/cart/add", (req, res) => {
     Product.findById(req.body.id, (err, product) => {
+        if (!product || product.stock_qty < 1) return res.status(!product ? 404 : 400).send("Item currently not in stock");
         const { id, name, price, image, info, stock_qty } = product;
-        if (!product || stock_qty < 1) return res.status(!product ? 404 : 400).send("Item currently not in stock");
         const cartItemIndex = req.session.cart.findIndex(item => item.id === id);
         const currentItem = req.session.cart[cartItemIndex];
 
