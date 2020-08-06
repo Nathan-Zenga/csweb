@@ -56,7 +56,10 @@
             e.preventDefault();
             $.post(this.action, $(this).serializeArray(), function(quantity) {
                 $(e.target).closest(".cart-item").find(".qty-count").text(quantity);
-                if ($(e.target).is(".item-remove-form")) $(e.target).closest(".cart-item").add("#checkout-link").addClass("deleted").hide(function() { $(this).remove() });
+                if ($(e.target).is(".item-remove-form")) {
+                    $(e.target).closest(".cart-item").addClass("deleted").hide(function() { $(this).remove() });
+                    if ($(".deleted").length === 1) $(e.target).closest("#checkout-link").hide(function() { $(this).remove() });
+                }
                 var prices = $(".cart-item:not(.deleted) .item-price span").map(function(i, item) { return parseFloat(item.innerText) * 100 }).get();
                 var quantities = $(".cart-item:not(.deleted) .qty-count").map(function(i, qty) { return parseInt(qty.innerText) }).get();
                 try {
