@@ -1,14 +1,15 @@
 <%_ include partials/header _%>
     <div class="container">
-        <div class="row">
-            <select id="fx-select" name="currency" style="display: block; color: black; font-weight: bold; width: 150px; margin-left: auto">
+        <div class="row" style="text-align: right; font-weight: bold">
+            <select id="fx-select" name="currency" style="color: black; width: 150px">
                 <%_ const currency_default = currency.toUpperCase(); _%>
                 <option value="<%= currency_default %>"><%- `${currency_default} (${currency_symbol})` %></option>
-                <%_ Object.keys(rates).concat("EUR").sort().forEach(c => {
+                <%_ Object.keys(rates).sort().forEach(c => {
                     if (c !== currency_default) { _%>
                 <option value="<%= c %>"><%= `${c} (${curr_symbols[c]})` %></option>
                 <%_ }}) _%>
             </select>
+            <i class="fas fa-chevron-down" id="dropdown-toggle"></i>
         </div>
         <%_ if (!products.length) { _%>
         <div style="padding: 50px 10px; text-align: center;"><h1>STOCKING UP<br>MERCH COMING SOON</h1></div>

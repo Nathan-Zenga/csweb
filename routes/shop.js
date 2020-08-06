@@ -1,14 +1,14 @@
 const router = require('express').Router();
 const stripe = require('stripe')(process.env.STRIPE_SK);
 const cloud = require('cloudinary');
-const { exchangeRates } = require('exchange-rates-api');
+const exchangeRates = require('exchange-rates-api').exchangeRates().latest().base("GBP");
 const { each } = require('async');
 const { Product } = require('../models/models');
 const MailingListMailTransporter = require('../config/mailingListMailTransporter');
 const curr_symbols = require('../config/currSymbols');
 
 router.get("/", async (req, res) => {
-    if (!req.session.rates) req.session.rates = await exchangeRates().latest().fetch();
+    if (!req.session.rates) req.session.rates = await exchangeRates.fetch();
     Product.find((err, products) => { res.render('shop', { title: "Shop", pagename: "shop", products, curr_symbols, rates: req.session.rates }) })
 });
 
@@ -22,7 +22,7 @@ router.get("/cart", (req, res) => {
 });
 
 router.post("/fx", (req, res) => {
-    exchangeRates().latest().base("GBP").symbols(req.body.currency).fetch().then(rate => {
+    exchangeRates.symbols(req.body.currency).fetch().then(rate => {
         const symbol = curr_symbols[req.body.currency];
         req.session.fx_rate = rate;
         req.session.currency = req.body.currency.toLowerCase();
@@ -34,7 +34,7 @@ router.post("/fx", (req, res) => {
 router.post("/stock/add", (req, res) => {
     const { name, price, stock_qty, info, image_file, image_url } = req.body;
     new Product({ name, price, stock_qty, info }).save((err, saved) => {
-        if (err) return res.status(500).send(err.message);
+        if (err) return res.status(400).send(err.message);
         if (!image_url && !image_file) return res.send("Product saved in stock");
         const public_id = ("shop/stock/" + saved.name.replace(/ /g, "-")).replace(/[ ?&#\\%<>]/g, "_");
         cloud.v2.uploader.upload(image_url || image_file, { public_id }, (err, result) => {
