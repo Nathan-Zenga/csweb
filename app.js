@@ -6,10 +6,11 @@ const path = require('path'); // core module
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MemoryStore = require('memorystore')(session);
-const stripe = require('stripe')(process.env.STRIPE_SK);
+const { STRIPE_SK, CSDB, NODE_ENV } = process.env;
+const stripe = require('stripe')(STRIPE_SK);
 const { Homepage_content } = require('./models/models');
 
-mongoose.connect(process.env.CSDB, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(CSDB, { useNewUrlParser: true, useUnifiedTopology: true, autoIndex: false });
 mongoose.connection.once('open', () => { console.log("Connected to DB") });
 
 // View Engine
@@ -75,5 +76,5 @@ app.get("*", (req, res) => {
 
 // Set port + listen for requests
 const port = process.env.PORT || 4001;
-const production = process.env.NODE_ENV === "production";
+const production = NODE_ENV === "production";
 app.listen(port, () => { console.log(`Server started${!production ? " on port " + port : ""}`) });

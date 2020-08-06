@@ -28,7 +28,7 @@ module.exports.Artist = model('Artist', Schema({
 module.exports.MailingList = model('MailingList', Schema({
     firstname: { type: String, set: v => v.charAt(0).toUpperCase() + v.slice(1) },
     lastname: { type: String, set: v => v.charAt(0).toUpperCase() + v.slice(1) },
-    email: String,
+    email: { type: String, index: true },
     size_top: String,
     size_bottom: String,
     extra_info: String

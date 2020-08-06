@@ -168,7 +168,7 @@ router.post("/checkout/payment-intent/complete", (req, res) => {
             req.session.cart = [];
             req.session.paymentIntentID = undefined;
             if (process.env.NODE_ENV !== "production") return res.end();
-            const transporter = new MailingListMailTransporter({ req, res }, pi.receipt_email);
+            const transporter = new MailingListMailTransporter({ req, res }, { email: pi.receipt_email });
             transporter.sendMail({
                 subject: "Purchase Nofication: Payment Successful",
                 message: `Hi ${pi.shipping.name},\n\n` +
@@ -176,7 +176,7 @@ router.post("/checkout/payment-intent/complete", (req, res) => {
                     `If you have not yet recieved your receipt via email, you can view it here instead:\n${pi.charges.data[0].receipt_url}\n\n` +
                     "Thank you for shopping with us!\n\n- CS"
             }, err => {
-                if (err) return res.status(500).send(err.message);
+                if (err) return res.status(500).send(err.message || err);
                 res.end();
             });
         })
