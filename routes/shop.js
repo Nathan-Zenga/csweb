@@ -71,6 +71,7 @@ router.post('/stock/edit', (req, res) => {
                 cloud.v2.uploader.upload(image_url || image_file, { public_id }, (err, result) => {
                     if (err) return res.status(500).send(err.message);
                     saved.image = result.secure_url;
+                    for (const item of req.session.cart) if (item.id === saved.id) item.image = result.secure_url;
                     saved.save(() => { res.send("Product details updated successfully") });
                 });
             })
@@ -98,6 +99,7 @@ router.post("/stock/remove", (req, res) => {
 
 router.post("/cart/add", (req, res) => {
     Product.findById(req.body.id, (err, product) => {
+        if (err) return res.status(500).send(err.message);
         if (!product || product.stock_qty < 1) return res.status(!product ? 404 : 400).send("Item currently not in stock");
         const { id, name, price, image, info, stock_qty } = product;
         const cartItemIndex = req.session.cart.findIndex(item => item.id === id);
