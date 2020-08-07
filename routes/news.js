@@ -24,7 +24,10 @@ router.post('/article/new', (req, res) => {
     article.save((err, saved) => {
         Article.find({ _id: { $ne: saved._id } }).sort({index: 1, created_at: -1}).exec((err, articles) => {
             articles.forEach(a => { a.index += 1; a.save() });
-            saveMedia(req.body, saved, (err, msg) => res.status(err ? 500 : 200).send(err.message || `Done${msg ? ". "+msg : ""}`));
+            saveMedia(req.body, saved, (err, msg) => {
+                if (err) return res.status(500).send(err.message);
+                res.send(`Done${msg ? ". "+msg : ""}`);
+            });
         })
     })
 });
