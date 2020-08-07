@@ -78,7 +78,7 @@ class MailingListMailTransporter {
     };
 
     /** @param {mongoose.Document} member existing mailing list member */
-    setRecipient(member) { this.#member = member };
+    setRecipient(member) { this.#member = member; return this };
 };
 
 module.exports = MailingListMailTransporter;
