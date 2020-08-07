@@ -11,6 +11,8 @@ router.get('/', (req, res) => {
     })
 });
 
+router.get('/events', (req, res, next) => { res.status(404); next() });
+
 router.get('/admin', (req, res) => {
     Collections(db => res.render('admin', { title: "Admin", pagename: "admin", ...db }))
 });
