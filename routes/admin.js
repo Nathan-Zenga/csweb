@@ -18,7 +18,7 @@ router.get('/login', (req, res) => {
 router.get('/logout', (req, res) => { req.logout(); res.redirect("/") });
 
 router.post('/login', (req, res) => {
-    req.body.username = email;
+    req.body.username = email; Object.freeze(req.body);
     passport.authenticate("local-login", (err, user, info) => {
         if (err) return res.status(500).send(err.message || err);
         if (!user) return res.status(400).send(info.message);
@@ -46,7 +46,7 @@ router.post('/login', (req, res) => {
 });
 
 router.post("/activate/:token", async (req, res) => {
-    req.body.username = email;
+    req.body.username = email; Object.freeze(req.body);
     passport.authenticate("local-register", (err, user, info) => {
         if (err) return res.status(500).send(err.message || err);
         if (!user) return res.status(400).send(info.message);
