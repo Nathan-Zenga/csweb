@@ -15,6 +15,13 @@ router.get('/login', (req, res) => {
     res.render('admin-login', { title: "Admin Login", pagename: "admin" })
 });
 
+router.get('/activate/:token', (req, res) => {
+    Admin.findOne({ password: req.params.token, tokenExpiryDate: { $gte: Date.now() } }, (err, found) => {
+        if (!found) return next();
+        res.render('admin-activate', { title: "Admin Register", pagename: "admin", token: found.password })
+    })
+});
+
 router.get('/logout', (req, res) => { req.logout(); res.redirect("/") });
 
 router.post('/login', (req, res) => {
