@@ -94,3 +94,9 @@ module.exports.saveMedia = (body, doc, cb) => {
         cb ? cb(err, msg) : console.log(err || msg)
     });
 };
+
+module.exports.isAuthed = (req, res, next) => {
+    if (process.env.NODE_ENV !== "production") return next();
+    if (req.isAuthenticated()) return next();
+    return res.status(401).redirect("/admin/login");
+}

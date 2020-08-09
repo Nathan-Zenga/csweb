@@ -160,7 +160,7 @@
             }
         });
 
-        $.post("/search", function(docs) {
+        $.post("/admin/search", function(docs) {
             $("#edit select[id*='_id']").change(function() {
                 var $form = $(this).closest("form");
                 var id = this.value;

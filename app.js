@@ -6,6 +6,7 @@ const path = require('path'); // core module
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MemoryStore = require('memorystore')(session);
+const passport = require('passport');
 const { STRIPE_SK, CSDB, NODE_ENV } = process.env;
 const stripe = require('stripe')(STRIPE_SK);
 const { Homepage_content } = require('./models/models');
@@ -34,10 +35,15 @@ app.use(session({
     store: new MemoryStore({ checkPeriod: 1000 * 60 * 60 * 12 })
 }));
 
+// Passport init
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Global variables
 app.use((req, res, next) => {
     Homepage_content.find((err, contents) => {
-        res.locals.socials = contents && contents.length ? contents[0].socials : [];
+        res.locals.user = req.user || null;
+        res.locals.socials = contents.length ? contents[0].socials : [];
         res.locals.location_origin = `https://${req.hostname}`;
         res.locals.cart = req.session.cart = req.session.cart || [];
         res.locals.fx_rate = req.session.fx_rate = req.session.fx_rate || 1;
@@ -62,6 +68,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/', require('./routes/index'));
+app.use('/admin', require('./routes/admin'));
 app.use('/news', require('./routes/news'));
 app.use('/artists', require('./routes/artists'));
 app.use('/discography', require('./routes/discography'));

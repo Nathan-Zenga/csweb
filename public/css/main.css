@@ -116,7 +116,7 @@ form {
 
 #admin-page form {
     border-radius: 10px;
-    box-shadow: 0 0 15px grey;
+    box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.2);
     padding: 20px;
 }
 
@@ -153,11 +153,11 @@ textarea {
     max-width: 100%;
 }
 
-input[type=text], input[type=number], input[type=url], input[type=email] {
+input[type=text], input[type=password], input[type=number], input[type=url], input[type=email] {
     border-bottom: 1px solid black;
 }
 
-input[type=text], input[type=number], input[type=url], input[type=email], textarea, select {
+input[type=text], input[type=password], input[type=number], input[type=url], input[type=email], textarea, select {
     padding: 10px;
 }
 

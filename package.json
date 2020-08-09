@@ -1,6 +1,6 @@
 {
   "name": "csweb",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "merch store website",
   "main": "app.js",
   "scripts": {
@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "async": "^3.2.0",
+    "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "cloudinary": "^1.22.0",
     "cookie-parser": "^1.4.5",
@@ -20,6 +21,8 @@
     "mongoose": "^5.9.21",
     "node-geocoder": "^3.27.0",
     "nodemailer": "^6.4.10",
+    "passport": "^0.4.1",
+    "passport-local": "^1.0.0",
     "request": "^2.88.2",
     "stripe": "^8.71.0"
   },

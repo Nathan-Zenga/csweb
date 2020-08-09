@@ -64,3 +64,9 @@ module.exports.Product = model('Product', Schema({
     info: String,
     stock_qty: { type: Number, min: [0, "No negative values allowed for stock quantity"] }
 }));
+
+module.exports.Admin = model('Admin', (() => {
+    const schema = new Schema({ email: { type: String, index: true }, password: String, tokenExpiryDate: Date });
+    schema.virtual("username").get(() => this.email);
+    return schema;
+})());
