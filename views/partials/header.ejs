@@ -42,6 +42,9 @@
                     <a href="/shop">SHOP</a>
                     <a href="/map">MAP</a>
                     <a href="/mailing-list/sign-up">SIGN UP</a>
+                    <%_ if (user) { _%>
+                    <a href="/admin/logout" style="text-decoration: underline">LOG OUT</a>
+                    <%_ } _%>
                 </nav>
             </div>
         </div>
