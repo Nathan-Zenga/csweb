@@ -2,7 +2,7 @@ const router = require('express').Router();
 const cloud = require('cloudinary');
 const { each } = require('async');
 const { Article } = require('../models/models');
-const { saveMedia, indexReorder } = require('../config/config');
+const { isAuthed, saveMedia, indexReorder } = require('../config/config');
 
 router.get('/', (req, res) => {
     Article.find().sort({ index: 1 }).exec((err, articles) => {
@@ -18,7 +18,7 @@ router.get('/article/:id', (req, res, next) => {
     })
 });
 
-router.post('/article/new', (req, res) => {
+router.post('/article/new', isAuthed, (req, res) => {
     const { headline, textbody } = req.body;
     const article = new Article({ headline, textbody, index: 1 });
     article.save((err, saved) => {
@@ -32,7 +32,7 @@ router.post('/article/new', (req, res) => {
     })
 });
 
-router.post('/article/delete', (req, res) => {
+router.post('/article/delete', isAuthed, (req, res) => {
     const ids = Object.values(req.body);
     if (!ids.length) return res.send("Nothing selected");
     Article.deleteMany({_id : { $in: ids }}, (err, result) => {
@@ -47,7 +47,7 @@ router.post('/article/delete', (req, res) => {
     })
 });
 
-router.post('/article/edit', (req, res) => {
+router.post('/article/edit', isAuthed, (req, res) => {
     const { article_id, headline, textbody, headline_image_thumb } = req.body;
     Article.findById(article_id, (err, article) => {
         if (err || !article) return res.status(err ? 500 : 404).send(err ? err.message || "Error occurred" : "Article not found");
@@ -77,7 +77,7 @@ router.post('/article/edit', (req, res) => {
     })
 });
 
-router.post('/article/edit/reorder', (req, res) => {
+router.post('/article/edit/reorder', isAuthed, (req, res) => {
     const { id, index } = req.body;
     indexReorder(Article, { id, newIndex: index, sort: {updated_at: -1} }, err => {
         if (err) return res.status(500).send(err.message || "Error occurred");

@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const cloud = require('cloudinary');
 const { each } = require('async');
-const { indexReorder } = require('../config/config');
+const { isAuthed, indexReorder } = require('../config/config');
 const { Homepage_content, Homepage_image } = require('../models/models');
 
 router.get('/', (req, res) => {
@@ -14,7 +14,7 @@ router.get('/', (req, res) => {
 
 router.get('/events', (req, res, next) => { res.status(404); next() });
 
-router.post('/homepage/content', (req, res) => {
+router.post('/homepage/content', isAuthed, (req, res) => {
     const { banner_text, footnote_text, socials_name, socials_url } = req.body;
     Homepage_content.find((err, contents) => {
         const content = !contents.length ? new Homepage_content() : contents[0];
@@ -35,7 +35,7 @@ router.post('/homepage/content', (req, res) => {
     })
 });
 
-router.post('/homepage/image/save', (req, res) => {
+router.post('/homepage/image/save', isAuthed, (req, res) => {
     const { filename, image, index } = req.body;
     const public_id = `homepage/images/${filename.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
     cloud.v2.uploader.upload(image, { public_id }, (err, result) => {
@@ -52,7 +52,7 @@ router.post('/homepage/image/save', (req, res) => {
     })
 });
 
-router.post('/homepage/image/delete', (req, res) => {
+router.post('/homepage/image/delete', isAuthed, (req, res) => {
     const p_ids = Object.values(req.body);
     if (!p_ids.length) return res.status(400).send("Nothing selected");
     each(p_ids, (p_id, cb) => {
@@ -65,12 +65,12 @@ router.post('/homepage/image/delete', (req, res) => {
     });
 });
 
-router.post('/homepage/image/reorder', (req, res) => {
+router.post('/homepage/image/reorder', isAuthed, (req, res) => {
     const { id, index } = req.body;
     indexReorder(Homepage_image, { id, newIndex: index }, () => res.send("Re-ordering process done"));
 });
 
-router.post('/cs/links/delete', (req, res) => {
+router.post('/cs/links/delete', isAuthed, (req, res) => {
     const names = Object.values(req.body);
     Homepage_content.findOne((err, content) => {
         if (!(content && names.length)) return res.status(400).send("Nothing selected");

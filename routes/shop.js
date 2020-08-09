@@ -3,6 +3,7 @@ const stripe = require('stripe')(process.env.STRIPE_SK);
 const cloud = require('cloudinary');
 const exchangeRates = require('exchange-rates-api').exchangeRates().latest().base("GBP");
 const { each } = require('async');
+const { isAuthed } = require('../config/config');
 const { Product } = require('../models/models');
 const MailingListMailTransporter = require('../config/mailingListMailTransporter');
 const curr_symbols = require('../config/currSymbols');
@@ -32,7 +33,7 @@ router.post("/fx", (req, res) => {
     }).catch(err => res.status(500).send(err.message));
 });
 
-router.post("/stock/add", (req, res) => {
+router.post("/stock/add", isAuthed, (req, res) => {
     const { name, price, stock_qty, info, image_file, image_url } = req.body;
     new Product({ name, price, stock_qty, info }).save((err, saved) => {
         if (err) return res.status(400).send(err.message);
@@ -46,7 +47,7 @@ router.post("/stock/add", (req, res) => {
     });
 });
 
-router.post('/stock/edit', (req, res) => {
+router.post('/stock/edit', isAuthed, (req, res) => {
     const { product_id, name, price, stock_qty, info, image_file, image_url } = req.body;
     Product.findById(product_id, (err, product) => {
         if (err || !product) return res.status(err ? 500 : 404).send(err ? err.message || "Error occurred" : "Product not found");
@@ -80,7 +81,7 @@ router.post('/stock/edit', (req, res) => {
     })
 });
 
-router.post("/stock/remove", (req, res) => {
+router.post("/stock/remove", isAuthed, (req, res) => {
     const ids = Object.values(req.body);
     if (!ids.length) return res.send("Nothing selected");
     Product.find({_id : { $in: ids }}, (err, products) => {

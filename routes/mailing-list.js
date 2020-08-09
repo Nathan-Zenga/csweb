@@ -2,6 +2,7 @@ const router = require('express').Router();
 const { post } = require('request');
 const { each } = require('async');
 const { MailingList } = require('../models/models');
+const { isAuthed } = require('../config/config');
 const MailingListMailTransporter = require('../config/mailingListMailTransporter');
 
 router.get('/sign-up', (req, res) => {
@@ -31,7 +32,7 @@ router.post('/new', (req, res) => {
     })
 });
 
-router.post('/update', (req, res) => {
+router.post('/update', isAuthed, (req, res) => {
     const { member_id, firstname, lastname, email, size_top, size_bottom, extra_info } = req.body;
     MailingList.findById(member_id, (err, member) => {
         if (err || !member) return res.status(err ? 500 : 404).send(err ? err.message || "Error occurred" : "Member not found");
@@ -45,7 +46,7 @@ router.post('/update', (req, res) => {
     })
 });
 
-router.post('/send/mail', (req, res) => {
+router.post('/send/mail', isAuthed, (req, res) => {
     const { email, subject, message } = req.body, sentCount = [];
     MailingList.find(email === "all" ? {} : { email: email || "null" }, (err, members) => {
         if (err || !members.length) return res.status(err ? 500 : 404).send(err ? err.message || "Error occurred" : "Member(s) not found");

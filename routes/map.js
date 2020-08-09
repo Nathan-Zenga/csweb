@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { Location } = require('../models/models');
+const { isAuthed } = require('../config/config');
 const geocoder = require('node-geocoder')({
     provider: 'google',
     httpAdapter: 'https',
@@ -24,7 +25,7 @@ router.post('/init', (req, res) => {
     });
 });
 
-router.post('/location/new', (req, res) => {
+router.post('/location/new', isAuthed, (req, res) => {
     const { name, street_address, city, country, postcode } = req.body;
     const newLocation = new Location({ name, street_address, city, country, postcode });
     const address = `${street_address}, ${city}, ${country}` + (postcode ? ", "+postcode : "");
@@ -39,7 +40,7 @@ router.post('/location/new', (req, res) => {
     })
 });
 
-router.post('/location/edit', (req, res) => {
+router.post('/location/edit', isAuthed, (req, res) => {
     const { location_id, name_edit, street_address_edit, city_edit, country_edit, postcode_edit } = req.body;
     const address = `${street_address_edit}, ${city_edit}, ${country_edit}` + (postcode_edit ? ", "+postcode_edit : "");
     Location.findById(location_id, (err, doc) => {
@@ -61,7 +62,7 @@ router.post('/location/edit', (req, res) => {
     })
 });
 
-router.post('/location/delete', (req, res) => {
+router.post('/location/delete', isAuthed, (req, res) => {
     const ids = Object.values(req.body);
     if (!ids.length) return res.send("Nothing selected");
     Location.deleteMany({_id : { $in: ids }}, (err, result) => {

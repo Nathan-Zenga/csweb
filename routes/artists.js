@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const cloud = require('cloudinary');
 const { Artist } = require('../models/models');
+const { isAuthed } = require('../config/config');
 
 router.get('/', (req, res) => {
     Artist.find((err, artists) => {
@@ -8,7 +9,7 @@ router.get('/', (req, res) => {
     })
 });
 
-router.post('/new', (req, res) => {
+router.post('/new', isAuthed, (req, res) => {
     const { name, bio, profile_image, social_media_name, social_media_url } = req.body;
     const artist = new Artist({ name, bio, socials: {} });
     const social_media_names = (social_media_name instanceof Array ? social_media_name : [social_media_name]).filter(e => e);
@@ -33,7 +34,7 @@ router.post('/new', (req, res) => {
     });
 });
 
-router.post('/edit', (req, res) => {
+router.post('/edit', isAuthed, (req, res) => {
     const { artist_id, artist_name, artist_bio, profile_image, social_media_name, social_media_url } = req.body;
     Artist.findById(artist_id, (err, artist) => {
         if (err || !artist) return res.status(err ? 500 : 404).send(err ? err.message || "Error occured" : "Artist not found");
@@ -60,7 +61,7 @@ router.post('/edit', (req, res) => {
     })
 });
 
-router.post('/delete', (req, res) => {
+router.post('/delete', isAuthed, (req, res) => {
     var ids = Object.values(req.body);
     if (ids.length) {
         Artist.deleteMany({_id : { $in: ids }}, (err, result) => {

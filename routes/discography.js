@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const cloud = require('cloudinary');
 const { Project } = require('../models/models');
+const { isAuthed } = require('../config/config');
 
 router.get('/', (req, res) => {
     Project.find().sort({ year: -1 }).exec((err, projects) => {
@@ -8,7 +9,7 @@ router.get('/', (req, res) => {
     })
 });
 
-router.post('/project/new', (req, res) => {
+router.post('/project/new', isAuthed, (req, res) => {
     const { title, artist, year, artwork_file, artwork_url, link_name, link_url, all_platforms } = req.body;
     const link_names = (link_name instanceof Array ? link_name : [link_name]).filter(e => e);
     const link_urls = (link_url instanceof Array ? link_url : [link_url]).filter(e => e);
@@ -28,7 +29,7 @@ router.post('/project/new', (req, res) => {
     });
 });
 
-router.post('/project/delete', (req, res) => {
+router.post('/project/delete', isAuthed, (req, res) => {
     const ids = Object.values(req.body);
     if (!ids.length) return res.send("Nothing selected");
     Project.deleteMany({_id : { $in: ids }}, (err, result) => {
@@ -40,7 +41,7 @@ router.post('/project/delete', (req, res) => {
     })
 });
 
-router.post('/project/edit', (req, res) => {
+router.post('/project/edit', isAuthed, (req, res) => {
     const { link_name, link_url, project_id, title, artist, year, artwork_url, all_platforms, artwork_file } = req.body;
     const link_names = (link_name instanceof Array ? link_name : [link_name]).filter(e => e);
     const link_urls = (link_url instanceof Array ? link_url : [link_url]).filter(e => e);
