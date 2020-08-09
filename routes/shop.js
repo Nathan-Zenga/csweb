@@ -177,13 +177,13 @@ router.post("/checkout/payment-intent/complete", (req, res) => {
                 subject: "Purchase Nofication: Payment Successful",
                 message: `Hi ${pi.shipping.name},\n\n` +
                     `Your payment was successful. Below is a summary of your purchase:\n\n${pi.charges.data[0].description}\n\n` +
-                    `If you have not yet recieved your receipt via email, you can view it here instead:\n${pi.charges.data[0].receipt_url}\n\n` +
+                    `If you have not yet received your receipt via email, you can view it here instead:\n${pi.charges.data[0].receipt_url}\n\n` +
                     "Thank you for shopping with us!\n\n- CS"
             }, err => {
                 const { line1, line2, city, postal_code } = pi.address;
                 transporter.setRecipient({ email: "info@thecs.co" }).sendMail({
                     subject: "Purchase Report: You Got Paid!",
-                    message: "You've recieved a new purchase from a new customer. Summary shown below\n\n" +
+                    message: "You've received a new purchase from a new customer. Summary shown below\n\n" +
                         `- Name: ${pi.shipping.name}\n- Email: ${pi.receipt_email}\n- Purchased items: ${pi.charges.data[0].description}\n` +
                         `- Address:\n\t${line1},${line2 ? "\n\t"+line2+"," : ""}\n\t${city},\n\t${postal_code}\n\n` +
                         `- Date of purchase: ${Date(pi.created * 1000)}\n- Total amount: £${pi.amount / 100}-\n\n`
