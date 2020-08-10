@@ -98,5 +98,6 @@ module.exports.saveMedia = (body, doc, cb) => {
 module.exports.isAuthed = (req, res, next) => {
     if (process.env.NODE_ENV !== "production") return next();
     if (req.isAuthenticated()) return next();
-    return res.status(401).redirect("/admin/login");
+    if (req.method === "GET") return res.status(401).redirect("/admin/login");
+    return res.sendStatus(401);
 }
