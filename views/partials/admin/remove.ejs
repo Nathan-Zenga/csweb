@@ -47,7 +47,7 @@
 
         <div id="remove-artist" class="tab-pane fade">
             <%_ if (artists.length) { _%>
-            <form action="/artists/delete" method="post">
+            <form action="/team/delete" method="post">
                 <label>DELETE ARTIST(S)</label>
                 <%_ artists.forEach((artist, i) => { _%>
                 <input type="checkbox" name="artist<%= i %>" value="<%= artist._id %>"> <span><%= artist.name %></span><br>

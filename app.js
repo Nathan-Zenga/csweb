@@ -70,7 +70,7 @@ app.use((req, res, next) => {
 app.use('/', require('./routes/index'));
 app.use('/admin', require('./routes/admin'));
 app.use('/news', require('./routes/news'));
-app.use('/artists', require('./routes/artists'));
+app.use('/team', require('./routes/artists'));
 app.use('/discography', require('./routes/discography'));
 app.use('/shop', require('./routes/shop'));
 app.use('/mailing-list', require('./routes/mailing-list'));
