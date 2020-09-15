@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const stripe = require('stripe')(process.env.STRIPE_SK);
+const stripe = new (require('stripe').Stripe)(process.env.STRIPE_SK);
 const cloud = require('cloudinary');
 const exchangeRates = require('exchange-rates-api').exchangeRates().latest().base("GBP");
 const { each } = require('async');
@@ -149,54 +149,53 @@ router.post("/checkout/payment-intent/create", (req, res) => {
             name: firstname + " " + lastname,
             address: { line1: address_l1, line2: address_l2, city, postal_code: postcode }
         }
-    }, (err, pi) => {
-        if (err) return res.status(400).send(err.message);
+    }).then(pi => {
         req.session.paymentIntentID = pi.id;
         res.send({ clientSecret: pi.client_secret, pk: process.env.STRIPE_PK });
-    });
+    }).catch(err => res.status(err.statusCode).send(err.message));
 });
 
-router.post("/checkout/payment-intent/complete", (req, res) => {
-    stripe.paymentIntents.retrieve(req.session.paymentIntentID, (err, pi) => {
-        if (err || !pi) return res.status(err ? 500 : 400).send("Error occurred");
+router.post("/checkout/payment-intent/complete", async (req, res) => {
+    try {
+        const pi = await stripe.paymentIntents.retrieve(req.session.paymentIntentID);
+        const products = await Product.find();
+        if (!pi) return res.status(404).send("Invalid payment session");
         if (pi.status !== "succeeded") return res.status(500).send(pi.status.replace(/_/g, " "));
-        Product.find((err, products) => {
-            if (production) req.session.cart.forEach(item => {
-                const product = products.filter(p => p.id === item.id)[0];
-                if (product) {
-                    product.stock_qty -= item.qty;
-                    if (product.stock_qty < 0) product.stock_qty = 0;
-                    product.save();
-                }
-            });
-            req.session.cart = [];
-            req.session.paymentIntentID = undefined;
-            if (!production) return res.end();
+        if (production) req.session.cart.forEach(item => {
+            const product = products.filter(p => p.id === item.id)[0];
+            if (product) {
+                product.stock_qty -= item.qty;
+                if (product.stock_qty < 0) product.stock_qty = 0;
+                product.save();
+            }
+        });
+        req.session.cart = [];
+        req.session.paymentIntentID = undefined;
 
-            const transporter = new MailingListMailTransporter({ req, res });
-            transporter.setRecipient(pi.receipt_email).sendMail({
-                subject: "Purchase Nofication: Payment Successful",
-                message: `Hi ${pi.shipping.name},\n\n` +
-                    `Your payment was successful. Below is a summary of your purchase:\n\n${pi.charges.data[0].description}\n\n` +
-                    `If you have not yet received your receipt via email, you can view it here instead:\n${pi.charges.data[0].receipt_url}\n\n` +
-                    "Thank you for shopping with us!\n\n- CS"
+        const { line1, line2, city, postal_code } = pi.shipping.address;
+        const transporter = new MailingListMailTransporter({ req, res });
+        transporter.setRecipient(pi.receipt_email).sendMail({
+            subject: "Purchase Nofication: Payment Successful",
+            message: `Hi ${pi.shipping.name},\n\n` +
+                `Your payment was successful. Below is a summary of your purchase:\n\n${pi.charges.data[0].description}\n\n` +
+                `If you have not yet received your receipt via email, you can view it here instead:\n${pi.charges.data[0].receipt_url}\n\n` +
+                "Thank you for shopping with us!\n\n- CS"
+        }, err => {
+            if (err) console.error(err), res.status(500);
+            transporter.setRecipient({ email: "info@thecs.co" }).sendMail({
+                subject: "Purchase Report: You Got Paid!",
+                message: "You've received a new purchase from a new customer. Summary shown below\n\n" +
+                    `- Name: ${pi.shipping.name}\n- Email: ${pi.receipt_email}\n- Purchased items: ${pi.charges.data[0].description}\n` +
+                    `- Address:\n\t${line1},${line2 ? "\n\t"+line2+"," : ""}\n\t${city},\n\t${postal_code}\n\n` +
+                    `- Date of purchase: ${Date(pi.created * 1000)}\n` +
+                    `- Total amount: £${pi.amount / 100}\n\n` +
+                    `- And finally, a copy of their receipt:\n${pi.charges.data[0].receipt_url}`
             }, err => {
-                const { line1, line2, city, postal_code } = pi.address;
-                transporter.setRecipient({ email: "info@thecs.co" }).sendMail({
-                    subject: "Purchase Report: You Got Paid!",
-                    message: "You've received a new purchase from a new customer. Summary shown below\n\n" +
-                        `- Name: ${pi.shipping.name}\n- Email: ${pi.receipt_email}\n- Purchased items: ${pi.charges.data[0].description}\n` +
-                        `- Address:\n\t${line1},${line2 ? "\n\t"+line2+"," : ""}\n\t${city},\n\t${postal_code}\n\n` +
-                        `- Date of purchase: ${Date(pi.created * 1000)}\n- Total amount: £${pi.amount / 100}-\n\n`
-                        `- And finally, a copy of their receipt:\n${pi.charges.data[0].receipt_url}`
-                }, err2 => {
-                    const error = err || err2;
-                    if (error) return res.status(500).send(error.message || (err || "")+" / "+(err2 || ""));
-                    res.end();
-                });
+                if (err) { console.error(err); if (res.statusCode !== 500) res.status(500) }
+                res.end();
             });
-        })
-    })
+        });
+    } catch(err) { res.status(err.statusCode || 500).send(err.message) }
 });
 
 module.exports = router;
