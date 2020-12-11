@@ -1,6 +1,5 @@
 const router = require('express').Router();
 const { post } = require('request');
-const { each } = require('async');
 const { MailingList } = require('../models/models');
 const { isAuthed } = require('../config/config');
 const MailingListMailTransporter = require('../config/mailingListMailTransporter');
@@ -46,36 +45,21 @@ router.post('/update', isAuthed, (req, res) => {
     })
 });
 
-router.post('/send/mail', isAuthed, (req, res) => {
-    const { email, subject, message } = req.body, sentCount = [];
-    MailingList.find(email === "all" ? {} : { email: email || "null" }, (err, members) => {
-        if (err || !members.length) return res.status(err ? 500 : 404).send(err ? err.message || "Error occurred" : "Member(s) not found");
-        const transporter = new MailingListMailTransporter({ req, res });
+router.post('/send/mail', isAuthed, async (req, res) => {
+    const { email, subject, message } = req.body;
+    const members = await MailingList.find(email === "all" ? {} : { email: email || "null" });
+    if (!members.length) return res.status(404).send("Member(s) not found");
+    const transporter = new MailingListMailTransporter({ req, res });
 
-        each(members, (member, cb) => {
-            transporter.setRecipient(member);
-            transporter.sendMail({ subject, message }, err => {
-                if (err) return cb(err.message || err);
-                sentCount.push(member.email);
-                console.log("The message was sent!");
-                cb();
+    members.forEach((member, i) => {
+        setTimeout(() => {
+            transporter.setRecipient(member).sendMail({ subject, message }, err => {
+                if (err) console.log(err.message || err), console.log(`Not sent for ${member.firstname +" "+ member.lastname}`);
+                else console.log(`Message sent!`);
             });
-        }, error => {
-            if (!error) return res.send(`Message sent to ${email === "all" ? "everyone" : members[0].firstname+" "+members[0].lastname}`);
-            new MailingList({ firstname: "CS", lastname: "Records", email: "info@thecs.co" }).save((err, saved) => {
-                const remainingRecipients = members.filter(m => !sentCount.includes(m.email)).map(m => `${m.firstname} ${m.lastname} (${m.email})`);
-                new MailingListMailTransporter({ req, res }, saved).sendMail({
-                    subject: "Error Notification",
-                    message: "Unable to send the latest email to the following members:\n\n- "+ remainingRecipients.join("\n- ")
-                }, err1 => {
-                    MailingList.deleteOne({ _id: saved.id }, err2 => {
-                        if (err1 || err2) return res.status(500).send(`${(err1 || err2).message || err1 || err2}\n\nUnable to send to:\n- ${remainingRecipients.join("\n- ")}`);
-                        res.status(500).send(error.message + "\n\nCheck your inbox");
-                    })
-                })
-            })
-        })
-    })
+        }, i * 2000);
+    });
+    res.send(`Message sent to ${email === "all" ? "everyone" : members[0].firstname+" "+members[0].lastname}`);
 });
 
 router.post('/member/delete', (req, res) => {
