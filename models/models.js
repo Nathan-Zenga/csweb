@@ -1,7 +1,8 @@
 const { model, Schema } = require('mongoose');
+Schema.Types.String.set('trim', true);
 
-module.exports.Article = model('Article', Schema({
-    headline: String,
+module.exports.Article = model('Article', new Schema({
+    headline: { type: String, unique: true, required: true },
     headline_images: [String],
     headline_image_thumb: String,
     textbody: String,
@@ -28,7 +29,7 @@ module.exports.Artist = model('Artist', Schema({
 module.exports.MailingList = model('MailingList', Schema({
     firstname: { type: String, set: v => v.charAt(0).toUpperCase() + v.slice(1) },
     lastname: { type: String, set: v => v.charAt(0).toUpperCase() + v.slice(1) },
-    email: { type: String, index: true },
+    email: { type: String, index: true, unique: true },
     size_top: String,
     size_bottom: String,
     extra_info: String
@@ -58,7 +59,7 @@ module.exports.Homepage_image = model('Homepage_image', Schema({
 }));
 
 module.exports.Product = model('Product', Schema({
-    name: String,
+    name: { type: String, unique: true, required: true },
     price: { type: Number, set: n => parseFloat(n) * 100 },
     image: String,
     info: String,

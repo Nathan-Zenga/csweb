@@ -3,23 +3,14 @@
         <%_ articles.forEach((article, i) => { _%>
         <article class="content-container col-md-4 col-sm-6">
             <div class="article-content">
-                <%_ var img = article.headline_image_thumb || "/img/cs-logo.png"; _%>
-                <a class="img" href="/news/article/<%= article._id %>" style="background-image: url('<%= img %>')"></a>
-                <div class="text">
-                    <h1><a href="/news/article/<%= article._id %>"><%- article.headline %></a></h1>
-                    <%-
-                        "<p>" +
-                        article.textbody.split(/\r?\n/gi)
-                        .map(x => x.toLowerCase() === "x" ? "<p></p>" : "<p>"+ x +"</p>")
-                        .map(x => x === "<p></p>" ? "<br>" : x)
-                        .join("\n") +
-                        "</p>"
-                    %>
-                </div>
-                <div class="overflow-fade-sheet"><a href="/news/article/<%= article._id %>">READ MORE</a></div>
+                <%_ const img = article.headline_image_thumb || "/img/cs-logo.png";
+                    const link = `/news/article/${ article.headline.replace(/\W+/g, '-').replace(/\W+$/, '') }`.toLowerCase(); _%>
+                <a class="img" href="<%- link %>" style="background-image: url('<%= img %>')"></a>
+                <div class="text"><h1><a href="<%- link %>"><%- article.headline %></a></h1></div>
+                <div class="overflow-fade-sheet"><a href="<%- link %>">READ MORE</a></div>
             </div>
         </article>
-        <%- ((i + 1) % 3 == 0) ? '<div class="breakpoint row dt-view-md"></div>' : '' %>
+        <%- (i + 1) % 3 == 0 ? '<div class="breakpoint row dt-view-md"></div>' : '' %>
         <%_ }) _%>
     </div>
 <%_ include partials/footer _%>
