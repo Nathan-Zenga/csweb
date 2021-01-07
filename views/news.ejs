@@ -4,7 +4,7 @@
         <article class="content-container col-md-4 col-sm-6">
             <div class="article-content">
                 <%_ const img = article.headline_image_thumb || "/img/cs-logo.png";
-                    const link = `/news/article/${ article.headline.replace(/\W+/g, '-').replace(/\W+$/, '') }`.toLowerCase(); _%>
+                    const link = `/news/article/${ article.headline.split("").map(c => /\W/.test(c) && c != "$" ? "-" : c).join("").replace(/\-+/g, "-").replace(/\W+$/, '') }`.toLowerCase(); _%>
                 <a class="img" href="<%- link %>" style="background-image: url('<%= img %>')"></a>
                 <div class="text"><h1><a href="<%- link %>"><%- article.headline %></a></h1></div>
                 <div class="overflow-fade-sheet"><a href="<%- link %>">READ MORE</a></div>
