@@ -79,6 +79,39 @@ nav a {
     vertical-align: middle;
 }
 
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, .85);
+}
+
+.modal-backdrop.in {
+    opacity: 1;
+}
+
+.modal-open .modal {
+    padding: 0!important;
+}
+
+.modal .modal-body {
+    padding: 50px 0;
+}
+
+.modal .modal-icons {
+    position: fixed;
+    right: 15px;
+    top: 10px;
+    font-size: 1.75em;
+    overflow: hidden;
+    z-index: 96;
+}
+
+.modal .modal-icons .close-view {
+    padding: 0 15px;
+    font-weight: 400;
+    background-color: transparent;
+    color: white;
+    font-size: 2em;
+}
+
 .tab-content {
     padding-top: 2em;
     padding-bottom: 2em;
@@ -353,7 +386,7 @@ article:not(.full) .article-content .text {
 
 article:not(.full) .article-content img + .text,
 article:not(.full) .article-content .img + .text {
-    height: 250px;
+    height: 200px;
 }
 
 article .article-content img,
@@ -394,6 +427,11 @@ article.full {
     padding: 30px 0;
     background-color: white;
     z-index: 10;
+}
+
+article.full h1 {
+    text-align: center;
+    padding: 0 20px;
 }
 
 article.full .article-content {
@@ -439,6 +477,26 @@ article.full .textbody-media img {
 
 article.full .textbody-media iframe:not([src*=youtu]) {
     width: 100%;
+}
+
+#news-article-page img {
+    cursor: pointer;
+}
+
+#news-article-page #image-modal .modal-body {
+    height: 100vh;
+    text-align: center;
+    padding: 30px 0;
+}
+
+#news-article-page #image-modal img {
+    position: relative;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+    max-width: 100%;
+    max-height: 100%;
+    cursor: default;
 }
 
 @media (max-width: 600px) {

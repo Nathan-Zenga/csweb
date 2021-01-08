@@ -1,15 +1,18 @@
 <%_ include partials/header _%>
+    <div id="image-modal" class="modal fade in" role="dialog">
+        <div class="modal-icons"><button type="button" class="close-view" data-dismiss="modal">&times;</button></div>
+        <div class="modal-body"></div>
+    </div>
+
     <article class="full content-container">
-        <h1 style="text-align: center;"><%- article.headline %></h1>
+        <h1><%- article.headline %></h1>
         <div class="article-content">
             <%_ if (article.headline_images.length) { _%>
             <div class="headline-images img-reel">
                 <%_ article.headline_images.forEach(image => { _%>
-                <img src="<%= image %>" alt="">
+                <img src="<%= image %>" data-toggle="modal" data-target="#image-modal">
                 <%_ }) _%>
             </div>
-            <%_ }
-            if (article.headline_images.length) { _%>
             <div class="img-reel-nav" style="display: none">
                 <a class="left fas fa-chevron-left"></a>
                 <a class="right fas fa-chevron-right"></a>
@@ -69,5 +72,6 @@
             var overflowing = lastImgOffsetRight > imgReelOffsetRight;
             $(".img-reel-nav")[overflowing ? "slideDown" : "slideUp"]();
         });
+        $("img[data-toggle=modal]").click(function() { $("#image-modal .modal-body").html("<img src='"+ $(this).attr("src") +"'>") })
     </script>
 <%_ include partials/footer _%>

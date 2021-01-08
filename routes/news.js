@@ -10,10 +10,14 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/article/:title', async (req, res, next) => {
-    const article = await Article.findOne({ headline: RegExp(req.params.title.replace(/\-|\$/g, "\\W+"), "i") });
+    try {
+        var article = await Article.findById(req.params.title);
+    } catch(e) {
+        var article = await Article.findOne({ headline: RegExp(req.params.title.replace(/\-|\$/g, "\\W+"), "i") });
+    }
     if (!article) return next();
     const headline = article.headline.length > 25 ? article.headline.slice(0, 25).trim() + "..." : article.headline;
-    res.render('news-article', { title: headline + " | News", pagename: "news", article })
+    res.render('news-article', { title: headline + " | News", pagename: "news-article", article })
 });
 
 router.post('/article/new', isAuthed, async (req, res) => {
