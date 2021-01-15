@@ -13,7 +13,8 @@ router.get('/article/:title', async (req, res, next) => {
     try {
         var article = await Article.findById(req.params.title);
     } catch(e) {
-        var article = await Article.findOne({ headline: RegExp(req.params.title.replace(/\-|\$/g, "\\W+"), "i") });
+        let title = req.params.title.replace(/\-|\$/g, "\\W+");
+        var article = await Article.findOne({ headline: RegExp(`^${title}(\\W+|_+)?$`, "i") });
     }
     if (!article) return next();
     const headline = article.headline.length > 25 ? article.headline.slice(0, 25).trim() + "..." : article.headline;
@@ -22,8 +23,8 @@ router.get('/article/:title', async (req, res, next) => {
 
 router.post('/article/new', isAuthed, async (req, res) => {
     const { headline, textbody } = req.body;
-    const hl = headline.replace(/\W+/g, '-').replace(/\W+$/, '');
-    const existing = await Article.findOne({ headline: RegExp(hl.replace(/\-|\$/g, "\\W+"), "i") });
+    const hl = headline.replace(/\W+/g, '-').replace(/\W+$/, '').replace(/\-|\$/g, "\\W+");
+    const existing = await Article.findOne({ headline: RegExp(`^${hl}(\\W+|_+)?$`, "i") });
     if (existing) return res.status(400).send("This headline already exists for another article.");
     const article = await Article.create({ headline, textbody, index: 1 }).catch(err => ({ err }));
     if (article.err) return res.status(500).send(article.err.message);
@@ -48,8 +49,8 @@ router.post('/article/delete', isAuthed, async (req, res) => {
 
 router.post('/article/edit', isAuthed, async (req, res) => {
     const { article_id, headline, textbody, headline_image_thumb } = req.body;
-    const hl = headline.replace(/\W+/g, '-').replace(/\W+$/, '');
-    const existing = await Article.findOne({ headline: RegExp(hl.replace(/\-|\$/g, "\\W+"), "i") });
+    const hl = headline.replace(/\W+/g, '-').replace(/\W+$/, '').replace(/\-|\$/g, "\\W+");
+    const existing = await Article.findOne({ headline: RegExp(`^${hl}(\\W+|_+)?$`, "i") });
     const article = await Article.findById(article_id).catch(err => ({ err }));
     const { err } = article || {};
     if (err || !article) return res.status(err ? 500 : 404).send(err ? err.message : "Article not found");
