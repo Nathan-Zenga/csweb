@@ -1,17 +1,20 @@
 const router = require('express').Router();
-const stripe = new (require('stripe').Stripe)(process.env.STRIPE_SK);
+const { STRIPE_SK, STRIPE_PK, NODE_ENV, EXCHANGERATE_API_KEY } = process.env;
+const stripe = new (require('stripe').Stripe)(STRIPE_SK);
 const cloud = require('cloudinary');
-const exchangeRates = require('exchange-rates-api').exchangeRates().latest().base("GBP");
+const { default: axios } = require('axios');
 const { each } = require('async');
 const { isAuthed } = require('../config/config');
 const { Product } = require('../models/models');
 const MailingListMailTransporter = require('../config/mailingListMailTransporter');
 const curr_symbols = require('../config/currSymbols');
-const production = process.env.NODE_ENV === "production";
+const production = NODE_ENV === "production";
+const axiosRequestUri = `https://v6.exchangerate-api.com/v6/${EXCHANGERATE_API_KEY}/latest/GBP`;
 
 router.get("/", async (req, res) => {
-    if (!req.session.rates) req.session.rates = await exchangeRates.fetch();
-    Product.find((err, products) => { res.render('shop', { title: "Shop", pagename: "shop", products, curr_symbols, rates: req.session.rates }) })
+    const products = await Product.find();
+    const rates = req.session.rates = req.session.rates || (await axios.get(axiosRequestUri)).data.conversion_rates;
+    res.render('shop', { title: "Shop", pagename: "shop", products, curr_symbols, rates })
 });
 
 router.get("/checkout", (req, res) => {
@@ -24,13 +27,12 @@ router.get("/cart", (req, res) => {
 });
 
 router.post("/fx", (req, res) => {
-    exchangeRates.symbols(req.body.currency).fetch().then(rate => {
-        const symbol = curr_symbols[req.body.currency];
-        req.session.fx_rate = rate;
-        req.session.currency = req.body.currency.toLowerCase();
-        req.session.currency_symbol = symbol;
-        res.send({ rate, symbol });
-    }).catch(err => res.status(500).send(err.message));
+    const rate = req.session.rates[req.body.currency];
+    const symbol = curr_symbols[req.body.currency];
+    req.session.fx_rate = rate;
+    req.session.currency = req.body.currency.toLowerCase();
+    req.session.currency_symbol = symbol;
+    res.send({ rate, symbol });
 });
 
 router.post("/stock/add", isAuthed, (req, res) => {
@@ -151,7 +153,7 @@ router.post("/checkout/payment-intent/create", (req, res) => {
         }
     }).then(pi => {
         req.session.paymentIntentID = pi.id;
-        res.send({ clientSecret: pi.client_secret, pk: process.env.STRIPE_PK });
+        res.send({ clientSecret: pi.client_secret, pk: STRIPE_PK });
     }).catch(err => res.status(err.statusCode).send(err.message));
 });
 
