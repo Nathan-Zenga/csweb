@@ -3,11 +3,10 @@
         <div class="row" style="text-align: right; font-weight: bold">
             <select id="fx-select" name="currency" style="color: black; width: 150px">
                 <%_ const currency_default = currency.toUpperCase(); _%>
-                <option value="<%= currency_default %>"><%- `${currency_default} (${currency_symbol})` %></option>
-                <%_ Object.keys(rates).sort().forEach(c => {
-                    if (c !== currency_default) { _%>
-                <option value="<%= c %>"><%= `${c} (${curr_symbols[c]})` %></option>
-                <%_ }}) _%>
+                <option value="<%= currency_default %>"><%- `${currency_default} (${currency_symbol || ""})` %></option>
+                <%_ Object.keys(rates).sort().forEach(c => { _%>
+                <option value="<%= c %>"><%= `${c} (${curr_symbols[c] || ""})` %></option>
+                <%_ }) _%>
             </select>
             <i class="fas fa-chevron-down" id="dropdown-toggle"></i>
         </div>
@@ -22,7 +21,7 @@
                 <div class="text">
                     <p class="name" style="font-size: 1.5em;"><%= item.name %></p>
                     <p class="price" style="font-size: 2em; text-align: right" data-gbp-price="<%= (item.price / 100).toFixed(2) %>">
-                        <span><%- currency_symbol %></span>
+                        <span><%- currency_symbol || currency %></span>
                         <span><%= converted_price(item.price).toFixed(2) %></span>
                     </p>
                     <p><%= item.info.replace(/\r?\n/g, "<br>") %></p>
@@ -58,11 +57,15 @@
         Object.freeze(prices);
         $("#fx-select").change(function() {
             $.post("/shop/fx", { currency: this.value }, function(res) {
-                $(".product-thumb .price").each(function(i, e) {
-                    $(e).find("span").eq(0).text(res.symbol);
-                    $(e).find("span").eq(1).text((prices[i] * res.rate).toFixed(2));
+                $(".product-thumb .price").fadeTo(0, .5);
+                $("html, body").animate({ scrollTop: $(".product-thumb").length ? $(".product-thumb").eq(0).offset().top : undefined }, function() {
+                    setTimeout(function() {
+                        $(".product-thumb .price").fadeTo(500, 1).each(function(i, e) {
+                            $(e).find("span").eq(0).text(res.symbol || res.currency.toUpperCase());
+                            $(e).find("span").eq(1).text((prices[i] * res.rate).toFixed(2));
+                        });
+                    }, 200);
                 });
-                alert("Currency changed successfully!\nScroll down to see the converted item prices.");
             }).fail(function(err) {
                 alert(err.responseText);
             })

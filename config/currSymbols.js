@@ -32,7 +32,6 @@ module.exports = {
     COP: "$",
     CRC: "₡",
     CUP: "$",
-    CVE: "​",
     CZK: "Kč",
     DJF: "Fdj",
     DKK: "kr.",

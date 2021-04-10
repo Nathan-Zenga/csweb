@@ -29,10 +29,10 @@ router.get("/cart", (req, res) => {
 router.post("/fx", (req, res) => {
     const rate = req.session.rates[req.body.currency];
     const symbol = curr_symbols[req.body.currency];
+    const currency = req.session.currency = req.body.currency.toLowerCase();
     req.session.fx_rate = rate;
-    req.session.currency = req.body.currency.toLowerCase();
     req.session.currency_symbol = symbol;
-    res.send({ rate, symbol });
+    res.send({ rate, symbol, currency });
 });
 
 router.post("/stock/add", isAuthed, (req, res) => {
