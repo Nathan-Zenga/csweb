@@ -1,6 +1,7 @@
 const { Article, Project, Artist, Location, MailingList, Homepage_content, Homepage_image, Product } = require('../models/models');
 const cloud = require('cloudinary');
 const mongoose = require('mongoose');
+const { default: axios } = require('axios');
 const { each, forEachOf } = require('async');
 
 /**
@@ -36,10 +37,10 @@ module.exports.indexReorder = (collection, args, cb) => {
     if (sort) sort = Object.assign({index: 1}, sort);
     collection.find().sort(sort || {index: 1}).exec((err, docs) => {
         if (err) return cb ? cb(err.message) : err;
-        var index = docs.findIndex(e => e._id == id);
-        var beforeSelectedDoc = docs.slice(0, index);
-        var afterSelectedDoc = docs.slice(index+1, docs.length);
-        var docs_mutable = [...beforeSelectedDoc, ...afterSelectedDoc];
+        const index = docs.findIndex(e => e._id == id);
+        const beforeSelectedDoc = docs.slice(0, index);
+        const afterSelectedDoc = docs.slice(index+1, docs.length);
+        const docs_mutable = [...beforeSelectedDoc, ...afterSelectedDoc];
         docs_mutable.splice(parseInt(newIndex)-1, 0, docs[index]);
         docs_mutable.forEach((doc, i) => { doc.index = i+1; doc.save() });
         if (cb) cb();
@@ -60,26 +61,34 @@ module.exports.saveMedia = (body, doc, cb) => {
         body[field] = !Array.isArray(body[field]) ? [body[field]] : body[field];
         doc[field] = Object.assign([], body[field]);
         forEachOf(body[field], (mediaStr, i, callback2) => {
-            var isIframe = /<iframe(.*?)><\/iframe>/i.test(mediaStr);
-            var ytUrl = /youtu.?be/.test(mediaStr) && !isIframe;
+            const isIframe = /<iframe(.*?)><\/iframe>/i.test(mediaStr);
+            const ytUrl = /youtu.?be/.test(mediaStr) && !isIframe;
             if (isIframe) {
                 doc[field].splice(i, 1, mediaStr.match(/<iframe(.*?)><\/iframe>/gi)[0].replace(/(width|height|style)\=\"?\'?(.*?)\"?\'? /gi, "") );
                 console.log("Stored iframe...");
                 callback2();
             } else if (ytUrl) {
-                var toReplace = /^.*(youtu.?be\/|v\/|u\/\w\/|watch\?v=|\&v=|\?v=)/i;
-                var iframe = '<iframe src="' + mediaStr.replace(toReplace, "https://youtube.com/embed/") + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
-                doc[field].splice(i, 1, iframe );
+                const toReplace = /^.*(youtu.?be\/|v\/|u\/\w\/|watch\?v=|\&v=|\?v=)/i;
+                const iframe = '<iframe src="' + mediaStr.replace(toReplace, "https://youtube.com/embed/") + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+                doc[field].splice(i, 1, iframe);
                 console.log("Youtube link stored as iframe...");
                 callback2();
             } else {
-                var public_id = ("article/"+ doc.id +"/"+ field + ( parseInt(i)+1 )).replace(/[ ?&#\\%<>]/g, "_");
-                cloud.v2.uploader.upload(mediaStr, { public_id, resource_type: "auto" }, (err, result) => {
-                    if (err) return callback2(err.message || "Error occurred whilst uploading image");
-                    if (body.headline_image_thumb === mediaStr) doc.headline_image_thumb = result.secure_url;
-                    doc[field].splice(i, 1, result.secure_url);
-                    console.log("Uploaded image / video to cloud...");
-                    callback2();
+                axios.get(mediaStr).catch(err => callback2(err)).then(response => {
+                    if (/^(\w+)\/html/.test(response.headers["content-type"] || "")) {
+                        doc[field].splice(i, 1, '<iframe src="' + mediaStr + '" frameborder="0" allowfullscreen></iframe>');
+                        console.log("Web link stored as iframe...");
+                        callback2();
+                    } else {
+                        const public_id = ("article/"+ doc.id +"/"+ field + ( parseInt(i)+1 )).replace(/[ ?&#\\%<>]/g, "_");
+                        cloud.v2.uploader.upload(mediaStr, { public_id, resource_type: "auto" }, (err, result) => {
+                            if (err) return callback2(err.message || "Error occurred whilst uploading image");
+                            if (body.headline_image_thumb === mediaStr) doc.headline_image_thumb = result.secure_url;
+                            doc[field].splice(i, 1, result.secure_url);
+                            console.log("Uploaded image / video to cloud...");
+                            callback2();
+                        });
+                    }
                 });
             }
         }, err => {

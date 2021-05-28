@@ -54,7 +54,7 @@ router.post('/article/edit', isAuthed, async (req, res) => {
     const article = await Article.findById(article_id).catch(err => ({ err }));
     const { err } = article || {};
     if (err || !article) return res.status(err ? 500 : 404).send(err ? err.message : "Article not found");
-    if (existing) return res.status(400).send("This headline already exists for another article.");
+    if (existing && existing.id !== article_id) return res.status(400).send("This headline already exists for another article.");
     if (headline) article.headline = headline;
     if (textbody) article.textbody = textbody;
     if (headline_image_thumb) article.headline_image_thumb = headline_image_thumb;
