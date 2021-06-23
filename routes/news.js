@@ -31,7 +31,7 @@ router.post('/article/new', isAuthed, async (req, res) => {
     const articles = await Article.find({ _id: { $ne: article._id } }).sort({ index: 1, created_at: -1 }).exec();
     articles.forEach(a => { a.index += 1; a.save() });
     saveMedia(req.body, article, (err, msg) => {
-        if (err) return res.status(500).send(err.message);
+        if (err) return res.status(err.http_code || 500).send(err.message);
         res.send(`Done${msg ? ". "+msg : ""}`);
     });
 });
@@ -69,7 +69,7 @@ router.post('/article/edit', isAuthed, async (req, res) => {
     }, err => {
         if (err) return res.status(500).send(err.message);
         saveMedia(req.body, saved, err => {
-            if (err) return res.status(500).send(err.message || "Error occurred whilst saving article media");
+            if (err) return res.status(err.http_code || 500).send(err.message);
             res.send("Article updated successfully");
         });
     });

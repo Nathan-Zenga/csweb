@@ -73,5 +73,11 @@
             $(".img-reel-nav")[overflowing ? "slideDown" : "slideUp"]();
         });
         $("img[data-toggle=modal]").click(function() { $("#image-modal .modal-body").html("<img src='"+ $(this).attr("src") +"'>") })
+
+        $("iframe").each(function(i, iframe) {
+            var src = iframe.src;
+            var observer = new MutationObserver(function() { if (iframe.src != src) iframe.src = src });
+            observer.observe(iframe, { attributes: true, childList: true, subtree: true });
+        });
     </script>
 <%_ include partials/footer _%>

@@ -54,7 +54,6 @@ module.exports.indexReorder = (collection, args, cb) => {
  * @param {function} [cb] optional callback
  */
 module.exports.saveMedia = (body, doc, cb) => {
-    var msg = "";
     var fields = ["headline_images", "textbody_media"].filter(f => body[f]);
     if (!fields.length) return cb ? cb(null, "Skipping media saving...") : false;
     each(fields, (field, callback1) => {
@@ -82,7 +81,7 @@ module.exports.saveMedia = (body, doc, cb) => {
                     } else {
                         const public_id = ("article/"+ doc.id +"/"+ field + ( parseInt(i)+1 )).replace(/[ ?&#\\%<>]/g, "_");
                         cloud.v2.uploader.upload(mediaStr, { public_id, resource_type: "auto" }, (err, result) => {
-                            if (err) return callback2(err.message || "Error occurred whilst uploading image");
+                            if (err) return callback2(err);
                             if (body.headline_image_thumb === mediaStr) doc.headline_image_thumb = result.secure_url;
                             doc[field].splice(i, 1, result.secure_url);
                             console.log("Uploaded image / video to cloud...");
@@ -92,12 +91,12 @@ module.exports.saveMedia = (body, doc, cb) => {
                 });
             }
         }, err => {
-            if (err) return callback1(err.message);
+            if (err) return callback1(err);
             console.log(`All media from ${field} field saved...`);
             callback1();
         });
     }, err => {
-        msg = "Images / videos saved";
+        const msg = "Images / videos saved";
         console.log(`Media saving process done.${!cb ? "" : " Calling callback now..."}`);
         doc.save();
         cb ? cb(err, msg) : console.log(err || msg)
