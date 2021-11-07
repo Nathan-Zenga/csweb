@@ -14,7 +14,7 @@
                     <%_ if (project.all_platforms && !project.links.length) { _%>
                         ON ALL PLATFORMS
                     <%_ } else if (project.links.length) { project.links.forEach(link => { _%>
-                        <a class="link" target="_blank" href="<%= link.url %>"><img style="height: 1.5em; vertical-align: top" src="https://cdn.jsdelivr.net/npm/simple-icons@v2/icons/<%- link.name %>.svg"></a>
+                        <a class="link" target="_blank" href="<%= link.url %>"><img style="height: 1.5em; vertical-align: top" src="https://cdn.jsdelivr.net/npm/simple-icons@5.21.1/icons/<%- link.name %>.svg"></a>
                     <%_ })} _%>
                     </p>
                 </div>
