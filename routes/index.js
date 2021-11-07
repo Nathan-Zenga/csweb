@@ -4,52 +4,45 @@ const { each } = require('async');
 const { isAuthed, indexReorder } = require('../config/config');
 const { Homepage_content, Homepage_image } = require('../models/models');
 
-router.get('/', (req, res) => {
-    Homepage_content.findOne((err, content) => {
-        Homepage_image.find().sort({index: 1}).exec((err, images) => {
-            res.render('index', { title: null, pagename: "home", content, images })
-        })
-    })
+router.get('/', async (req, res) => {
+    const content = await Homepage_content.findOne();
+    const images = await Homepage_image.find().sort({index: 1}).exec();
+    res.render('index', { title: null, pagename: "home", content, images })
 });
 
 router.get('/events', (req, res, next) => { res.status(404); next() });
 
-router.post('/homepage/content', isAuthed, (req, res) => {
+router.post('/homepage/content', isAuthed, async (req, res) => {
     const { banner_text, footnote_text, socials_name, socials_url } = req.body;
-    Homepage_content.find((err, contents) => {
-        const content = !contents.length ? new Homepage_content() : contents[0];
-        if (banner_text)   content.banner_text = banner_text;
-        if (footnote_text) content.footnote_text = footnote_text;
-        if (socials_name && socials_url) {
-            const names = (socials_name instanceof Array ? socials_name : [socials_name]).filter(e => e);
-            const urls = (socials_url instanceof Array ? socials_url : [socials_url]).filter(e => e);
-            if (names.length !== urls.length) return res.status(400).send("Number of specified social names + urls don't match");
-            const socials = names.map((name, i) => { return { name, url: urls[i] } });
-            if (content.socials instanceof Array) {
-                content.socials = content.socials.filter(s => socials_name !== s.name).concat(socials);
-            } else {
-                content.socials = socials;
-            }
+    const contents = await Homepage_content.find();
+    const content = !contents.length ? new Homepage_content() : contents[0];
+    if (banner_text)   content.banner_text = banner_text;
+    if (footnote_text) content.footnote_text = footnote_text;
+    if (socials_name && socials_url) {
+        const names = (socials_name instanceof Array ? socials_name : [socials_name]).filter(e => e);
+        const urls = (socials_url instanceof Array ? socials_url : [socials_url]).filter(e => e);
+        if (names.length !== urls.length) return res.status(400).send("Number of specified social names + urls don't match");
+        const socials = names.map((name, i) => { return { name, url: urls[i] } });
+        if (content.socials instanceof Array) {
+            content.socials = content.socials.filter(s => socials_name !== s.name).concat(socials);
+        } else {
+            content.socials = socials;
         }
-        content.save(err => res.send("Homepage content " + (!contents.length ? "saved" : "updated")));
-    })
+    }
+    content.save(err => res.send("Homepage content " + (!contents.length ? "saved" : "updated")));
 });
 
-router.post('/homepage/image/save', isAuthed, (req, res) => {
+router.post('/homepage/image/save', isAuthed, async (req, res) => {
     const { filename, image, index } = req.body;
     const public_id = `homepage/images/${filename.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
-    cloud.v2.uploader.upload(image, { public_id }, (err, result) => {
-        if (err) return res.status(500).send(err.message);
-        Homepage_image.find((err, images) => {
-            const length = images.length;
-            const newImage = new Homepage_image({ url: result.secure_url, p_id: result.public_id, index });
-            newImage.save((err, saved) => {
-                if (err) return res.status(500).send(err.message);
-                if (saved.index === length + 1) return res.send("Image saved");
-                indexReorder(Homepage_image, { id: saved._id, newIndex: saved.index }, () => res.send("Image saved"));
-            });
-        })
-    })
+    try {
+        const result = await cloud.v2.uploader.upload(image, { public_id });
+        const { length } = await Homepage_image.find();
+        const newImage = new Homepage_image({ url: result.secure_url, p_id: result.public_id, index });
+        const saved = await newImage.save();
+        if (saved.index === length + 1) return res.send("Image saved");
+        indexReorder(Homepage_image, { id: saved._id, newIndex: saved.index }, () => res.send("Image saved"));
+    } catch (err) { res.status(500).send(err.message) }
 });
 
 router.post('/homepage/image/delete', isAuthed, (req, res) => {
@@ -70,13 +63,13 @@ router.post('/homepage/image/reorder', isAuthed, (req, res) => {
     indexReorder(Homepage_image, { id, newIndex: index }, () => res.send("Re-ordering process done"));
 });
 
-router.post('/cs/links/delete', isAuthed, (req, res) => {
+router.post('/cs/links/delete', isAuthed, async (req, res) => {
     const names = Object.values(req.body);
-    Homepage_content.findOne((err, content) => {
-        if (!(content && names.length)) return res.status(400).send("Nothing selected");
-        content.socials = content.socials.filter(x => !names.includes(x.name));
-        content.save(err => res.send(err ? err.message : "Link"+ (names.length > 1 ? "s" : "") +" removed successfully"));
-    })
+    const content = await Homepage_content.findOne();
+    if (!content || !names.length) return res.status(400).send("Nothing selected");
+    content.socials = content.socials.filter(x => !names.includes(x.name));
+    content.save().then(() => res.send("Link"+ (names.length > 1 ? "s" : "") +" removed successfully"))
+    .catch(err => res.status(500).send(err.message));
 });
 
 module.exports = router;

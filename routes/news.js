@@ -10,12 +10,9 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/article/:title', async (req, res, next) => {
-    try {
-        var article = await Article.findById(req.params.title);
-    } catch(e) {
-        let title = req.params.title.replace(/\-|\$/g, "\\W+");
-        var article = await Article.findOne({ headline: RegExp(`^${title}(\\W+|_+)?$`, "i") });
-    }
+    const title = req.params.title.replace(/\-|\$/g, "\\W+");
+    var article = await Article.findById(req.params.title).catch(err => null);
+    article = article || await Article.findOne({ headline: RegExp(`^${title}(\\W+|_+)?$`, "i") });
     if (!article) return next();
     const headline = article.headline.length > 25 ? article.headline.slice(0, 25).trim() + "..." : article.headline;
     res.render('news-article', { title: headline + " | News", pagename: "news-article", article })
@@ -38,13 +35,15 @@ router.post('/article/new', isAuthed, async (req, res) => {
 
 router.post('/article/delete', isAuthed, async (req, res) => {
     const ids = Object.values(req.body);
-    if (!ids.length) return res.send("Nothing selected");
-    const { err, deletedCount } = await Article.deleteMany({_id : { $in: ids }}).catch(err => ({ err }));
-    if (err || !deletedCount) return res.status(err ? 500 : 404).send(err ? err.message || "Error occurred" : "Article(s) not found");
-    ids.forEach(id => { cloud.v2.api.delete_resources_by_prefix("article/" + id, (err, result) => { console.log(err || result) }) });
-    const articles = await Article.find().sort({index: 1}).exec();
-    articles.forEach((a, i) => { a.index = i+1; a.save() });
-    res.send("Article"+ (ids.length > 1 ? "s" : "") +" deleted successfully")
+    if (!ids.length) return res.status(400).send("Nothing selected");
+    try {
+        const { deletedCount } = await Article.deleteMany({_id : { $in: ids }});
+        if (!deletedCount) return res.status(404).send("Article(s) not found");
+        await Promise.all(ids.map(id => cloud.v2.api.delete_resources_by_prefix(`article/${id}`)));
+        const articles = await Article.find().sort({index: 1}).exec();
+        await Promise.all(articles.map((a, i) => { a.index = i+1; return a.save() }));
+        res.send(`Article${ids.length > 1 ? "s" : ""} deleted successfully`)
+    } catch (err) { res.status(err.http_code || 500).send(err.message) }
 });
 
 router.post('/article/edit', isAuthed, async (req, res) => {

@@ -7,7 +7,6 @@ const { each, forEachOf } = require('async');
 /**
  * Getting all documents from all collections
  * @param {function} cb callback with passed document collections as arguments
- * @callback cb
  */
 module.exports.Collections = async cb => {
     const docs = {};
@@ -28,23 +27,22 @@ module.exports.Collections = async cb => {
  * @param {Object} args
  * @param {string} args.id identifier to specify document to re-order
  * @param {number} args.newIndex the new order number (position) to which the selected document is assigned (by index field)
- * @param {{}} [args.sort] sort query
+ * @param {object} [args.sort] sort query
  * @param {function} [cb] callback
- * @callback cb
  */
 module.exports.indexReorder = (collection, args, cb) => {
-    var { id, newIndex, sort } = args;
-    if (sort) sort = Object.assign({index: 1}, sort);
-    collection.find().sort(sort || {index: 1}).exec((err, docs) => {
-        if (err) return cb ? cb(err.message) : err;
+    try {
+        const { id, newIndex, sort } = args;
+        if (sort) sort = Object.assign({index: 1}, sort);
+        const docs = await collection.find().sort(sort || {index: 1}).exec();
         const index = docs.findIndex(e => e._id == id);
         const beforeSelectedDoc = docs.slice(0, index);
         const afterSelectedDoc = docs.slice(index+1, docs.length);
         const docs_mutable = [...beforeSelectedDoc, ...afterSelectedDoc];
         docs_mutable.splice(parseInt(newIndex)-1, 0, docs[index]);
-        docs_mutable.forEach((doc, i) => { doc.index = i+1; doc.save() });
+        await Promise.all(docs_mutable.map((doc, i) => { doc.index = i+1; return doc.save() }));
         if (cb) cb();
-    })
+    } catch(err) { if (cb) return cb(err); throw err }
 };
 
 /**

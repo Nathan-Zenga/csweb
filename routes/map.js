@@ -7,68 +7,57 @@ const geocoder = require('node-geocoder')({
     apiKey: 'AIzaSyCRIzIyhXXI1JxBGUqmUsX5N4MnxYHHGCo'
 });
 
-router.get('/', (req, res) => {
-    res.render('map', { title: "Map", pagename: "map" });
+router.get('/', (req, res) => res.render('map', { title: "Map", pagename: "map" }));
+
+router.post('/init', async (req, res) => {
+    const locations = await Location.find();
+    const defaultPts = { lat: 51.5073219, lng: -0.1276474 };
+    if (!locations.length) return res.send({ locations: [defaultPts], mid_point: defaultPts});
+    const lat = locations.map(x => x.latitude).reduce((sum, n) => sum + n) / locations.length;
+    const lng = locations.map(x => x.longitude).reduce((sum, n) => sum + n) / locations.length;
+    const mid_point = { lat, lng };
+    res.send({ locations, mid_point });
 });
 
-router.post('/init', (req, res) => {
-    Location.find((err, locations) => {
-        if (locations.length) {
-            const lat = locations.map(x => x.latitude).reduce((sum, n) => sum + n) / locations.length;
-            const lng = locations.map(x => x.longitude).reduce((sum, n) => sum + n) / locations.length;
-            const mid_point = { lat, lng };
-            res.send({ locations, mid_point });
-        } else {
-            const defaultPts = { lat: 51.5073219, lng: -0.1276474 };
-            res.send({ locations: [defaultPts], mid_point: defaultPts});
-        }
-    });
-});
-
-router.post('/location/new', isAuthed, (req, res) => {
+router.post('/location/new', isAuthed, async (req, res) => {
     const { name, street_address, city, country, postcode } = req.body;
     const newLocation = new Location({ name, street_address, city, country, postcode });
     const address = `${street_address}, ${city}, ${country}` + (postcode ? ", "+postcode : "");
-    newLocation.save((err, saved) => {
-        if (err) return res.status(500).send(err.message);
-        geocoder.geocode(address, (err, result) => {
-            if (err) return res.status(500).send(err.message);
-            saved.latitude = result[0].latitude;
-            saved.longitude = result[0].longitude;
-            saved.save(() => res.send("Location saved"));
-        })
-    })
+    try {
+        const result = await geocoder.geocode(address);
+        newLocation.latitude = result[0].latitude;
+        newLocation.longitude = result[0].longitude;
+        await newLocation.save(); res.send("Location saved");
+    } catch (err) { res.status(500).send(err.message) }
 });
 
-router.post('/location/edit', isAuthed, (req, res) => {
+router.post('/location/edit', isAuthed, async (req, res) => {
     const { location_id, name_edit, street_address_edit, city_edit, country_edit, postcode_edit } = req.body;
     const address = `${street_address_edit}, ${city_edit}, ${country_edit}` + (postcode_edit ? ", "+postcode_edit : "");
-    Location.findById(location_id, (err, doc) => {
-        if (err || !doc) return res.status(err ? 500 : 404).send(err ? err.message || "Error occurred" : "Location not found");
+    try {
+        const doc = await Location.findById(location_id);
+        if (!doc) return res.status(404).send("Location not found");
         if (name_edit)           doc.name = name_edit;
         if (street_address_edit) doc.street_address = street_address_edit;
         if (city_edit)           doc.city = city_edit;
         if (country_edit)        doc.country = country_edit;
         if (postcode_edit)       doc.postcode = postcode_edit;
-        doc.save((err, saved) => {
-            if (err) return res.status(500).send(err.message);
-            geocoder.geocode(address, (err, result) => {
-                if (err) return res.status(500).send(err.message);
-                saved.latitude = result[0].latitude;
-                saved.longitude = result[0].longitude;
-                saved.save(() => res.send("Location updated"));
-            })
-        })
-    })
+        const saved = await doc.save();
+        const result = await geocoder.geocode(address);
+        saved.latitude = result[0].latitude;
+        saved.longitude = result[0].longitude;
+        await saved.save(); res.send("Location updated");
+    } catch (err) { res.status(500).send(err.message) }
 });
 
-router.post('/location/delete', isAuthed, (req, res) => {
+router.post('/location/delete', isAuthed, async (req, res) => {
     const ids = Object.values(req.body);
-    if (!ids.length) return res.send("Nothing selected");
-    Location.deleteMany({_id : { $in: ids }}, (err, result) => {
-        if (err || !result.deletedCount) return res.status(err ? 500 : 404).send(err ? err.message || "Error occurred" : "Location(s) not found");
+    if (!ids.length) return res.status(400).send("Nothing selected");
+    try {
+        const result = await Location.deleteMany({_id : { $in: ids }});
+        if (!result.deletedCount) return res.status(404).send("Location(s) not found");
         res.send("Location"+ (ids.length > 1 ? "s" : "") + " removed successfully")
-    })
+    } catch (err) { res.status(500).send(err.message) }
 });
 
 module.exports = router;

@@ -8,41 +8,38 @@ router.get('/sign-up', (req, res) => {
     res.render('mailing-list', { title: "Sign Up", pagename: "sign-up" })
 });
 
-router.get('/member/delete', (req, res) => {
+router.get('/member/delete', async (req, res) => {
     const { id, src } = req.query;
-    MailingList.findById(id, (err, doc) => {
-        if (!src.match(/^email_unsub_link[A-Za-z0-9]{24}$/g) || src.slice(-24) !== id || err || !doc) return res.status(400).send("Invalid entry");
-        post({ url: res.locals.location_origin + req.originalUrl, json: { id } }, (err, response) => {
-            if (err) return res.status(500).send(err.message || "Error occurred");
-            var result = response.body === "Nothing selected" ? "You don't exist on our records." : "You are now unsubscribed. Sorry to see you go!";
-            res.send(result + "<br><br> - CS");
-        })
+    const doc = await MailingList.findById(id);
+    if (!src.match(/^email_unsub_link[A-Za-z0-9]{24}$/g) || src.slice(-24) !== id || err || !doc) return res.status(400).send("Invalid entry");
+    post({ url: res.locals.location_origin + req.originalUrl, json: { id } }, (err, response) => {
+        if (err) return res.status(500).send(err.message || "Error occurred");
+        const result = response.body === "Nothing selected" ? "You don't exist on our records." : "You are now unsubscribed. Sorry to see you go!";
+        res.send(`${result}<br><br> - CS`);
     })
 });
 
-router.post('/new', (req, res) => {
+router.post('/new', async (req, res) => {
     for (const k in req.body) if (typeof req.body[k] == "string") req.body[k] = req.body[k].replace(/<script(.*?)>(<\/script>)?/gi, "");
     const { firstname, lastname, email, size_top, size_bottom, extra_info } = req.body;
     const newMember = new MailingList({ firstname, lastname, email, size_top, size_bottom, extra_info });
 
-    MailingList.findOne({ email }, (err, member) => {
-        if (err || member) return res.status(err ? 500 : 200).send(err || "Already registered");
-        newMember.save(err => res.send(err ? err.message : "You are now registered"))
-    })
+    const member = await MailingList.findOne({ email });
+    if (member) return res.status(400).send("Already registered");
+    newMember.save().then(() => res.send("You are now registered")).catch(err => res.status(500).send(err.message))
 });
 
-router.post('/update', isAuthed, (req, res) => {
+router.post('/update', isAuthed, async (req, res) => {
     const { member_id, firstname, lastname, email, size_top, size_bottom, extra_info } = req.body;
-    MailingList.findById(member_id, (err, member) => {
-        if (err || !member) return res.status(err ? 500 : 404).send(err ? err.message || "Error occurred" : "Member not found");
-        if (firstname)   member.firstname = firstname;
-        if (lastname)    member.lastname = lastname;
-        if (email)       member.email = email;
-        if (size_top)    member.size_top = size_top;
-        if (size_bottom) member.size_bottom = size_bottom;
-        if (extra_info)  member.extra_info = extra_info;
-        member.save(err => res.send(err ? err.message : "Member updated"));
-    })
+    const member = await MailingList.findById(member_id).catch(err => null);
+    if (!member) return res.status(404).send("Member not found");
+    if (firstname)   member.firstname = firstname;
+    if (lastname)    member.lastname = lastname;
+    if (email)       member.email = email;
+    if (size_top)    member.size_top = size_top;
+    if (size_bottom) member.size_bottom = size_bottom;
+    if (extra_info)  member.extra_info = extra_info;
+    member.save().then(() => res.send("Member updated")).catch(err => res.status(500).send(err.message));
 });
 
 router.post('/send/mail', isAuthed, async (req, res) => {
@@ -62,14 +59,12 @@ router.post('/send/mail', isAuthed, async (req, res) => {
     res.send(`Message sent to ${email === "all" ? "everyone" : members[0].firstname+" "+members[0].lastname}`);
 });
 
-router.post('/member/delete', (req, res) => {
+router.post('/member/delete', async (req, res) => {
     const ids = Object.values(req.body);
-    if (ids.length) {
-        MailingList.deleteMany({_id : { $in: ids }}, (err, result) => {
-            if (err || !result.deletedCount) return res.status(err ? 500 : 404).send(err || "Member(s) not found");
-            res.send("Member"+ (ids.length > 1 ? "s" : "") +" removed successfully")
-        })
-    } else { res.send("Nothing selected") }
+    if (!ids.length) return res.status(400).send("Nothing selected");
+    const result = await MailingList.deleteMany({ _id : { $in: ids } }).catch(err => null);
+    if (!result.deletedCount) return res.status(404).send("Member(s) not found");
+    res.send(`Member${ids.length > 1 ? "s" : ""} removed successfully`)
 });
 
 module.exports = router;

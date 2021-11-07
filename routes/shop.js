@@ -35,26 +35,25 @@ router.post("/fx", (req, res) => {
     res.send({ rate, symbol, currency });
 });
 
-router.post("/stock/add", isAuthed, (req, res) => {
+router.post("/stock/add", isAuthed, async (req, res) => {
     const { name, price, stock_qty, info, image_file, image_url } = req.body;
-    new Product({ name, price, stock_qty, info }).save((err, saved) => {
-        if (err) return res.status(400).send(err.message);
+    try {
+        const product = await Product.create({ name, price, stock_qty, info });
         if (!image_url && !image_file) return res.send("Product saved in stock");
-        const public_id = ("shop/stock/" + saved.name.replace(/ /g, "-")).replace(/[ ?&#\\%<>]/g, "_");
-        cloud.v2.uploader.upload(image_url || image_file, { public_id }, (err, result) => {
-            if (err) return res.status(500).send(err.message);
-            saved.image = result.secure_url;
-            saved.save(() => { res.send("Product saved in stock") });
-        });
-    });
+        const public_id = `shop/stock/${product.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
+        const result = await cloud.v2.uploader.upload(image_url || image_file, { public_id });
+        product.image = result.secure_url;
+        await product.save(); res.send("Product saved in stock");
+    } catch (err) { res.status(err.http_code || 500).send(err.message) }
 });
 
-router.post('/stock/edit', isAuthed, (req, res) => {
+router.post('/stock/edit', isAuthed, async (req, res) => {
     const { product_id, name, price, stock_qty, info, image_file, image_url } = req.body;
-    Product.findById(product_id, (err, product) => {
-        if (err || !product) return res.status(err ? 500 : 404).send(err ? err.message || "Error occurred" : "Product not found");
+    try {
+        const product = await Product.findById(product_id);
+        if (!product) return res.status(404).send("Product not found");
 
-        const prefix = ("shop/stock/" + product.name.replace(/ /g, "-")).replace(/[ ?&#\\%<>]/g, "_");
+        const prefix = `shop/stock/${product.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
         if (name) product.name = name;
         if (price) product.price = price;
         if (info) product.info = info;
@@ -66,21 +65,16 @@ router.post('/stock/edit', isAuthed, (req, res) => {
             });
         };
 
-        product.save((err, saved) => {
-            if (err) return res.status(500).send(err.message || "Error occurred whilst saving product");
-            if (!image_url && !image_file) return res.send("Product details updated successfully");
-            const public_id = ("shop/stock/" + saved.name.replace(/ /g, "-")).replace(/[ ?&#\\%<>]/g, "_");
-            cloud.v2.api.delete_resources([prefix], err => {
-                if (err) return res.status(500).send(err.message);
-                cloud.v2.uploader.upload(image_url || image_file, { public_id }, (err, result) => {
-                    if (err) return res.status(500).send(err.message);
-                    saved.image = result.secure_url;
-                    for (const item of req.session.cart) if (item.id === saved.id) item.image = result.secure_url;
-                    saved.save(() => { res.send("Product details updated successfully") });
-                });
-            })
-        });
-    })
+        const saved = await product.save();
+        if (!image_url && !image_file) return res.send("Product details updated successfully");
+        const public_id = ("shop/stock/" + saved.name.replace(/ /g, "-")).replace(/[ ?&#\\%<>]/g, "_");
+        await cloud.v2.api.delete_resources([prefix]);
+        const result = await cloud.v2.uploader.upload(image_url || image_file, { public_id });
+        saved.image = result.secure_url;
+        await saved.save();
+        for (const item of req.session.cart) if (item.id === saved.id) item.image = result.secure_url;
+        res.send("Product details updated successfully");
+    } catch (err) { res.status(err.http_code || 500).send(err.message) }
 });
 
 router.post("/stock/remove", isAuthed, (req, res) => {
@@ -176,23 +170,21 @@ router.post("/checkout/payment-intent/complete", async (req, res) => {
 
         const { line1, line2, city, postal_code } = pi.shipping.address;
         const transporter = new MailingListMailTransporter({ req, res });
-        transporter.setRecipient(pi.receipt_email).sendMail({
-            subject: "Purchase Nofication: Payment Successful",
-            message: `Hi ${pi.shipping.name},\n\n` +
-                `Your payment was successful. Below is a summary of your purchase:\n\n${pi.charges.data[0].description}\n\n` +
-                `If you have not yet received your receipt via email, you can view it here instead:\n${pi.charges.data[0].receipt_url}\n\n` +
-                "Thank you for shopping with us!\n\n- CS"
-        }, err => {
+        const subject = "Purchase Nofication: Payment Successful";
+        const message = `Hi ${pi.shipping.name},\n\n` +
+        `Your payment was successful. Below is a summary of your purchase:\n\n${pi.charges.data[0].description}\n\n` +
+        `If you have not yet received your receipt via email, you can view it here instead:\n${pi.charges.data[0].receipt_url}\n\n` +
+        "Thank you for shopping with us!\n\n- CS";
+        transporter.setRecipient(pi.receipt_email).sendMail({ subject, message }, err => {
             if (err) console.error(err), res.status(500);
-            transporter.setRecipient({ email: "info@thecs.co" }).sendMail({
-                subject: "Purchase Report: You Got Paid!",
-                message: "You've received a new purchase from a new customer. Summary shown below\n\n" +
-                    `- Name: ${pi.shipping.name}\n- Email: ${pi.receipt_email}\n- Purchased items: ${pi.charges.data[0].description}\n` +
-                    `- Address:\n\t${line1},${line2 ? "\n\t"+line2+"," : ""}\n\t${city},\n\t${postal_code}\n\n` +
-                    `- Date of purchase: ${Date(pi.created * 1000)}\n` +
-                    `- Total amount: £${pi.amount / 100}\n\n` +
-                    `- And finally, a copy of their receipt:\n${pi.charges.data[0].receipt_url}`
-            }, err => {
+            const subject = "Purchase Report: You Got Paid!";
+            const message = "You've received a new purchase from a new customer. Summary shown below\n\n" +
+            `- Name: ${pi.shipping.name}\n- Email: ${pi.receipt_email}\n- Purchased items: ${pi.charges.data[0].description}\n` +
+            `- Address:\n\t${line1},${line2 ? "\n\t"+line2+"," : ""}\n\t${city},\n\t${postal_code}\n\n` +
+            `- Date of purchase: ${Date(pi.created * 1000)}\n` +
+            `- Total amount: £${pi.amount / 100}\n\n` +
+            `- And finally, a copy of their receipt:\n${pi.charges.data[0].receipt_url}`;
+            transporter.setRecipient({ email: "info@thecs.co" }).sendMail({ subject, message }, err => {
                 if (err) { console.error(err); if (res.statusCode !== 500) res.status(500) }
                 res.end();
             });
