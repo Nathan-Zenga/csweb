@@ -1,4 +1,4 @@
-<%_ include partials/header _%>
+<%- include ('partials/header') -%>
     <div class="content-container" style="padding-top: 2em;">
         <ul class="nav nav-pills">
             <li class="active"><a data-toggle="pill" href="#home">HOME</a></li>
@@ -13,39 +13,39 @@
         </ul>
         <div class="tab-content container">
             <div id="home" class="creation tab-pane fade in active">
-            <%_ include partials/admin/home _%>
+            <%- include ('partials/admin/home') -%>
             </div>
 
             <div id="articles" class="creation tab-pane fade">
-            <%_ include partials/admin/articles _%>
+            <%- include ('partials/admin/articles') -%>
             </div>
 
             <div id="discography" class="creation tab-pane fade">
-            <%_ include partials/admin/discography _%>
+            <%- include ('partials/admin/discography') -%>
             </div>
 
             <div id="artists" class="creation tab-pane fade">
-            <%_ include partials/admin/artists _%>
+            <%- include ('partials/admin/artists') -%>
             </div>
 
             <div id="locations" class="creation tab-pane fade">
-            <%_ include partials/admin/locations _%>
+            <%- include ('partials/admin/locations') -%>
             </div>
 
             <div id="mail" class="creation tab-pane fade">
-            <%_ include partials/admin/mail _%>
+            <%- include ('partials/admin/mail') -%>
             </div>
 
             <div id="shop" class="creation tab-pane fade">
-            <%_ include partials/admin/shop _%>
+            <%- include ('partials/admin/shop') -%>
             </div>
 
             <div id="edit" class="tab-pane fade">
-            <%_ include partials/admin/edit _%>
+            <%- include ('partials/admin/edit') -%>
             </div>
 
             <div id="remove" class="tab-pane fade">
-            <%_ include partials/admin/remove _%>
+            <%- include ('partials/admin/remove') -%>
             </div>
         </div>
     </div>
@@ -305,4 +305,4 @@
             });
         });
     </script>
-<%_ include partials/footer _%>
+<%- include ('partials/footer') -%>

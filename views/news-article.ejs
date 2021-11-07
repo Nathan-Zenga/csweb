@@ -1,4 +1,4 @@
-<%_ include partials/header _%>
+<%- include ('partials/header') -%>
     <div id="image-modal" class="modal fade in" role="dialog">
         <div class="modal-icons"><button type="button" class="close-view" data-dismiss="modal">&times;</button></div>
         <div class="modal-body"></div>
@@ -49,9 +49,7 @@
             </div>
         </div>
     </article>
-    <style>
-        .text a { text-decoration: underline; }
-    </style>
+    <style> .text a { text-decoration: underline } </style>
     <script>
         if (!("object-fit" in document.body.style)) $(".img-reel img").css("width", "auto");
         if ($(".img-reel img").length > 1) {
@@ -80,4 +78,4 @@
             observer.observe(iframe, { attributes: true, childList: true, subtree: true });
         });
     </script>
-<%_ include partials/footer _%>
+<%- include ('partials/footer') -%>

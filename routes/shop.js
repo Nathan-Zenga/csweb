@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { STRIPE_SK, STRIPE_PK, NODE_ENV, EXCHANGERATE_API_KEY } = process.env;
-const stripe = new (require('stripe').Stripe)(STRIPE_SK);
+const Stripe = new (require('stripe').Stripe)(STRIPE_SK);
 const cloud = require('cloudinary');
 const { default: axios } = require('axios');
 const { each } = require('async');
@@ -136,7 +136,7 @@ router.post("/cart/increment", (req, res) => {
 router.post("/checkout/payment-intent/create", (req, res) => {
     const { firstname, lastname, email, address_l1, address_l2, city, postcode } = req.body;
     const { cart, currency_symbol, converted_price } = req.session;
-    stripe.paymentIntents.create({ // Create a PaymentIntent with the order details
+    Stripe.paymentIntents.create({ // Create a PaymentIntent with the order details
         receipt_email: email,
         description: cart.map(p => `${p.name} (${currency_symbol}${converted_price(p.price).toFixed(2)} X ${p.qty})`).join(", \r\n"),
         amount: cart.map(p => p.price * p.qty).reduce((sum, val) => sum + val),

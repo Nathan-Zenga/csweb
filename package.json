@@ -1,34 +1,34 @@
 {
   "name": "csweb",
-  "version": "1.6.0",
+  "version": "1.6.2",
   "description": "merch store website",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "async": "^3.2.0",
-    "axios": "^0.21.1",
-    "bcrypt": "^5.0.0",
+    "async": "^3.2.2",
+    "axios": "^0.24.0",
+    "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
-    "cloudinary": "^1.22.0",
+    "cloudinary": "^1.27.1",
     "cookie-parser": "^1.4.5",
-    "ejs": "^2.7.4",
+    "ejs": "^3.1.6",
     "express": "^4.17.1",
-    "express-session": "^1.17.1",
-    "googleapis": "^48.0.0",
-    "memorystore": "^1.6.2",
-    "mongoose": "^5.9.28",
+    "express-session": "^1.17.2",
+    "googleapis": "^89.0.0",
+    "memorystore": "^1.6.6",
+    "mongoose": "^6.0.12",
     "node-geocoder": "^3.27.0",
-    "nodemailer": "^6.4.11",
-    "passport": "^0.4.1",
+    "nodemailer": "^6.7.0",
+    "passport": "^0.5.0",
     "passport-local": "^1.0.0",
     "request": "^2.88.2",
-    "stripe": "^8.84.0"
+    "stripe": "^8.186.1"
   },
   "engines": {
-    "node": "*",
-    "npm": "*"
+    "node": "^16.x.x",
+    "npm": "^8.x.x"
   },
   "author": "Nathan Zengamambu",
   "license": "ISC"

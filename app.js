@@ -7,12 +7,12 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const MemoryStore = require('memorystore')(session);
 const passport = require('passport');
-const { STRIPE_SK, CSDB, NODE_ENV } = process.env;
-const stripe = require('stripe')(STRIPE_SK);
+const { STRIPE_SK, CSDB, NODE_ENV, PORT = 4001 } = process.env;
+const Stripe = new (require('stripe').Stripe)(STRIPE_SK);
 const { Homepage_content } = require('./models/models');
+const production = NODE_ENV === "production";
 
-mongoose.connect(CSDB, { useNewUrlParser: true, useUnifiedTopology: true, autoIndex: false });
-mongoose.connection.once('open', () => { console.log("Connected to DB") });
+mongoose.connect(CSDB).then(() => { console.log("Connected to DB") });
 
 // View Engine
 app.set('view engine', 'ejs');
@@ -40,31 +40,27 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Global variables
-app.use((req, res, next) => {
-    Homepage_content.find((err, contents) => {
-        res.locals.user = req.user || null;
-        res.locals.socials = contents.length ? contents[0].socials : [];
-        res.locals.location_origin = `https://${req.hostname}`;
-        res.locals.cart = req.session.cart = req.session.cart || [];
-        res.locals.fx_rate = req.session.fx_rate = req.session.fx_rate || 1;
-        res.locals.currency = req.session.currency = req.session.currency || "gbp";
-        res.locals.currency_symbol = req.session.currency_symbol = req.session.currency_symbol || "£";
-        res.locals.converted_price = req.session.converted_price = price => {
-            const value = parseFloat(price / 100), {currency, fx_rate} = req.session;
-            return Function(`return (${value} ${currency === "EUR" ? "/" : "*"} ${fx_rate})`)();
-        };
-        if (!req.session.paymentIntentID) return next();
-        stripe.paymentIntents.retrieve(req.session.paymentIntentID, (err, pi) => {
-            if (err) return console.log(err.message || err), next();
-            // id used in payment completion request if true
-            if (!(pi && pi.status === "succeeded")) req.session.paymentIntentID = undefined;
-            if (!pi || pi.status === "succeeded") return next();
-            stripe.paymentIntents.cancel(pi.id, { cancellation_reason: "requested_by_customer" }, err => {
-                if (err) console.log(err.message || err);
-                next();
-            });
-        });
-    })
+app.use(async (req, res, next) => {
+    const contents = await Homepage_content.find();
+    res.locals.user = req.user || null;
+    res.locals.socials = contents.length ? contents[0].socials : [];
+    res.locals.location_origin = `https://${req.hostname}`;
+    res.locals.cart = req.session.cart = req.session.cart || [];
+    res.locals.fx_rate = req.session.fx_rate = req.session.fx_rate || 1;
+    res.locals.currency = req.session.currency = req.session.currency || "gbp";
+    res.locals.currency_symbol = req.session.currency_symbol = req.session.currency_symbol || "£";
+    res.locals.converted_price = req.session.converted_price = price => {
+        const value = parseFloat(price / 100), {currency, fx_rate} = req.session;
+        return Function(`return (${value} ${currency === "EUR" ? "/" : "*"} ${fx_rate})`)();
+    };
+    if (!req.session.paymentIntentID) return next();
+    try {
+        const pi = await Stripe.paymentIntents.retrieve(req.session.paymentIntentID);
+        if (!pi || pi.status !== "succeeded") req.session.paymentIntentID = undefined; // id used in payment completion request if true
+        if (!pi || pi.status === "succeeded") return next();
+        await Stripe.paymentIntents.cancel(pi.id, { cancellation_reason: "requested_by_customer" });
+        next();
+    } catch (err) { console.log(err.message || err); next() }
 });
 
 app.use('/', require('./routes/index'));
@@ -81,7 +77,6 @@ app.get("*", (req, res) => {
     res.status(404).render('error', { title: "Error 404", pagename: "error", html });
 });
 
-// Set port + listen for requests
-const port = process.env.PORT || 4001;
-const production = NODE_ENV === "production";
-app.listen(port, () => { console.log(`Server started${!production ? " on port " + port : ""}`) });
+app.post("*", (req, res) => res.status(400).send("Sorry, your request currently cannot be processed"));
+
+app.listen(PORT, () => { console.log(`Server started${!production ? " on port " + PORT : ""}`) });

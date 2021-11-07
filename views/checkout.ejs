@@ -1,5 +1,5 @@
-<%_ include partials/header _%>
-    <%_ include partials/stripe-checkout-css _%>
+<%- include ('partials/header') -%>
+    <%- include ('partials/stripe-checkout-css') -%>
     <div class="content-container" id="payment-form-container">
         <div class="content container">
             <form id="payment-details-form" action="/shop/checkout/payment-intent/create">
@@ -41,7 +41,7 @@
         </div>
     </div>
 
-    <style> form + form { padding-top: 0; margin-top: -2em; } </style>
+    <style> form + form { padding-top: 0; margin-top: -2em } </style>
 
     <script src="https://js.stripe.com/v3/"></script>
     <script>
@@ -115,4 +115,4 @@
             };
         })
     </script>
-<%_ include partials/footer _%>
+<%- include ('partials/footer') -%>

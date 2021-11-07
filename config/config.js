@@ -30,7 +30,7 @@ module.exports.Collections = async cb => {
  * @param {object} [args.sort] sort query
  * @param {function} [cb] callback
  */
-module.exports.indexReorder = (collection, args, cb) => {
+module.exports.indexReorder = async (collection, args, cb) => {
     try {
         const { id, newIndex, sort } = args;
         if (sort) sort = Object.assign({index: 1}, sort);

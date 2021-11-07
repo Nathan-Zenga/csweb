@@ -1,12 +1,8 @@
-<%_ include partials/header _%>
+<%- include ('partials/header') -%>
     <div class="content-container" style="background-color: transparent;">
         <div class="content"><div id="map"></div></div>
     </div>
-    <style>
-        #map > div {
-            background-color: transparent!important;
-        }
-    </style>
+    <style> #map > div { background-color: transparent!important } </style>
     <script>
         function initMap() {
             $.post("/map/init", function(res) {
@@ -33,4 +29,4 @@
         }
     </script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCRIzIyhXXI1JxBGUqmUsX5N4MnxYHHGCo&libraries=visualization&callback=initMap"></script>
-<%_ include partials/footer _%>
+<%- include ('partials/footer') -%>

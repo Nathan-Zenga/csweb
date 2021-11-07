@@ -1,4 +1,4 @@
-    <%_ include partials/header _%>
+    <%- include ('partials/header') -%>
     <%_ artists.forEach((artist, i) => {
         var isEven = i % 2 == 0; _%>
     <div class="artist-bio content-container">
@@ -18,4 +18,4 @@
     </div>
     <%_ }) _%>
     <script> $(".social-icon").one("error", function() { $(this).parent().hide() }); </script>
-<%_ include partials/footer _%>
+<%- include ('partials/footer') -%>

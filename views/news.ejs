@@ -1,4 +1,4 @@
-<%_ include partials/header _%>
+<%- include ('partials/header') -%>
     <div class="container">
         <%_ articles.forEach((article, i) => { _%>
         <article class="content-container col-md-4 col-sm-6">
@@ -13,4 +13,4 @@
         <%- (i + 1) % 3 == 0 ? '<div class="breakpoint row dt-view-md"></div>' : '' %>
         <%_ }) _%>
     </div>
-<%_ include partials/footer _%>
+<%- include ('partials/footer') -%>
