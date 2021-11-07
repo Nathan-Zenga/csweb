@@ -77,41 +77,38 @@ router.post('/stock/edit', isAuthed, async (req, res) => {
     } catch (err) { res.status(err.http_code || 500).send(err.message) }
 });
 
-router.post("/stock/remove", isAuthed, (req, res) => {
+router.post("/stock/remove", isAuthed, async (req, res) => {
     const ids = Object.values(req.body);
     if (!ids.length) return res.send("Nothing selected");
-    Product.find({_id : { $in: ids }}, (err, products) => {
-        each(products, (item, cb) => {
-            Product.deleteOne({ _id : item.id }, (err, result) => {
-                if (err || !result.deletedCount) return cb(err ? err.message : "Product(s) not found");
-                const prefix = ("shop/stock/" + item.name.replace(/ /g, "-")).replace(/[ ?&#\\%<>]/g, "_");
-                cloud.v2.api.delete_resources([prefix], () => cb());
-            })
-        }, err => {
-            if (!err) return res.send("Product"+ (ids.length > 1 ? "s" : "") +" deleted from stock successfully");
-            let is404 = err.message === "Product(s) not found";
-            res.status(!is404 ? 500 : 404).send(!is404 ? "Error occurred" : "Product(s) not found");
+    const products = await Product.find({_id : { $in: ids }}).catch(err => ({ err }));
+    if (products.err) return res.status(400).send(products.err.message);
+    each(products, (item, cb) => {
+        Product.deleteOne({ _id : item.id }, (err, result) => {
+            if (err || !result.deletedCount) return cb(err ? err.message : "Product(s) not found");
+            const prefix = ("shop/stock/" + item.name.replace(/ /g, "-")).replace(/[ ?&#\\%<>]/g, "_");
+            cloud.v2.api.delete_resources([prefix], () => cb());
         })
-    });
+    }, err => {
+        if (!err) return res.send("Product"+ (ids.length > 1 ? "s" : "") +" deleted from stock successfully");
+        let is404 = err.message === "Product(s) not found";
+        res.status(!is404 ? 500 : 404).send(!is404 ? "Error occurred" : "Product(s) not found");
+    })
 });
 
-router.post("/cart/add", (req, res) => {
-    Product.findById(req.body.id, (err, product) => {
-        if (err) return res.status(500).send(err.message);
-        if (!product || product.stock_qty < 1) return res.status(!product ? 404 : 400).send("Item currently not in stock");
-        const { id, name, price, image, info, stock_qty } = product;
-        const cartItemIndex = req.session.cart.findIndex(item => item.id === id);
-        const currentItem = req.session.cart[cartItemIndex];
+router.post("/cart/add", async (req, res) => {
+    const product = await Product.findById(req.body.id).catch(err => null);
+    if (!product || product.stock_qty < 1) return res.status(!product ? 404 : 400).send("Item currently not in stock");
+    const { id, name, price, image, info, stock_qty } = product;
+    const currentItem = req.session.cart.find(item => item.id === id);
 
-        if (cartItemIndex >= 0) {
-            currentItem.qty += 1;
-            if (currentItem.qty > stock_qty) currentItem.qty = stock_qty;
-        } else {
-            req.session.cart.unshift({ id, name, price, image, info, stock_qty, qty: 1 });
-        }
+    if (!currentItem) {
+        currentItem.qty += 1;
+        if (currentItem.qty > stock_qty) currentItem.qty = stock_qty;
+    } else {
+        req.session.cart.unshift({ id, name, price, image, info, stock_qty, qty: 1 });
+    }
 
-        res.send(`${req.session.cart.length}`);
-    })
+    res.send(`${req.session.cart.length}`);
 });
 
 router.post("/cart/remove", (req, res) => {
@@ -123,8 +120,7 @@ router.post("/cart/remove", (req, res) => {
 
 router.post("/cart/increment", (req, res) => {
     const { id, increment } = req.body;
-    const cartItemIndex = req.session.cart.findIndex(item => item.id === id);
-    const currentItem = req.session.cart[cartItemIndex];
+    const currentItem = req.session.cart.find(item => item.id === id);
     if (!currentItem) return res.status(400).send("Item not found, or the cart is empty");
     const newQuantity = currentItem.qty + parseInt(increment);
     const ltMin = newQuantity < 1;
@@ -136,15 +132,14 @@ router.post("/cart/increment", (req, res) => {
 router.post("/checkout/payment-intent/create", (req, res) => {
     const { firstname, lastname, email, address_l1, address_l2, city, postcode } = req.body;
     const { cart, currency_symbol, converted_price } = req.session;
+    const name = firstname + " " + lastname;
+    const address = { line1: address_l1, line2: address_l2, city, postal_code: postcode };
     Stripe.paymentIntents.create({ // Create a PaymentIntent with the order details
         receipt_email: email,
         description: cart.map(p => `${p.name} (${currency_symbol}${converted_price(p.price).toFixed(2)} X ${p.qty})`).join(", \r\n"),
         amount: cart.map(p => p.price * p.qty).reduce((sum, val) => sum + val),
         currency: "gbp",
-        shipping: {
-            name: firstname + " " + lastname,
-            address: { line1: address_l1, line2: address_l2, city, postal_code: postcode }
-        }
+        shipping: { name, address }
     }).then(pi => {
         req.session.paymentIntentID = pi.id;
         res.send({ clientSecret: pi.client_secret, pk: STRIPE_PK });
