@@ -13,7 +13,7 @@ router.get('/member/delete', async (req, res) => {
     const src = Array.isArray(req.query.src) ? req.query.src[0] : req.query.src;
     try {
         const doc = await MailingList.findById(id);
-        if (!src.match(/^email_unsub_link[A-Za-z0-9]{24}$/g) || src.slice(-24) !== id || err || !doc) return res.status(400).send("Invalid entry");
+        if (!src.match(/^email_unsub_link[A-Za-z0-9]{24}$/g) || src.slice(-24) !== id || !doc) return res.status(400).send("Invalid entry");
         const { data: body } = await axios.post(res.locals.location_origin + req.originalUrl, { id });
         if (body === "Nothing selected") return res.status(404).send("You already don't exist on our records.<br><br> - CS");
         res.send(`You are now unsubscribed. Sorry to see you go!<br><br> - CS`);

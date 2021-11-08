@@ -10,12 +10,11 @@ router.get('/', async (req, res) => {
 
 router.post('/new', isAuthed, async (req, res) => {
     const { name, bio, profile_image, social_media_name, social_media_url } = req.body;
-    const artist = new Artist({ name, bio, socials: {} });
+    const artist = new Artist({ name, bio });
     const social_media_names = (social_media_name instanceof Array ? social_media_name : [social_media_name]).filter(e => e);
     const social_media_urls = (social_media_url instanceof Array ? social_media_url : [social_media_url]).filter(e => e);
     if (social_media_names.length !== social_media_urls.length) return res.status(400).send("Number of specified social media names + urls don't match");
 
-    artist.socials = [];
     social_media_names.forEach((n, i) => { artist.socials.push({ name: social_media_names[i], url: social_media_urls[i] }) });
 
     try {
@@ -53,7 +52,7 @@ router.post('/edit', isAuthed, async (req, res) => {
 
 router.post('/delete', isAuthed, async (req, res) => {
     const ids = Object.values(req.body);
-    if (ids.length) return res.status(400).send("Nothing selected");
+    if (!ids.length) return res.status(400).send("Nothing selected");
     try {
         const result = await Artist.deleteMany({_id : { $in: ids }});
         if (!result.deletedCount) return res.status(404).send("Artist(s) not found");
