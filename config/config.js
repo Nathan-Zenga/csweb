@@ -1,6 +1,6 @@
 const { Article, Project, Artist, Location, MailingList, Homepage_content, Homepage_image, Product } = require('../models/models');
-const cloud = require('cloudinary');
-const mongoose = require('mongoose');
+const { v2: cloud } = require('cloudinary');
+const { Model, Document: MongooseDocument } = require('mongoose');
 const { default: axios } = require('axios');
 const { each, forEachOf } = require('async');
 
@@ -23,8 +23,8 @@ module.exports.Collections = async cb => {
 
 /**
  * Executing process of re-ordering document items
- * @param {mongoose.Model.<Document, {}>} collection a database collection model
- * @param {Object} args
+ * @param {Model.<MongooseDocument, {}>} collection a database collection model
+ * @param {object} args
  * @param {string} args.id identifier to specify document to re-order
  * @param {number} args.newIndex the new order number (position) to which the selected document is assigned (by index field)
  * @param {object} [args.sort] sort query
@@ -48,11 +48,12 @@ module.exports.indexReorder = async (collection, args, cb) => {
 /**
  * Saving images / videos for news articles
  * @param {object} body response body object
- * @param {mongoose.Document} doc the new / existing document to contain references (URLs) to the media being uploaded / saved
+ * @param {MongooseDocument} doc the new / existing document to contain references (URLs) to the media being uploaded / saved
  * @param {function} [cb] optional callback
  */
 module.exports.saveMedia = (body, doc, cb) => {
-    var fields = ["headline_images", "textbody_media"].filter(f => body[f]);
+    const fields = ["headline_images", "textbody_media"].filter(f => body[f]);
+    const saved_p_ids = [];
     if (!fields.length) return cb ? cb(null, "Skipping media saving...") : false;
     each(fields, (field, callback1) => {
         body[field] = !Array.isArray(body[field]) ? [body[field]] : body[field];
@@ -78,26 +79,29 @@ module.exports.saveMedia = (body, doc, cb) => {
                         callback2();
                     } else {
                         const public_id = ("article/"+ doc.id +"/"+ field + ( parseInt(i)+1 )).replace(/[ ?&#\\%<>]/g, "_");
-                        cloud.v2.uploader.upload(mediaStr, { public_id, resource_type: "auto" }, (err, result) => {
+                        cloud.uploader.upload(mediaStr, { public_id, resource_type: "auto" }, (err, result) => {
                             if (err) return callback2(err);
                             if (body.headline_image_thumb === mediaStr) doc.headline_image_thumb = result.secure_url;
+                            saved_p_ids.push(result.public_id);
                             doc[field].splice(i, 1, result.secure_url);
-                            console.log("Uploaded image / video to cloud...");
+                            console.log(`Uploaded ${result.resource_type} to cloud...`);
                             callback2();
                         });
                     }
                 });
             }
-        }, err => {
-            if (err) return callback1(err);
+        }, async err => {
+            if (err) { await cloud.api.delete_resources(saved_p_ids).catch(e => e); return callback1(err) }
             console.log(`All media from ${field} field saved...`);
             callback1();
         });
-    }, err => {
+    }, async err => {
         const msg = "Images / videos saved";
-        console.log(`Media saving process done.${!cb ? "" : " Calling callback now..."}`);
-        doc.save();
-        cb ? cb(err, msg) : console.log(err || msg)
+        const error = doc.validateSync() || err;
+        if (error) return cb ? cb(error) : console.error(error.message);
+        await doc.save();
+        console.log("Media saving process done." + (cb ? " Running callback..." : ""));
+        cb ? cb(null, msg) : console.log(msg)
     });
 };
 

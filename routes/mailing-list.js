@@ -52,7 +52,7 @@ router.post('/send/mail', isAuthed, async (req, res) => {
     members.forEach((member, i) => {
         setTimeout(() => {
             transporter.setRecipient(member).sendMail({ subject, message }, err => {
-                if (err) console.log(err.message || err), console.log(`Not sent for ${member.firstname +" "+ member.lastname}`);
+                if (err) console.error(`${err.message || err}\nNot sent for ${member.firstname +" "+ member.lastname}`);
                 else console.log(`Message sent!`);
             });
         }, i * 2000);

@@ -88,7 +88,7 @@
                             window.onbeforeunload = null;
                             $("#cart-item-count").text(0);
                             $.post("/shop/checkout/payment-intent/complete").fail(function(err, status, codeMessage) {
-                                console.log(codeMessage + (err ? ": " + err.responseText : ""));
+                                console.error(codeMessage + (err ? ": " + err.responseText : ""));
                             }).always(function() {
                                 btnControl.finish();
                                 $("html, body").animate({ scrollTop: 0 }, function() {
