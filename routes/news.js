@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const cloud = require('cloudinary');
+const { v2: cloud } = require('cloudinary');
 const { each } = require('async');
 const { Article } = require('../models/models');
 const { isAuthed, saveMedia, indexReorder } = require('../config/config');
@@ -23,13 +23,13 @@ router.post('/article/new', isAuthed, async (req, res) => {
     const hl = headline.replace(/\W+/g, '-').replace(/\W+$/, '').replace(/\-|\$/g, "\\W+");
     const existing = await Article.findOne({ headline: RegExp(`^${hl}(\\W+|_+)?$`, "i") });
     if (existing) return res.status(400).send("This headline already exists for another article.");
-    const article = await Article.create({ headline, textbody, index: 1 }).catch(err => ({ err }));
-    if (article.err) return res.status(500).send(article.err.message);
+    const article = await Article.create({ headline, textbody, index: 1 });
     const articles = await Article.find({ _id: { $ne: article._id } }).sort({ index: 1, created_at: -1 }).exec();
-    articles.forEach(a => { a.index += 1; a.save() });
-    saveMedia(req.body, article, (err, msg) => {
+    await Promise.all(articles.map(a => { a.index += 1; return a.save() }));
+    saveMedia(req.body, article, async (err, results) => {
         if (err) return res.status(err.http_code || 500).send(err.message);
-        res.send(`Done${msg ? ". "+msg : ""}`);
+        if (results) for (const k in results) article[k] = results[k];
+        article.save(err => res.status(err ? 500 : 200).send(err ? err.message : "Done"));
     });
 });
 
@@ -39,7 +39,7 @@ router.post('/article/delete', isAuthed, async (req, res) => {
     try {
         const { deletedCount } = await Article.deleteMany({_id : { $in: ids }});
         if (!deletedCount) return res.status(404).send("Article(s) not found");
-        await Promise.all(ids.map(id => cloud.v2.api.delete_resources_by_prefix(`article/${id}`)));
+        await Promise.all(ids.map(id => cloud.api.delete_resources_by_prefix(`article/${id}`)));
         const articles = await Article.find().sort({index: 1}).exec();
         await Promise.all(articles.map((a, i) => { a.index = i+1; return a.save() }));
         res.send(`Article${ids.length > 1 ? "s" : ""} deleted successfully`)
@@ -50,28 +50,24 @@ router.post('/article/edit', isAuthed, async (req, res) => {
     const { article_id, headline, textbody, headline_image_thumb } = req.body;
     const hl = headline.replace(/\W+/g, '-').replace(/\W+$/, '').replace(/\-|\$/g, "\\W+");
     const existing = await Article.findOne({ headline: RegExp(`^${hl}(\\W+|_+)?$`, "i") });
-    const article = await Article.findById(article_id).catch(err => ({ err }));
-    const { err } = article || {};
-    if (err || !article) return res.status(err ? 500 : 404).send(err ? err.message : "Article not found");
     if (existing && existing.id !== article_id) return res.status(400).send("This headline already exists for another article.");
-    if (headline) article.headline = headline;
-    if (textbody) article.textbody = textbody;
-    if (headline_image_thumb) article.headline_image_thumb = headline_image_thumb;
+    try {
+        const article = await Article.findById(article_id);
+        const media_fields = ["headline_images", "textbody_media"].filter(f => req.body[f]);
+        if (!article) return res.status(404).send("Article not found");
+        if (headline) article.headline = headline;
+        if (textbody) article.textbody = textbody;
+        if (headline_image_thumb) article.headline_image_thumb = headline_image_thumb;
+        if (!media_fields.length) { await article.save(); return res.send("Article updated successfully") }
 
-    const saved = await article.save().catch(err => ({ err }));
-    if (saved.err) return res.status(500).send(saved.err.message);
-    const media_fields = ["headline_images", "textbody_media"].filter(f => req.body[f]);
-    if (!media_fields.length) return res.send("Article updated successfully");
-    each(media_fields, (field, cb) => {
-        const prefix = "article/" + saved.id + "/" + field;
-        cloud.v2.api.delete_resources_by_prefix(prefix, err => { err ? cb(err) : cb() });
-    }, err => {
-        if (err) return res.status(500).send(err.message);
-        saveMedia(req.body, saved, err => {
-            if (err) return res.status(err.http_code || 500).send(err.message);
-            res.send("Article updated successfully");
+        await each(media_fields, (field, cb) => {
+            const prefix = "article/" + saved.id + "/" + field;
+            cloud.api.delete_resources_by_prefix(prefix, err => { err ? cb(err) : cb() });
         });
-    });
+        const results = await saveMedia(req.body, article);
+        if (results) for (const k in results) article[k] = results[k];
+        article.save(_ => res.send("Article updated successfully"));
+    } catch (err) { res.status(err.http_code || 500).send(err.message) }
 });
 
 router.post('/article/edit/reorder', isAuthed, (req, res) => {

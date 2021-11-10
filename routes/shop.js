@@ -148,7 +148,7 @@ router.post("/checkout/payment-intent/create", (req, res) => {
 
 router.post("/checkout/payment-intent/complete", async (req, res) => {
     try {
-        const pi = await stripe.paymentIntents.retrieve(req.session.paymentIntentID);
+        const pi = await Stripe.paymentIntents.retrieve(req.session.paymentIntentID);
         const products = await Product.find();
         if (!pi) return res.status(404).send("Invalid payment session");
         if (pi.status !== "succeeded") return res.status(500).send(pi.status.replace(/_/g, " "));

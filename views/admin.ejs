@@ -49,13 +49,24 @@
             </div>
         </div>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/async/3.2.1/async.min.js"></script>
     <script>
-        var readDataURLs = function(files, cb) {
-            $.each(files, function(i, file) {
+        var readDataURLs = function(files, callback) {
+            var urls = [];
+            var errMsg = (files.length > 1 ? "one or more images" : "image") + " not found/valid";
+            async.each(files, function(file, cb) {
                 var reader = new FileReader();
-                reader.onload = cb;
+                reader.onerror = function(e) { cb(`${e.type}: ${errMsg}`) };
+                reader.onload = function(e) {
+                    var result = e.target.result;
+                    var media = result.includes("image") ? new Image() : document.createElement("video");
+                    media.onload = function() { urls.push(result); cb() };
+                    media.oncanplay = media.onload;
+                    media.onerror = reader.onerror;
+                    media.src = result;
+                };
                 reader.readAsDataURL(file)
-            });
+            }, err => callback(err, urls));
         };
         var showMessage = function(result) {
             var reload = confirm(result + "\n\nRefresh page?");
@@ -68,23 +79,22 @@
             var $thumb_choice = $form.find(".headline-image-thumb-choice");
             $thumb_choice.find("input").off("change").end().empty().hide();
             $form.find(".headline-image-data").empty();
-            if (files.length) {
-                var $submitInput = $form.children("input:submit");
-                var counter = 0;
-                var label = "<label>CHOOSE ARTICLE THUMBNAIL</label>";
-                $submitInput.attr("disabled", true);
-                $thumb_choice.show().append(label);
-                readDataURLs(files, function(e) {
-                    var url = e.target.result;
+            if (!files || !files.length) return;
+            var $submitInput = $form.children("input:submit");
+            var label = "<label>CHOOSE ARTICLE THUMBNAIL</label>";
+            $submitInput.attr("disabled", true);
+            $thumb_choice.show().append(label);
+            readDataURLs(files, function(err, urls) {
+                $submitInput.attr("disabled", false);
+                if (err) return alert(err.message);
+                for (var url of urls) {
                     var name = "headline_image_thumb";
                     var $input = $("<input>").attr({ type: "radio", name, value: url, required: true });
                     var $img = $("<img>").attr({ src: url });
                     $form.find(".headline-image-data").append( $("<input>").attr({ type: "hidden", name: "headline_images" }).val(url) );
                     $thumb_choice.append($input.add($img));
-                    counter += 1;
-                    if (counter === files.length) $submitInput.attr("disabled", false);
-                });
-            }
+                }
+            });
         });
 
         $("#textbody, #textbody_edit").keyup(function() {
@@ -93,28 +103,27 @@
             var spots = textbody.value.match(/^x$/gim) || [];
             var current_values = $tbm_container.find("input:text").map(function() { return this.value }).get();
             if ($tbm_container.html()) $tbm_container.empty();
-            if (spots.length) {
-                spots.forEach(function(spot, i) {
-                    var $fileInput = $("<input>").attr({ class: "input-"+i, type: "file", id: "upload-"+i }).css({ display: "initial", width: "auto" });
-                    var $clearUploadsButton = $("<button>").attr({ class: "clear-uploads", "data-id": "upload-"+i }).text("CLEAR FILE UPLOAD");
-                    var $textInput = $("<input>").attr({ class: "input-"+i, type: "text", name: "textbody_media", required: true, placeholder: "...or enter image URL or embed code" });
-                    $fileInput.add($clearUploadsButton).add($textInput.val(current_values[i])).appendTo($tbm_container);
-                });
+            if (!spots.length) return;
+            spots.forEach(function(spot, i) {
+                var $fileInput = $("<input>").attr({ class: "input-"+i, type: "file", id: "upload-"+i }).css({ display: "initial", width: "auto" });
+                var $clearUploadsButton = $("<button>").attr({ class: "clear-uploads", "data-id": "upload-"+i }).text("CLEAR FILE UPLOAD");
+                var $textInput = $("<input>").attr({ class: "input-"+i, type: "text", name: "textbody_media", required: true, placeholder: "...or enter image URL or embed code" });
+                $fileInput.add($clearUploadsButton).add($textInput.val(current_values[i])).appendTo($tbm_container);
+            });
 
-                $tbm_container.find("input:file").change(function() {
-                    var files = this.files;
-                    var $textInput = $(this).nextAll("input:text." + this.className);
-                    var filesPresent = Boolean(files && files.length);
-                    $textInput.val(filesPresent ? "N/A" : "").attr("disabled", false).next(":hidden").remove();
-                    if (filesPresent) {
-                        readDataURLs(files, function(e) {
-                            $textInput.val("N/A").attr("disabled", true).after($("<input>").attr({ type: "hidden", name: "textbody_media", value: e.target.result }));
-                        });
-                    }
-                }).end().find(".clear-uploads").click(function(e) {
-                    e.preventDefault(); $tbm_container.find(":file#"+this.dataset.id).val("").change()
+            $tbm_container.find("input:file").change(function() {
+                var files = this.files;
+                var $textInput = $(this).nextAll("input:text." + this.className);
+                var filesPresent = files && files.length;
+                $textInput.val(filesPresent ? "N/A" : "").attr("disabled", false).next(":hidden").remove();
+                if (!filesPresent) return this;
+                readDataURLs(files, function(err, urls) {
+                    if (err) return alert(err.message);
+                    $textInput.val("N/A").attr("disabled", true).after($("<input>").attr({ type: "hidden", name: "textbody_media", value: urls[0] }));
                 });
-            }
+            }).end().find(".clear-uploads").click(function(e) {
+                e.preventDefault(); $tbm_container.find(":file#"+this.dataset.id).val("").change()
+            });
         });
         $(".clear-uploads").click(function(e) {
             e.preventDefault();
@@ -131,14 +140,14 @@
             var files = this.files;
             var $image_data = $(this).closest(".file-upload-container").find(":hidden").val("");
             var $image_url = $(this).closest(".file-upload-container").find("input[type=url]").attr("disabled", false).val("");
-            if (files && files.length) {
-                var $submitInput = $(this).closest("form").children("input:submit").attr("disabled", true);
-                readDataURLs(files, function(e) {
-                    $image_data.val(e.target.result);
-                    $image_url.attr("disabled", true).val(files[0].name);
-                    $submitInput.attr("disabled", false);
-                });
-            }
+            if (!files || !files.length) return;
+            var $submitInput = $(this).closest("form").children("input:submit").attr("disabled", true);
+            readDataURLs(files, function(err, urls) {
+                $submitInput.attr("disabled", false);
+                if (err) return alert(err.message);
+                $image_data.val(urls[0]);
+                $image_url.attr("disabled", true).val(files[0].name);
+            });
         });
 
        $(".input-group .input-item :input").on("change keyup", function() {

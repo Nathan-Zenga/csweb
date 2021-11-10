@@ -10,7 +10,7 @@ module.exports.Article = model('Article', new Schema({
     index: Number
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } }));
 
-module.exports.Project = model('Project', Schema({
+module.exports.Project = model('Project', new Schema({
     title: String,
     artist: String,
     year: Number,
@@ -19,14 +19,14 @@ module.exports.Project = model('Project', Schema({
     all_platforms: { type: Boolean, default: false }
 }));
 
-module.exports.Artist = model('Artist', Schema({
+module.exports.Artist = model('Artist', new Schema({
     name: String,
     bio: String,
     socials: [{ name: String, url: String }],
     profile_image: String
 }));
 
-module.exports.MailingList = model('MailingList', Schema({
+module.exports.MailingList = model('MailingList', new Schema({
     firstname: { type: String, set: v => v.charAt(0).toUpperCase() + v.slice(1) },
     lastname: { type: String, set: v => v.charAt(0).toUpperCase() + v.slice(1) },
     email: { type: String, index: true, unique: true },
@@ -35,7 +35,7 @@ module.exports.MailingList = model('MailingList', Schema({
     extra_info: String
 }));
 
-module.exports.Location = model('Location', Schema({
+module.exports.Location = model('Location', new Schema({
     name: String,
     street_address: String,
     city: String,
@@ -45,20 +45,20 @@ module.exports.Location = model('Location', Schema({
     longitude: Number
 }));
 
-module.exports.Homepage_content = model('Homepage_content', Schema({
+module.exports.Homepage_content = model('Homepage_content', new Schema({
     banner_text: String,
     banner_media: [String],
     footnote_text: String,
     socials: [{ name: String, url: String }]
 }));
 
-module.exports.Homepage_image = model('Homepage_image', Schema({
+module.exports.Homepage_image = model('Homepage_image', new Schema({
     p_id: String,
     url: String,
     index: Number
 }));
 
-module.exports.Product = model('Product', Schema({
+module.exports.Product = model('Product', new Schema({
     name: { type: String, unique: true, required: true },
     price: { type: Number, set: n => parseFloat(n) * 100 },
     image: String,
