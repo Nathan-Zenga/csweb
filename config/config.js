@@ -87,18 +87,18 @@ module.exports.saveMedia = async (body, doc, cb) => {
                         callback2();
                     });
                 } else {
-                    axios.get(mediaStr).catch(err => callback2(err)).then(response => {
+                    axios.get(mediaStr).then(response => {
                         const isHTML = /^(\w+)\/html/.test(response.headers["content-type"] || "");
                         if (!isHTML) return callback2(Error("Web link / file format not valid"));
                         savedMedia[field].splice(i, 1, `<iframe src="${mediaStr}" frameborder="0" allowfullscreen></iframe>`);
                         console.log("Web link stored as iframe...");
                         callback2();
-                    });
+                    }).catch(err => callback2(err));
                 }
-            }).catch(err => callback1(err)).then(() => {
+            }).then(() => {
                 console.log(`All media from ${field} field saved...`);
                 callback1();
-            });
+            }).catch(err => callback1(err));
         });
         console.log("Media saving process done");
         return cb ? cb(null, savedMedia) : savedMedia;
