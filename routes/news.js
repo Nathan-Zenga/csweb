@@ -1,6 +1,5 @@
 const router = require('express').Router();
 const { v2: cloud } = require('cloudinary');
-const { each } = require('async');
 const { Article } = require('../models/models');
 const { isAuthed, saveMedia, indexReorder } = require('../config/config');
 
@@ -11,8 +10,8 @@ router.get('/', async (req, res) => {
 
 router.get('/article/:title', async (req, res, next) => {
     const title = req.params.title.replace(/\-|\$/g, "\\W+");
-    var article = await Article.findById(req.params.title).catch(err => null);
-    article = article || await Article.findOne({ headline: RegExp(`^${title}(\\W+|_+)?$`, "i") });
+    const a = await Article.findById(req.params.title).catch(err => null);
+    const article = a || await Article.findOne({ headline: RegExp(`^${title}(\\W+|_+)?$`, "i") });
     if (!article) return next();
     const headline = article.headline.length > 25 ? article.headline.slice(0, 25).trim() + "..." : article.headline;
     res.render('news-article', { title: headline + " | News", pagename: "news-article", article })
@@ -23,12 +22,12 @@ router.post('/article/new', isAuthed, async (req, res) => {
     const hl = headline.replace(/\W+/g, '-').replace(/\W+$/, '').replace(/\-|\$/g, "\\W+");
     const existing = await Article.findOne({ headline: RegExp(`^${hl}(\\W+|_+)?$`, "i") });
     if (existing) return res.status(400).send("This headline already exists for another article.");
-    const article = await Article.create({ headline, textbody, index: 1 });
-    const articles = await Article.find({ _id: { $ne: article._id } }).sort({ index: 1, created_at: -1 }).exec();
-    await Promise.all(articles.map(a => { a.index += 1; return a.save() }));
-    saveMedia(req.body, article, (err, results) => {
+    const article = new Article({ headline, textbody, index: 1 });
+    const articles = await Article.find().sort({ index: 1, created_at: -1 }).exec();
+    saveMedia(req.body, article, async (err, results) => {
         if (err) return res.status(err.http_code || 500).send(err.message);
         if (results) for (const k in results) article[k] = results[k];
+        await Promise.all(articles.map(a => { a.index += 1; return a.save() }));
         article.save(err => res.status(err ? 500 : 200).send(err ? err.message : "Done"));
     });
 });
@@ -60,19 +59,21 @@ router.post('/article/edit', isAuthed, async (req, res) => {
         if (headline_image_thumb) article.headline_image_thumb = headline_image_thumb;
         if (!media_fields.length) { await article.save(); return res.send("Article updated successfully") }
 
-        await each(media_fields, (field, cb) => {
-            const prefix = "article/" + article.id + "/" + field;
-            cloud.api.delete_resources_by_prefix(prefix, err => { err ? cb(err) : cb() });
-        });
         const results = await saveMedia(req.body, article);
-        if (results) for (const k in results) article[k] = results[k];
-        article.save(_ => res.send("Article updated successfully"));
+        const urls_to_delete1 = results && results.headline_images.length ? article.headline_images.slice(results.headline_images.length) : [];
+        const urls_to_delete2 = results && results.textbody_media.length ? article.textbody_media.slice(results.textbody_media.length) : [];
+        await Promise.all([...urls_to_delete1, ...urls_to_delete2].map(url => {
+            const prefix = url.slice(url.indexOf("/article/"));
+            return url.startsWith("https://res.cloudinary.com") ? cloud.api.delete_resources_by_prefix(prefix) : null;
+        }));
+        if (results) for (const k in results) article[k] = results[k].length ? results[k] : article[k];
+        await article.save(); res.send("Article updated successfully")
     } catch (err) { res.status(err.http_code || 500).send(err.message) }
 });
 
 router.post('/article/edit/reorder', isAuthed, (req, res) => {
-    const { id, index } = req.body;
-    indexReorder(Article, { id, newIndex: index, sort: {updated_at: -1} }, err => {
+    const { id, index: newIndex } = req.body;
+    indexReorder(Article, { id, newIndex, sort: {updated_at: -1} }, err => {
         if (err) return res.status(500).send(err.message || "Error occurred");
         res.send("Article re-ordered successfully")
     });

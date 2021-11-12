@@ -16,7 +16,7 @@ module.exports.Collections = async cb => {
     docs.locations = await Location.find();
     docs.members = await MailingList.find().sort({ lastname: 1 }).exec();
     docs.homepage_contents = await Homepage_content.find();
-    docs.homepage_images = await Homepage_image.find().sort({index: 1}).exec();
+    docs.homepage_images = await Homepage_image.find().sort({ index: 1 }).exec();
     docs.products = await Product.find();
     if (!cb) return docs; cb(docs);
 };
@@ -53,7 +53,7 @@ module.exports.indexReorder = async (collection, args, cb) => {
  */
 module.exports.saveMedia = async (body, doc, cb) => {
     const fields = ["headline_images", "textbody_media"].filter(f => body[f]);
-    const savedMedia = {};
+    const savedMedia = { headline_images: [], textbody_media: [] };
     const saved_p_ids = [];
     const warning = "Article document not valid";
     if (!(doc instanceof Doc)) { if (!cb) throw Error(warning); return cb(Error(warning)) };
@@ -66,6 +66,7 @@ module.exports.saveMedia = async (body, doc, cb) => {
                 const isIframe = /<iframe(.*?)><\/iframe>/i.test(mediaStr);
                 const ytUrl = /youtu.?be/.test(mediaStr) && !isIframe;
                 const dataUrl = /^data:(image|video|audio)\/(.*?);base64/i.test(mediaStr);
+                const url = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/.test(mediaStr);
                 if (isIframe) {
                     savedMedia[field].splice(i, 1, mediaStr.match(/<iframe(.*?)><\/iframe>/gi)[0].replace(/(width|height|style)\=\"?\'?(.*?)\"?\'? /gi, "") );
                     console.log("Stored iframe...");
@@ -86,7 +87,7 @@ module.exports.saveMedia = async (body, doc, cb) => {
                         console.log(`Uploaded ${result.resource_type} to cloud...`);
                         callback2();
                     });
-                } else {
+                } else if (url) {
                     axios.get(mediaStr).then(response => {
                         const isHTML = /^(\w+)\/html/.test(response.headers["content-type"] || "");
                         if (!isHTML) return callback2(Error("Web link / file format not valid"));
@@ -94,7 +95,7 @@ module.exports.saveMedia = async (body, doc, cb) => {
                         console.log("Web link stored as iframe...");
                         callback2();
                     }).catch(err => callback2(err));
-                }
+                } else callback2(Error("Media file / URL format not valid"));
             }).then(() => {
                 console.log(`All media from ${field} field saved...`);
                 callback1();
