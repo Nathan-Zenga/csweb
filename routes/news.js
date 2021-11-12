@@ -26,7 +26,7 @@ router.post('/article/new', isAuthed, async (req, res) => {
     const article = await Article.create({ headline, textbody, index: 1 });
     const articles = await Article.find({ _id: { $ne: article._id } }).sort({ index: 1, created_at: -1 }).exec();
     await Promise.all(articles.map(a => { a.index += 1; return a.save() }));
-    saveMedia(req.body, article, async (err, results) => {
+    saveMedia(req.body, article, (err, results) => {
         if (err) return res.status(err.http_code || 500).send(err.message);
         if (results) for (const k in results) article[k] = results[k];
         article.save(err => res.status(err ? 500 : 200).send(err ? err.message : "Done"));
@@ -61,7 +61,7 @@ router.post('/article/edit', isAuthed, async (req, res) => {
         if (!media_fields.length) { await article.save(); return res.send("Article updated successfully") }
 
         await each(media_fields, (field, cb) => {
-            const prefix = "article/" + saved.id + "/" + field;
+            const prefix = "article/" + article.id + "/" + field;
             cloud.api.delete_resources_by_prefix(prefix, err => { err ? cb(err) : cb() });
         });
         const results = await saveMedia(req.body, article);

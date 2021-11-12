@@ -1,12 +1,12 @@
 const { Article, Project, Artist, Location, MailingList, Homepage_content, Homepage_image, Product } = require('../models/models');
 const { v2: cloud } = require('cloudinary');
-const { Model, Document: MongooseDocument } = require('mongoose');
+const { Model, Document: Doc } = require('mongoose');
 const { default: axios } = require('axios');
 const { each, forEachOf } = require('async');
 
 /**
  * Getting all documents from all collections
- * @param {function} cb callback with passed document collections as arguments
+ * @param {(docs: {[collection: string]: Doc[]})} [cb] callback with passed document collections as arguments
  */
 module.exports.Collections = async cb => {
     const docs = {};
@@ -18,7 +18,7 @@ module.exports.Collections = async cb => {
     docs.homepage_contents = await Homepage_content.find();
     docs.homepage_images = await Homepage_image.find().sort({index: 1}).exec();
     docs.products = await Product.find();
-    cb(docs);
+    if (!cb) return docs; cb(docs);
 };
 
 /**
@@ -48,13 +48,15 @@ module.exports.indexReorder = async (collection, args, cb) => {
 /**
  * Saving images / videos for news articles
  * @param {object} body response body object
- * @param {MongooseDocument} doc the new / existing document to contain references (URLs) to the media being uploaded / saved
+ * @param {Doc} doc the new / existing document to contain references (URLs) to the media being uploaded / saved
  * @param {(err: Error, mediaResults: {headline_images: string[], textbody_media: string[]}) => void} [cb] optional callback
  */
 module.exports.saveMedia = async (body, doc, cb) => {
     const fields = ["headline_images", "textbody_media"].filter(f => body[f]);
     const savedMedia = {};
     const saved_p_ids = [];
+    const warning = "Article document not valid";
+    if (!(doc instanceof Doc)) { if (!cb) throw Error(warning); return cb(Error(warning)) };
     if (!fields.length) return cb ? cb() : null;
     try {
         await each(fields, (field, callback1) => {
@@ -63,14 +65,14 @@ module.exports.saveMedia = async (body, doc, cb) => {
             forEachOf(body[field], (mediaStr, i, callback2) => {
                 const isIframe = /<iframe(.*?)><\/iframe>/i.test(mediaStr);
                 const ytUrl = /youtu.?be/.test(mediaStr) && !isIframe;
-                const dataUrl = /data:(image|video|audio)\/(.*?);base64/g.test(mediaStr);
+                const dataUrl = /^data:(image|video|audio)\/(.*?);base64/i.test(mediaStr);
                 if (isIframe) {
                     savedMedia[field].splice(i, 1, mediaStr.match(/<iframe(.*?)><\/iframe>/gi)[0].replace(/(width|height|style)\=\"?\'?(.*?)\"?\'? /gi, "") );
                     console.log("Stored iframe...");
                     callback2();
                 } else if (ytUrl) {
                     const toReplace = /^.*(youtu.?be\/|v\/|u\/\w\/|watch\?v=|\&v=|\?v=)/i;
-                    const iframe = '<iframe src="' + mediaStr.replace(toReplace, "https://youtube.com/embed/") + '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+                    const iframe = `<iframe src="${mediaStr.replace(toReplace, "https://youtube.com/embed/")}" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
                     savedMedia[field].splice(i, 1, iframe);
                     console.log("Youtube link stored as iframe...");
                     callback2();
@@ -93,8 +95,7 @@ module.exports.saveMedia = async (body, doc, cb) => {
                         callback2();
                     });
                 }
-            }, err => {
-                if (err) return callback1(err);
+            }).catch(err => callback1(err)).then(() => {
                 console.log(`All media from ${field} field saved...`);
                 callback1();
             });

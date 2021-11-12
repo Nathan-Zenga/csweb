@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { STRIPE_SK, STRIPE_PK, NODE_ENV, EXCHANGERATE_API_KEY } = process.env;
 const Stripe = new (require('stripe').Stripe)(STRIPE_SK);
-const cloud = require('cloudinary');
+const { v2: cloud } = require('cloudinary');
 const { default: axios } = require('axios');
 const { each } = require('async');
 const { isAuthed } = require('../config/config');
@@ -41,7 +41,7 @@ router.post("/stock/add", isAuthed, async (req, res) => {
         const product = await Product.create({ name, price, stock_qty, info });
         if (!image_url && !image_file) return res.send("Product saved in stock");
         const public_id = `shop/stock/${product.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
-        const result = await cloud.v2.uploader.upload(image_url || image_file, { public_id });
+        const result = await cloud.uploader.upload(image_url || image_file, { public_id });
         product.image = result.secure_url;
         await product.save(); res.send("Product saved in stock");
     } catch (err) { res.status(err.http_code || 500).send(err.message) }
@@ -53,23 +53,21 @@ router.post('/stock/edit', isAuthed, async (req, res) => {
         const product = await Product.findById(product_id);
         if (!product) return res.status(404).send("Product not found");
 
-        const prefix = `shop/stock/${product.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
+        const prev_p_id = `shop/stock/${product.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
         if (name) product.name = name;
         if (price) product.price = price;
         if (info) product.info = info;
-        if (stock_qty) {
-            product.stock_qty = stock_qty;
-            req.session.cart = req.session.cart.map(item => {
-                if (item.id === product.id) item.stock_qty = stock_qty;
-                return item;
-            });
-        };
+        if (stock_qty) product.stock_qty = stock_qty;
+        if (stock_qty) req.session.cart = req.session.cart.map(item => {
+            if (item.id === product.id) item.stock_qty = stock_qty;
+            return item;
+        });
 
         const saved = await product.save();
         if (!image_url && !image_file) return res.send("Product details updated successfully");
-        const public_id = ("shop/stock/" + saved.name.replace(/ /g, "-")).replace(/[ ?&#\\%<>]/g, "_");
-        await cloud.v2.api.delete_resources([prefix]);
-        const result = await cloud.v2.uploader.upload(image_url || image_file, { public_id });
+        const public_id = `shop/stock/${saved.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
+        await cloud.api.delete_resources([prev_p_id]);
+        const result = await cloud.uploader.upload(image_url || image_file, { public_id });
         saved.image = result.secure_url;
         await saved.save();
         for (const item of req.session.cart) if (item.id === saved.id) item.image = result.secure_url;
@@ -79,20 +77,21 @@ router.post('/stock/edit', isAuthed, async (req, res) => {
 
 router.post("/stock/remove", isAuthed, async (req, res) => {
     const ids = Object.values(req.body);
-    if (!ids.length) return res.send("Nothing selected");
-    const products = await Product.find({_id : { $in: ids }}).catch(err => ({ err }));
-    if (products.err) return res.status(400).send(products.err.message);
-    each(products, (item, cb) => {
-        Product.deleteOne({ _id : item.id }, (err, result) => {
-            if (err || !result.deletedCount) return cb(err ? err.message : "Product(s) not found");
-            const prefix = ("shop/stock/" + item.name.replace(/ /g, "-")).replace(/[ ?&#\\%<>]/g, "_");
-            cloud.v2.api.delete_resources([prefix], () => cb());
-        })
-    }, err => {
-        if (!err) return res.send("Product"+ (ids.length > 1 ? "s" : "") +" deleted from stock successfully");
-        let is404 = err.message === "Product(s) not found";
-        res.status(!is404 ? 500 : 404).send(!is404 ? "Error occurred" : "Product(s) not found");
-    })
+    if (!ids.length) return res.status(400).send("Nothing selected");
+    try {
+        const products = await Product.find({_id : { $in: ids }});
+        await each(products, (item, cb) => {
+            Product.deleteOne({ _id : item.id }, (err, result) => {
+                if (err || !result.deletedCount) return cb(err || Error("Product(s) not found"));
+                const p_id = `shop/stock/${item.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
+                cloud.api.delete_resources([p_id], () => cb());
+            })
+        });
+        res.send("Product"+ (ids.length > 1 ? "s" : "") +" deleted from stock successfully");
+    } catch (err) {
+        const missing = err.message === "Product(s) not found";
+        res.status(missing ? 404 : 500).send(missing ? "Product(s) not found" : err.message);
+    }
 });
 
 router.post("/cart/add", async (req, res) => {
