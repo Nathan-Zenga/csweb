@@ -87,7 +87,7 @@ router.post("/stock/remove", isAuthed, async (req, res) => {
                 cloud.api.delete_resources([p_id], () => cb());
             })
         });
-        res.send("Product"+ (ids.length > 1 ? "s" : "") +" deleted from stock successfully");
+        res.send(`Product${ids.length > 1 ? "s" : ""} deleted from stock successfully`);
     } catch (err) {
         const missing = err.message === "Product(s) not found";
         res.status(missing ? 404 : 500).send(missing ? "Product(s) not found" : err.message);
@@ -112,7 +112,7 @@ router.post("/cart/add", async (req, res) => {
 
 router.post("/cart/remove", (req, res) => {
     const cartItemIndex = req.session.cart.findIndex(item => item.id === req.body.id);
-    if (cartItemIndex === -1) return res.status(400).send("Item not found, or the cart is empty");
+    if (cartItemIndex === -1) return res.status(400).send("The selected item is not found in your cart");
     req.session.cart.splice(cartItemIndex, 1);
     res.send(`${req.session.cart.length}`);
 });
@@ -120,7 +120,7 @@ router.post("/cart/remove", (req, res) => {
 router.post("/cart/increment", (req, res) => {
     const { id, increment } = req.body;
     const currentItem = req.session.cart.find(item => item.id === id);
-    if (!currentItem) return res.status(400).send("Item not found, or the cart is empty");
+    if (!currentItem) return res.status(400).send("The selected item is not found in your cart");
     const newQuantity = currentItem.qty + parseInt(increment);
     const ltMin = newQuantity < 1;
     const gtMax = newQuantity > currentItem.stock_qty;

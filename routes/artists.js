@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const cloud = require('cloudinary');
+const { v2: cloud } = require('cloudinary');
 const { Artist } = require('../models/models');
 const { isAuthed } = require('../config/config');
 
@@ -15,12 +15,12 @@ router.post('/new', isAuthed, async (req, res) => {
     const social_media_urls = (social_media_url instanceof Array ? social_media_url : [social_media_url]).filter(e => e);
     if (social_media_names.length !== social_media_urls.length) return res.status(400).send("Number of specified social media names + urls don't match");
 
-    social_media_names.forEach((n, i) => { artist.socials.push({ name: social_media_names[i], url: social_media_urls[i] }) });
+    artist.socials = social_media_names.map((name, i) => ({ name, url: social_media_urls[i] }));
 
     try {
         if (!profile_image) return await artist.save().then(() => res.send("Done"));
         const public_id = `artists/${artist.id}/${artist.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
-        const result = await cloud.v2.uploader.upload(profile_image, { public_id });
+        const result = await cloud.uploader.upload(profile_image, { public_id });
         artist.profile_image = result.secure_url;
         await artist.save(); res.send("Done - image saved")
     } catch (err) { res.status(500).send(err.message) }
@@ -36,15 +36,14 @@ router.post('/edit', isAuthed, async (req, res) => {
 
     if (artist_name) artist.name = artist_name;
     if (artist_bio) artist.bio = artist_bio;
-    artist.socials = [];
-    social_media_names.forEach((n, i) => { artist.socials.push({ name: social_media_names[i], url: social_media_urls[i] }) });
+    artist.socials = social_media_names.map((name, i) => ({ name, url: social_media_urls[i] }));
 
     try {
         const saved = await artist.save();
         if (!profile_image) return res.send(`Artist updated successfully: ${saved.name}`);
-        await cloud.v2.api.delete_resources_by_prefix(`artists/${saved.id}`);
+        await cloud.api.delete_resources_by_prefix(`artists/${saved.id}`);
         const public_id = `artists/${saved.id}/${saved.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
-        const result = await cloud.v2.uploader.upload(profile_image, { public_id });
+        const result = await cloud.uploader.upload(profile_image, { public_id });
         saved.profile_image = result.secure_url;
         await saved.save(); res.send(`Artist updated successfully: ${saved.name}`);
     } catch (err) { res.status(err.http_code || 500).send(err.message) }
@@ -56,7 +55,7 @@ router.post('/delete', isAuthed, async (req, res) => {
     try {
         const result = await Artist.deleteMany({_id : { $in: ids }});
         if (!result.deletedCount) return res.status(404).send("Artist(s) not found");
-        await Promise.all(ids.map(id => cloud.v2.api.delete_resources_by_prefix("artists/" + id)));
+        await Promise.all(ids.map(id => cloud.api.delete_resources_by_prefix("artists/" + id)));
         res.send("Artist"+ (ids.length > 1 ? "s" : "") +" removed successfully")
     } catch (err) { res.status(err.http_code || 500).send(err.message) }
 });

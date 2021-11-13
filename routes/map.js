@@ -1,11 +1,8 @@
 const router = require('express').Router();
 const { Location } = require('../models/models');
 const { isAuthed } = require('../config/config');
-const geocoder = require('node-geocoder')({
-    provider: 'google',
-    httpAdapter: 'https',
-    apiKey: 'AIzaSyCRIzIyhXXI1JxBGUqmUsX5N4MnxYHHGCo'
-});
+const apiKey = 'AIzaSyCRIzIyhXXI1JxBGUqmUsX5N4MnxYHHGCo';
+const geocoder = require('node-geocoder')({ provider: 'google', httpAdapter: 'https', apiKey });
 
 router.get('/', (req, res) => res.render('map', { title: "Map", pagename: "map" }));
 
@@ -56,7 +53,7 @@ router.post('/location/delete', isAuthed, async (req, res) => {
     try {
         const result = await Location.deleteMany({_id : { $in: ids }});
         if (!result.deletedCount) return res.status(404).send("Location(s) not found");
-        res.send("Location"+ (ids.length > 1 ? "s" : "") + " removed successfully")
+        res.send(`Location${ids.length > 1 ? "s" : ""} removed successfully`)
     } catch (err) { res.status(500).send(err.message) }
 });
 
