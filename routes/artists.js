@@ -11,14 +11,14 @@ router.get('/', async (req, res) => {
 router.post('/new', isAuthed, async (req, res) => {
     const { name, bio, profile_image, social_media_name, social_media_url } = req.body;
     const artist = new Artist({ name, bio });
-    const social_media_names = (social_media_name instanceof Array ? social_media_name : [social_media_name]).filter(e => e);
-    const social_media_urls = (social_media_url instanceof Array ? social_media_url : [social_media_url]).filter(e => e);
+    const social_media_names = (Array.isArray(social_media_name) ? social_media_name : [social_media_name]).filter(e => e);
+    const social_media_urls = (Array.isArray(social_media_url) ? social_media_url : [social_media_url]).filter(e => e);
     if (social_media_names.length !== social_media_urls.length) return res.status(400).send("Number of specified social media names + urls don't match");
 
     artist.socials = social_media_names.map((name, i) => ({ name, url: social_media_urls[i] }));
 
     try {
-        if (!profile_image) return await artist.save().then(() => res.send("Done"));
+        if (!profile_image) { await artist.save(); return res.send("Done") }
         const public_id = `artists/${artist.id}/${artist.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
         const result = await cloud.uploader.upload(profile_image, { public_id });
         artist.profile_image = result.secure_url;
@@ -28,17 +28,17 @@ router.post('/new', isAuthed, async (req, res) => {
 
 router.post('/edit', isAuthed, async (req, res) => {
     const { artist_id, artist_name, artist_bio, profile_image, social_media_name, social_media_url } = req.body;
-    const artist = await Artist.findById(artist_id).catch(() => null);
-    if (!artist) return res.status(404).send("Artist not found");
-    const social_media_names = (social_media_name instanceof Array ? social_media_name : [social_media_name]).filter(e => e);
-    const social_media_urls = (social_media_url instanceof Array ? social_media_url : [social_media_url]).filter(e => e);
-    if (social_media_names.length !== social_media_urls.length) return res.status(400).send("Number of specified social media names + urls don't match");
-
-    if (artist_name) artist.name = artist_name;
-    if (artist_bio) artist.bio = artist_bio;
-    artist.socials = social_media_names.map((name, i) => ({ name, url: social_media_urls[i] }));
-
     try {
+        const artist = await Artist.findById(artist_id);
+        if (!artist) return res.status(404).send("Artist not found");
+        const social_media_names = (Array.isArray(social_media_name) ? social_media_name : [social_media_name]).filter(e => e);
+        const social_media_urls = (Array.isArray(social_media_url) ? social_media_url : [social_media_url]).filter(e => e);
+        if (social_media_names.length !== social_media_urls.length) return res.status(400).send("Number of specified social media names + urls don't match");
+
+        if (artist_name) artist.name = artist_name;
+        if (artist_bio) artist.bio = artist_bio;
+        artist.socials = social_media_names.map((name, i) => ({ name, url: social_media_urls[i] }));
+
         const saved = await artist.save();
         if (!profile_image) return res.send(`Artist updated successfully: ${saved.name}`);
         await cloud.api.delete_resources_by_prefix(`artists/${saved.id}`);

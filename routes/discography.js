@@ -10,12 +10,12 @@ router.get('/', async (req, res) => {
 
 router.post('/project/new', isAuthed, async (req, res) => {
     const { title, artist, year, artwork_file, artwork_url, link_name, link_url, all_platforms } = req.body;
-    const link_names = (link_name instanceof Array ? link_name : [link_name]).filter(e => e);
-    const link_urls = (link_url instanceof Array ? link_url : [link_url]).filter(e => e);
+    const link_names = (Array.isArray(link_name) ? link_name : [link_name]).filter(e => e);
+    const link_urls = (Array.isArray(link_url) ? link_url : [link_url]).filter(e => e);
     if (link_names.length !== link_urls.length) return res.status(400).send("Number of specified link names + urls don't match");
 
     const project = new Project({ title, artist, year, artwork: artwork_url, all_platforms: !!all_platforms });
-    link_names.forEach((name, i) => { project.links.push({ name, url: link_urls[i] }) });
+    project.links = link_names.map((name, i) => ({ name, url: link_urls[i] }));
 
     try {
         if (!artwork_file) { await project.save(); return res.send("Done") }
@@ -39,8 +39,8 @@ router.post('/project/delete', isAuthed, async (req, res) => {
 
 router.post('/project/edit', isAuthed, async (req, res) => {
     const { link_name, link_url, project_id, title, artist, year, artwork_url, all_platforms, artwork_file } = req.body;
-    const link_names = (link_name instanceof Array ? link_name : [link_name]).filter(e => e);
-    const link_urls = (link_url instanceof Array ? link_url : [link_url]).filter(e => e);
+    const link_names = (Array.isArray(link_name) ? link_name : [link_name]).filter(e => e);
+    const link_urls = (Array.isArray(link_url) ? link_url : [link_url]).filter(e => e);
     if (link_names.length !== link_urls.length) return res.status(400).send("Number of specified link names + urls don't match");
 
     try {

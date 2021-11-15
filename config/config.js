@@ -65,7 +65,8 @@ module.exports.saveMedia = async (body, doc, cb) => {
             forEachOf(body[field], (mediaStr, i, callback2) => {
                 const isIframe = /<iframe(.*?)><\/iframe>/i.test(mediaStr);
                 const ytUrl = /youtu.?be/.test(mediaStr) && !isIframe;
-                const dataUrl = /^data:(image|video|audio)\/(.*?);base64/i.test(mediaStr);
+                const img = /^data:image\/(.*?);base64|\.(jpe?g|png|gif|bmp)$/i.test(mediaStr);
+                const av = /^data:(video|audio)\/(.*?);base64|\.(mp(4|3|2)|mov|avi|wmv|f(l|4)v|webm|mkv|ogg|mpeg?|m(4|k)a|wav)$/i.test(mediaStr);
                 const url = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/.test(mediaStr);
                 if (isIframe) {
                     savedMedia[field].splice(i, 1, mediaStr.match(/<iframe(.*?)><\/iframe>/gi)[0].replace(/(width|height|style)\=\"?\'?(.*?)\"?\'? /gi, "") );
@@ -77,9 +78,9 @@ module.exports.saveMedia = async (body, doc, cb) => {
                     savedMedia[field].splice(i, 1, iframe);
                     console.log("Youtube link stored as iframe...");
                     callback2();
-                } else if (dataUrl) {
+                } else if (img || av) {
                     const public_id = `article/${doc.id}/${field}${parseInt(i)+1}`.replace(/[ ?&#\\%<>]/g, "_");
-                    cloud.uploader.upload(mediaStr, { public_id, resource_type: "auto" }, (err, result) => {
+                    cloud.uploader.upload(mediaStr, { public_id, resource_type: img ? "image" : "video" }, (err, result) => {
                         if (err) return callback2(err);
                         if (body.headline_image_thumb === mediaStr) doc.headline_image_thumb = result.secure_url;
                         saved_p_ids.push(result.public_id);
