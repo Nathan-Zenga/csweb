@@ -56,12 +56,12 @@ module.exports.saveMedia = async (body, doc, cb) => {
     const savedMedia = { headline_images: [], textbody_media: [] };
     const saved_p_ids = [];
     const warning = "Article document not valid";
-    if (!(doc instanceof Doc)) { if (!cb) throw Error(warning); return cb(Error(warning)) };
+    if (!(doc instanceof Doc)) { if (!cb) throw TypeError(warning); return cb(TypeError(warning)) };
     if (!fields.length) return cb ? cb() : null;
     try {
         await each(fields, (field, callback1) => {
             body[field] = Array.isArray(body[field]) ? body[field] : [body[field]];
-            savedMedia[field] = [...body[field]];
+            savedMedia[field].push(...body[field]);
             forEachOf(body[field], (mediaStr, i, callback2) => {
                 const isIframe = /<iframe(.*?)><\/iframe>/i.test(mediaStr);
                 const ytUrl = /youtu.?be/.test(mediaStr) && !isIframe;
@@ -91,12 +91,12 @@ module.exports.saveMedia = async (body, doc, cb) => {
                 } else if (url) {
                     axios.get(mediaStr).then(response => {
                         const isHTML = /^(\w+)\/html/.test(response.headers["content-type"] || "");
-                        if (!isHTML) return callback2(Error("Web link / file format not valid"));
+                        if (!isHTML) return callback2(TypeError("Web link / file format not valid"));
                         savedMedia[field].splice(i, 1, `<iframe src="${mediaStr}" frameborder="0" allowfullscreen></iframe>`);
                         console.log("Web link stored as iframe...");
                         callback2();
                     }).catch(err => callback2(err));
-                } else callback2(Error("Media file / URL format not valid"));
+                } else callback2(TypeError("Media file / URL format not valid"));
             }).then(() => {
                 console.log(`All media from ${field} field saved...`);
                 callback1();
