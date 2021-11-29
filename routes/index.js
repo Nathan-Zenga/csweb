@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const cloud = require('cloudinary');
+const { v2: cloud } = require('cloudinary');
 const { each } = require('async');
 const { isAuthed, indexReorder } = require('../config/config');
 const { Homepage_content, Homepage_image } = require('../models/models');
@@ -19,11 +19,11 @@ router.post('/homepage/content', isAuthed, async (req, res) => {
     if (banner_text)   content.banner_text = banner_text;
     if (footnote_text) content.footnote_text = footnote_text;
     if (socials_name && socials_url) {
-        const names = (socials_name instanceof Array ? socials_name : [socials_name]).filter(e => e);
-        const urls = (socials_url instanceof Array ? socials_url : [socials_url]).filter(e => e);
+        const names = (Array.isArray(socials_name) ? socials_name : [socials_name]).filter(e => e);
+        const urls = (Array.isArray(socials_url) ? socials_url : [socials_url]).filter(e => e);
         if (names.length !== urls.length) return res.status(400).send("Number of specified social names + urls don't match");
-        const socials = names.map((name, i) => { return { name, url: urls[i] } });
-        if (content.socials instanceof Array) {
+        const socials = names.map((name, i) => ({ name, url: urls[i] }));
+        if (Array.isArray(content.socials)) {
             content.socials = content.socials.filter(s => socials_name !== s.name).concat(socials);
         } else {
             content.socials = socials;
@@ -36,26 +36,24 @@ router.post('/homepage/image/save', isAuthed, async (req, res) => {
     const { filename, image, index } = req.body;
     const public_id = `homepage/images/${filename.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
     try {
-        const result = await cloud.v2.uploader.upload(image, { public_id });
+        const result = await cloud.uploader.upload(image, { public_id });
         const { length } = await Homepage_image.find();
         const newImage = new Homepage_image({ url: result.secure_url, p_id: result.public_id, index });
         const saved = await newImage.save();
         if (saved.index === length + 1) return res.send("Image saved");
         indexReorder(Homepage_image, { id: saved._id, newIndex: saved.index }, () => res.send("Image saved"));
-    } catch (err) { res.status(500).send(err.message) }
+    } catch (err) { res.status(err.http_code || 500).send(err.message) }
 });
 
 router.post('/homepage/image/delete', isAuthed, (req, res) => {
     const p_ids = Object.values(req.body);
     if (!p_ids.length) return res.status(400).send("Nothing selected");
     each(p_ids, (p_id, cb) => {
-        cloud.v2.api.delete_resources([ p_id ], err => {
-            if (err) return cb(err.message);
-            Homepage_image.deleteOne({ p_id }, err => { if (err) return cb(err.message); cb() });
+        cloud.api.delete_resources([ p_id ], err => {
+            if (err) return cb(err);
+            Homepage_image.deleteOne({ p_id }, err => { err ? cb(err) : cb() });
         })
-    }, err => {
-        res.status(err ? 500 : 200).send(err ? err.message : "Images removed");
-    });
+    }, err => res.status(err ? err.http_code || 500 : 200).send(err ? err.message : "Images removed"));
 });
 
 router.post('/homepage/image/reorder', isAuthed, (req, res) => {
@@ -68,8 +66,7 @@ router.post('/cs/links/delete', isAuthed, async (req, res) => {
     const content = await Homepage_content.findOne();
     if (!content || !names.length) return res.status(400).send("Nothing selected");
     content.socials = content.socials.filter(x => !names.includes(x.name));
-    content.save().then(() => res.send("Link"+ (names.length > 1 ? "s" : "") +" removed successfully"))
-    .catch(err => res.status(500).send(err.message));
+    content.save(err => res.status(err ? 500 : 200).send(err ? err.message : `Link${names.length > 1 ? "s" : ""} removed successfully`));
 });
 
 module.exports = router;

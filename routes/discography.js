@@ -18,11 +18,10 @@ router.post('/project/new', isAuthed, async (req, res) => {
     project.links = link_names.map((name, i) => ({ name, url: link_urls[i] }));
 
     try {
-        if (!artwork_file) { await project.save(); return res.send("Done") }
         const public_id = `discography/${project.id}/${project.title.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
-        const result = await cloud.uploader.upload(artwork_file, { public_id });
-        project.artwork = result.secure_url;
-        await project.save(); res.send("Done - artwork saved");
+        const result = artwork_file ? await cloud.uploader.upload(artwork_file, { public_id }) : null;
+        if (result) project.artwork = result.secure_url;
+        await project.save(); res.send(`Done${result ? ", artwork saved" : ""}`);
     } catch (err) { res.status(500).send(err.message) }
 });
 
@@ -53,13 +52,11 @@ router.post('/project/edit', isAuthed, async (req, res) => {
         if (link_names.length && link_urls.length) project.links = link_names.map((name, i) => ({ name, url: link_urls[i] }));
         project.all_platforms = !!all_platforms;
 
-        const saved = await project.save();
-        if (!artwork_file) return res.send("Done");
-        await cloud.api.delete_resources_by_prefix(`discography/${saved.id}`);
-        const public_id = `discography/${saved.id}/${saved.title.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
-        const result = await cloud.uploader.upload(artwork_file, { public_id });
-        saved.artwork = result.secure_url;
-        await saved.save(); res.send("Done - artwork saved");
+        if (artwork_file) await cloud.api.delete_resources_by_prefix(`discography/${project.id}`);
+        const public_id = `discography/${project.id}/${project.title.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
+        const result = artwork_file ? await cloud.uploader.upload(artwork_file, { public_id }) : null;
+        if (result) project.artwork = result.secure_url;
+        await project.save(); res.send(`Done${result ? ", artwork saved" : ""}`);
     } catch (err) { res.status(500).send(err.message) }
 });
 

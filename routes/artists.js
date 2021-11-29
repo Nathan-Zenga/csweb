@@ -18,11 +18,10 @@ router.post('/new', isAuthed, async (req, res) => {
     artist.socials = social_media_names.map((name, i) => ({ name, url: social_media_urls[i] }));
 
     try {
-        if (!profile_image) { await artist.save(); return res.send("Done") }
         const public_id = `artists/${artist.id}/${artist.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
-        const result = await cloud.uploader.upload(profile_image, { public_id });
-        artist.profile_image = result.secure_url;
-        await artist.save(); res.send("Done - image saved")
+        const result = profile_image ? await cloud.uploader.upload(profile_image, { public_id }) : null;
+        if (result) artist.profile_image = result.secure_url;
+        await artist.save(); res.send(`Done${result ? ", profile picture saved" : ""}`)
     } catch (err) { res.status(500).send(err.message) }
 });
 
@@ -39,13 +38,11 @@ router.post('/edit', isAuthed, async (req, res) => {
         if (artist_bio) artist.bio = artist_bio;
         artist.socials = social_media_names.map((name, i) => ({ name, url: social_media_urls[i] }));
 
-        const saved = await artist.save();
-        if (!profile_image) return res.send(`Artist updated successfully: ${saved.name}`);
-        await cloud.api.delete_resources_by_prefix(`artists/${saved.id}`);
-        const public_id = `artists/${saved.id}/${saved.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
-        const result = await cloud.uploader.upload(profile_image, { public_id });
-        saved.profile_image = result.secure_url;
-        await saved.save(); res.send(`Artist updated successfully: ${saved.name}`);
+        if (profile_image) await cloud.api.delete_resources_by_prefix(`artists/${artist.id}`);
+        const public_id = `artists/${artist.id}/${artist.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
+        const result = profile_image ? await cloud.uploader.upload(profile_image, { public_id }) : null;
+        if (result) artist.profile_image = result.secure_url;
+        await artist.save(); res.send(`Artist updated successfully: ${artist.name}`);
     } catch (err) { res.status(err.http_code || 500).send(err.message) }
 });
 

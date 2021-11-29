@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { Location } = require('../models/models');
 const { isAuthed } = require('../config/config');
-const apiKey = 'AIzaSyCRIzIyhXXI1JxBGUqmUsX5N4MnxYHHGCo';
+const apiKey = process.env.GEOCODER_API_KEY;
 const geocoder = require('node-geocoder')({ provider: 'google', httpAdapter: 'https', apiKey });
 
 router.get('/', (req, res) => res.render('map', { title: "Map", pagename: "map" }));
@@ -12,8 +12,7 @@ router.post('/init', async (req, res) => {
     if (!locations.length) return res.send({ locations: [defaultPts], mid_point: defaultPts});
     const lat = locations.map(x => x.latitude).reduce((sum, n) => sum + n) / locations.length;
     const lng = locations.map(x => x.longitude).reduce((sum, n) => sum + n) / locations.length;
-    const mid_point = { lat, lng };
-    res.send({ locations, mid_point });
+    res.send({ locations, mid_point: { lat, lng } });
 });
 
 router.post('/location/new', isAuthed, async (req, res) => {

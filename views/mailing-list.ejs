@@ -36,9 +36,13 @@
             </div>
             <label>EXTRA INFO (OPTIONAL)</label>
             <textarea name="extra_info" id="extra_info"></textarea>
+
+            <div class="g-recaptcha" id="recaptcha" data-sitekey="<%= recaptcha_site_key %>"></div>
+
             <input type="submit" value="SIGN UP">
         </form>
     </div>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script>
         $("form").submit(function(e) {
             e.preventDefault();
@@ -46,6 +50,9 @@
             $.post(this.action, $(this).serializeArray(), function(result) {
                 alert(result);
                 e.target.reset();
+            }).fail(function(err) {
+                alert(err.responseText);
+            }).always(function() {
                 btnController.finish();
             });
         });

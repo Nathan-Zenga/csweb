@@ -1,11 +1,12 @@
 const router = require('express').Router();
 const { MailingList } = require('../models/models');
 const { isAuthed } = require('../config/config');
-const MailingListMailTransporter = require('../config/mailingListMailTransporter');
+const MailTransporter = require('../config/mailingListMailTransporter');
 const { default: axios } = require('axios');
+const { RECAPTCHA_SITE_KEY: recaptcha_site_key, RECAPTCHA_SECRET_KEY } = process.env;
 
 router.get('/sign-up', (req, res) => {
-    res.render('mailing-list', { title: "Sign Up", pagename: "sign-up" })
+    res.render('mailing-list', { title: "Sign Up", pagename: "sign-up", recaptcha_site_key })
 });
 
 router.get('/member/delete', async (req, res) => {
@@ -22,12 +23,17 @@ router.get('/member/delete', async (req, res) => {
 
 router.post('/new', async (req, res) => {
     for (const k in req.body) if (typeof req.body[k] == "string") req.body[k] = req.body[k].replace(/<script(.*?)>(<\/script>)?/gi, "");
-    const { firstname, lastname, email, size_top, size_bottom, extra_info } = req.body;
+    const { firstname, lastname, email, size_top, size_bottom, extra_info, "g-recaptcha-response": captcha } = req.body;
     const newMember = new MailingList({ firstname, lastname, email, size_top, size_bottom, extra_info });
+
+    const params = new URLSearchParams({ secret: RECAPTCHA_SECRET_KEY, response: captcha, remoteip: req.socket.remoteAddress });
+    const verifyURL = `https://google.com/recaptcha/api/siteverify?${params.toString()}`;
+    const { data: result } = await axios.get(verifyURL).catch(e => e);
+    if (!result || !result.success) return res.status(400).send("Failed CAPTCHA verification");
 
     const member = await MailingList.findOne({ email });
     if (member) return res.status(400).send("Already registered");
-    newMember.save().then(() => res.send("You are now registered")).catch(err => res.status(500).send(err.message))
+    newMember.save(err => res.status(err ? 500 : 200).send(err ? err.message : "You are now registered"));
 });
 
 router.post('/update', isAuthed, async (req, res) => {
@@ -40,32 +46,32 @@ router.post('/update', isAuthed, async (req, res) => {
     if (size_top)    member.size_top = size_top;
     if (size_bottom) member.size_bottom = size_bottom;
     if (extra_info)  member.extra_info = extra_info;
-    member.save().then(() => res.send("Member updated")).catch(err => res.status(500).send(err.message));
+    member.save(err => res.status(err ? 500 : 200).send(err ? err.message : "Member updated"));
 });
 
 router.post('/send/mail', isAuthed, async (req, res) => {
     const { email, subject, message } = req.body;
     const members = await MailingList.find(email === "all" ? {} : { email: email || "null" });
     if (!members.length) return res.status(404).send("Member(s) not found");
-    const transporter = new MailingListMailTransporter({ req, res });
+    const transporter = new MailTransporter({ req, res });
 
-    members.forEach((member, i) => {
-        setTimeout(() => {
-            transporter.setRecipient(member).sendMail({ subject, message }, err => {
-                if (err) console.error(`${err.message || err}\nNot sent for ${member.firstname +" "+ member.lastname}`);
-                else console.log(`Message sent!`);
-            });
-        }, i * 2000);
-    });
+    for (let i = 0; i < members.length; i++) setTimeout(() => {
+        transporter.setRecipient(members[i]).sendMail({ subject, message }, err => {
+            if (err) console.error(`${err.message || err}\nNot sent for ${members[i].firstname+" "+members[i].lastname}`);
+            else console.log(`Message sent!`);
+        });
+    }, i * 2000);
     res.send(`Message sent to ${email === "all" ? "everyone" : members[0].firstname+" "+members[0].lastname}`);
 });
 
 router.post('/member/delete', async (req, res) => {
     const ids = Object.values(req.body);
     if (!ids.length) return res.status(400).send("Nothing selected");
-    const result = await MailingList.deleteMany({ _id : { $in: ids } }).catch(err => null);
-    if (!result.deletedCount) return res.status(404).send("Member(s) not found");
-    res.send(`Member${ids.length > 1 ? "s" : ""} removed successfully`)
+    try {
+        const { deletedCount } = await MailingList.deleteMany({ _id : { $in: ids } });
+        if (!deletedCount) return res.status(404).send("Member(s) not found");
+        res.send(`Member${ids.length > 1 ? "s" : ""} removed successfully`)
+    } catch (err) { res.status(500).send(err.message) }
 });
 
 module.exports = router;
