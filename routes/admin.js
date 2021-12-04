@@ -1,11 +1,10 @@
 const router = require('express').Router();
 const crypto = require('crypto');
-const passport = require('passport');
 const { isAuthed, Collections } = require('../config/config');
 const MailingListMailTransporter = require('../config/mailingListMailTransporter');
 const { Admin } = require('../models/models');
 const email = "info@thecs.co";
-require('../config/passport')(passport);
+const passport = require('../config/passport');
 
 router.get('/', isAuthed, (req, res) => {
     Collections(db => res.render('admin', { title: "Admin", pagename: "admin", ...db }))
