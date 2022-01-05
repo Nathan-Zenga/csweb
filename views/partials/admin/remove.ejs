@@ -1,157 +1,159 @@
-<div class="col-md-3 sidebar" id="remove-sidebar">
-    <div class="mb-view-md section-dropdown-options" style="font-weight: bold; max-width: 250px; margin: 0 auto">
-        <label>SELECT OPTION <i class="fas fa-chevron-down"></i></label>
-        <select>
-            <option value="#remove-cs-link">CS LINKS</option>
-            <option value="#remove-artist">ARTIST</option>
-            <option value="#remove-article">ARTICLE</option>
-            <option value="#remove-project">PROJECT</option>
-            <option value="#remove-location">LOCATION</option>
-            <option value="#remove-member">MEMBER</option>
-            <option value="#remove-product">SHOP PRODUCT</option>
-            <option value="#remove-homepage-image">HOMEPAGE IMAGE</option>
-        </select>
+<div class="row">
+    <div class="col-md-3 float-left sidebar" id="remove-sidebar">
+        <div class="mb-view-md section-dropdown-options" style="font-weight: bold; max-width: 250px; margin: 0 auto">
+            <label>SELECT OPTION <i class="fas fa-chevron-down"></i></label>
+            <select>
+                <option value="#remove-cs-link">CS LINKS</option>
+                <option value="#remove-artist">ARTIST</option>
+                <option value="#remove-article">ARTICLE</option>
+                <option value="#remove-project">PROJECT</option>
+                <option value="#remove-location">LOCATION</option>
+                <option value="#remove-member">MEMBER</option>
+                <option value="#remove-product">SHOP PRODUCT</option>
+                <option value="#remove-homepage-image">HOMEPAGE IMAGE</option>
+            </select>
+        </div>
+        <div class="nav nav-pills flex-column nav-justified dt-view-md">
+            <a class="nav-link active" data-toggle="pill" href="#remove-cs-link">CS LINKS</a>
+            <a class="nav-link" data-toggle="pill" href="#remove-artist">ARTIST</a>
+            <a class="nav-link" data-toggle="pill" href="#remove-article">ARTICLE</a>
+            <a class="nav-link" data-toggle="pill" href="#remove-project">PROJECT</a>
+            <a class="nav-link" data-toggle="pill" href="#remove-location">LOCATION</a>
+            <a class="nav-link" data-toggle="pill" href="#remove-member">MEMBER</a>
+            <a class="nav-link" data-toggle="pill" href="#remove-product">SHOP PRODUCT</a>
+            <a class="nav-link" data-toggle="pill" href="#remove-homepage-image">HOMEPAGE IMAGE</a>
+        </div>
     </div>
-    <ul class="nav nav-pills nav-stacked dt-view-md">
-        <li class="active"><a data-toggle="pill" href="#remove-cs-link">CS LINKS</a></li>
-        <li><a data-toggle="pill" href="#remove-artist">ARTIST</a></li>
-        <li><a data-toggle="pill" href="#remove-article">ARTICLE</a></li>
-        <li><a data-toggle="pill" href="#remove-project">PROJECT</a></li>
-        <li><a data-toggle="pill" href="#remove-location">LOCATION</a></li>
-        <li><a data-toggle="pill" href="#remove-member">MEMBER</a></li>
-        <li><a data-toggle="pill" href="#remove-product">SHOP PRODUCT</a></li>
-        <li><a data-toggle="pill" href="#remove-homepage-image">HOMEPAGE IMAGE</a></li>
-    </ul>
-</div>
-<div class="col-md-9">
-    <div class="tab-content" style="padding-top: 10px;">
+    <div class="col-md-9 float-left">
+        <div class="tab-content" style="padding-top: 10px;">
 
-        <div id="remove-cs-link" class="tab-pane fade in active">
-            <%_ var { socials } = homepage_contents[0];
-                if (socials.length) { _%>
-            <form action="/cs/links/delete" method="post">
-                <label>DELETE SOCIAL LINK(S)</label>
-                <%_ socials.forEach((social, i) => {
-                    var occurrences = socials.filter(s => s.name === social.name).length;
-                    var label = social.name.slice(0,1).toUpperCase() + social.name.slice(1).replace(/_/g, " ");
-                    label += occurrences > 1 ? " " + social.url : ""; _%>
-                <input type="checkbox" name="social<%= i %>" value="<%= social.name %>"> <span><%= label %></span><br>
-                <%_ }) _%>
-                <br>
-                <input type="submit" value="DELETE LINKS">
-            </form>
-            <%_ } else { _%>
-            <p style="text-align: center; margin-top: 2em"><b>NO SOCIAL LINKS TO DELETE</b></p>
-            <%_ } _%>
+            <div id="remove-cs-link" class="tab-pane fade show active">
+                <%_ var { socials } = homepage_contents[0];
+                    if (socials.length) { _%>
+                <form action="/cs/links/delete" method="post">
+                    <label>DELETE SOCIAL LINK(S)</label>
+                    <%_ socials.forEach((social, i) => {
+                        var occurrences = socials.filter(s => s.name === social.name).length;
+                        var label = social.name.slice(0,1).toUpperCase() + social.name.slice(1).replace(/_/g, " ");
+                        label += occurrences > 1 ? " " + social.url : ""; _%>
+                    <input type="checkbox" name="social<%= i %>" value="<%= social.name %>"> <span><%= label %></span><br>
+                    <%_ }) _%>
+                    <br>
+                    <input type="submit" value="DELETE LINKS">
+                </form>
+                <%_ } else { _%>
+                <p style="text-align: center; margin-top: 2em"><b>NO SOCIAL LINKS TO DELETE</b></p>
+                <%_ } _%>
+            </div>
+
+            <div id="remove-artist" class="tab-pane fade">
+                <%_ if (artists.length) { _%>
+                <form action="/team/delete" method="post">
+                    <label>DELETE ARTIST(S)</label>
+                    <%_ artists.forEach((artist, i) => { _%>
+                    <input type="checkbox" name="artist<%= i %>" value="<%= artist._id %>"> <span><%= artist.name %></span><br>
+                    <%_ }) _%>
+                    <br>
+                    <input type="submit" value="DELETE ARTISTS">
+                </form>
+                <%_ } else { _%>
+                <p style="text-align: center; margin-top: 2em"><b>NO ARTISTS TO DELETE</b></p>
+                <%_ } _%>
+            </div>
+
+            <div id="remove-project" class="tab-pane fade">
+                <%_ if (projects.length) { _%>
+                <form action="/discography/project/delete" method="post">
+                    <label>DELETE PROJECT(S)</label>
+                    <%_ projects.forEach((project, i) => { _%>
+                    <input type="checkbox" name="project<%= i %>" value="<%= project._id %>"> <span><%= project.title %></span><br>
+                    <%_ }) _%>
+                    <br>
+                    <input type="submit" value="DELETE PROJECTS">
+                </form>
+                <%_ } else { _%>
+                <p style="text-align: center; margin-top: 2em"><b>NO PROJECTS TO DELETE</b></p>
+                <%_ } _%>
+            </div>
+
+            <div id="remove-article" class="tab-pane fade">
+                <%_ if (articles.length) { _%>
+                <form action="/news/article/delete" method="post">
+                    <label>DELETE ARTICLE(S)</label>
+                    <%_ articles.forEach((article, i) => { _%>
+                    <input type="checkbox" name="article<%= i %>" value="<%= article._id %>"> <span><%= article.headline %></span><br>
+                    <%_ }) _%>
+                    <br>
+                    <input type="submit" value="DELETE ARTICLES">
+                </form>
+                <%_ } else { _%>
+                <p style="text-align: center; margin-top: 2em"><b>NO ARTICLES TO DELETE</b></p>
+                <%_ } _%>
+            </div>
+
+            <div id="remove-location" class="tab-pane fade">
+                <%_ if (locations.length) { _%>
+                <form action="/map/location/delete" method="post">
+                    <label>DELETE LOCATION(S)</label>
+                    <%_ locations.forEach((location, i) => { _%>
+                    <input type="checkbox" name="location<%= i %>" value="<%= location._id %>"> <span><%- "<b>"+ location.name +"</b> - "+ location.city +", "+ location.country %></span><br>
+                    <%_ }) _%>
+                    <br>
+                    <input type="submit" value="DELETE LOCATIONS">
+                </form>
+                <%_ } else { _%>
+                <p style="text-align: center; margin-top: 2em"><b>NO LOCATIONS TO DELETE</b></p>
+                <%_ } _%>
+            </div>
+
+            <div id="remove-member" class="tab-pane fade">
+                <%_ if (members.length) { _%>
+                <form action="/mailing-list/member/delete" method="post">
+                    <label>DELETE MEMBER(S) FROM MAILING LIST</label>
+                    <%_ members.forEach((member, i) => { _%>
+                    <input type="checkbox" name="member<%= i %>" value="<%= member._id %>"> <span><%= member.firstname +" "+ member.lastname %></span><br>
+                    <%_ }) _%>
+                    <br>
+                    <input type="submit" value="DELETE MEMBERS">
+                </form>
+                <%_ } else { _%>
+                <p style="text-align: center; margin-top: 2em"><b>NO MEMBERS TO REMOVE</b></p>
+                <%_ } _%>
+            </div>
+
+            <div id="remove-product" class="tab-pane fade">
+                <%_ if (products.length) { _%>
+                <form action="/shop/stock/remove" method="post">
+                    <label>DELETE PRODUCT(S) FROM STOCK</label>
+                    <%_ products.forEach((item, i) => { _%>
+                    <input type="checkbox" name="product<%= i %>" value="<%= item._id %>"> <span><%= item.name %></span><br>
+                    <%_ }) _%>
+                    <br>
+                    <input type="submit" value="DELETE PRODUCTS">
+                </form>
+                <%_ } else { _%>
+                <p style="text-align: center; margin-top: 2em"><b>NO SHOP PRODUCTS TO REMOVE</b></p>
+                <%_ } _%>
+            </div>
+
+            <div id="remove-homepage-image" class="tab-pane fade">
+                <%_ if (homepage_images.length) { _%>
+                <form action="/homepage/image/delete" method="post">
+                    <label>DELETE HOMEPAGE IMAGE(S)</label><br>
+                    <%_ homepage_images.forEach((image, i) => { _%>
+                    <div style="display: inline-block">
+                        <input type="checkbox" name="image<%= i %>" value="<%= image.p_id %>">
+                        <span><img style="height: 100px; margin-bottom: 10px;" src="<%= image.url %>" alt="<%= image.p_id.replace('homepage/images/', '') %>"></span>
+                    </div>
+                    <%_ }) _%>
+                    <br><br>
+                    <input type="submit" value="DELETE IMAGES">
+                </form>
+                <%_ } else { _%>
+                <p style="text-align: center; margin-top: 2em"><b>NO IMAGES TO DELETE</b></p>
+                <%_ } _%>
+            </div>
+
         </div>
-
-        <div id="remove-artist" class="tab-pane fade">
-            <%_ if (artists.length) { _%>
-            <form action="/team/delete" method="post">
-                <label>DELETE ARTIST(S)</label>
-                <%_ artists.forEach((artist, i) => { _%>
-                <input type="checkbox" name="artist<%= i %>" value="<%= artist._id %>"> <span><%= artist.name %></span><br>
-                <%_ }) _%>
-                <br>
-                <input type="submit" value="DELETE ARTISTS">
-            </form>
-            <%_ } else { _%>
-            <p style="text-align: center; margin-top: 2em"><b>NO ARTISTS TO DELETE</b></p>
-            <%_ } _%>
-        </div>
-
-        <div id="remove-project" class="tab-pane fade">
-            <%_ if (projects.length) { _%>
-            <form action="/discography/project/delete" method="post">
-                <label>DELETE PROJECT(S)</label>
-                <%_ projects.forEach((project, i) => { _%>
-                <input type="checkbox" name="project<%= i %>" value="<%= project._id %>"> <span><%= project.title %></span><br>
-                <%_ }) _%>
-                <br>
-                <input type="submit" value="DELETE PROJECTS">
-            </form>
-            <%_ } else { _%>
-            <p style="text-align: center; margin-top: 2em"><b>NO PROJECTS TO DELETE</b></p>
-            <%_ } _%>
-        </div>
-
-        <div id="remove-article" class="tab-pane fade">
-            <%_ if (articles.length) { _%>
-            <form action="/news/article/delete" method="post">
-                <label>DELETE ARTICLE(S)</label>
-                <%_ articles.forEach((article, i) => { _%>
-                <input type="checkbox" name="article<%= i %>" value="<%= article._id %>"> <span><%= article.headline %></span><br>
-                <%_ }) _%>
-                <br>
-                <input type="submit" value="DELETE ARTICLES">
-            </form>
-            <%_ } else { _%>
-            <p style="text-align: center; margin-top: 2em"><b>NO ARTICLES TO DELETE</b></p>
-            <%_ } _%>
-        </div>
-
-        <div id="remove-location" class="tab-pane fade">
-            <%_ if (locations.length) { _%>
-            <form action="/map/location/delete" method="post">
-                <label>DELETE LOCATION(S)</label>
-                <%_ locations.forEach((location, i) => { _%>
-                <input type="checkbox" name="location<%= i %>" value="<%= location._id %>"> <span><%- "<b>"+ location.name +"</b> - "+ location.city +", "+ location.country %></span><br>
-                <%_ }) _%>
-                <br>
-                <input type="submit" value="DELETE LOCATIONS">
-            </form>
-            <%_ } else { _%>
-            <p style="text-align: center; margin-top: 2em"><b>NO LOCATIONS TO DELETE</b></p>
-            <%_ } _%>
-        </div>
-
-        <div id="remove-member" class="tab-pane fade">
-            <%_ if (members.length) { _%>
-            <form action="/mailing-list/member/delete" method="post">
-                <label>DELETE MEMBER(S) FROM MAILING LIST</label>
-                <%_ members.forEach((member, i) => { _%>
-                <input type="checkbox" name="member<%= i %>" value="<%= member._id %>"> <span><%= member.firstname +" "+ member.lastname %></span><br>
-                <%_ }) _%>
-                <br>
-                <input type="submit" value="DELETE MEMBERS">
-            </form>
-            <%_ } else { _%>
-            <p style="text-align: center; margin-top: 2em"><b>NO MEMBERS TO REMOVE</b></p>
-            <%_ } _%>
-        </div>
-
-        <div id="remove-product" class="tab-pane fade">
-            <%_ if (products.length) { _%>
-            <form action="/shop/stock/remove" method="post">
-                <label>DELETE PRODUCT(S) FROM STOCK</label>
-                <%_ products.forEach((item, i) => { _%>
-                <input type="checkbox" name="product<%= i %>" value="<%= item._id %>"> <span><%= item.name %></span><br>
-                <%_ }) _%>
-                <br>
-                <input type="submit" value="DELETE PRODUCTS">
-            </form>
-            <%_ } else { _%>
-            <p style="text-align: center; margin-top: 2em"><b>NO SHOP PRODUCTS TO REMOVE</b></p>
-            <%_ } _%>
-        </div>
-
-        <div id="remove-homepage-image" class="tab-pane fade">
-            <%_ if (homepage_images.length) { _%>
-            <form action="/homepage/image/delete" method="post">
-                <label>DELETE HOMEPAGE IMAGE(S)</label><br>
-                <%_ homepage_images.forEach((image, i) => { _%>
-                <div style="display: inline-block">
-                    <input type="checkbox" name="image<%= i %>" value="<%= image.p_id %>">
-                    <span><img style="height: 100px; margin-bottom: 10px;" src="<%= image.url %>" alt="<%= image.p_id.replace('homepage/images/', '') %>"></span>
-                </div>
-                <%_ }) _%>
-                <br><br>
-                <input type="submit" value="DELETE IMAGES">
-            </form>
-            <%_ } else { _%>
-            <p style="text-align: center; margin-top: 2em"><b>NO IMAGES TO DELETE</b></p>
-            <%_ } _%>
-        </div>
-
     </div>
 </div>

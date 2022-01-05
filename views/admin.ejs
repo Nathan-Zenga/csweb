@@ -1,18 +1,19 @@
 <%- include ('partials/header') -%>
     <div class="content-container" style="padding-top: 2em;">
-        <ul class="nav nav-pills">
-            <li class="active"><a data-toggle="pill" href="#home">HOME</a></li>
-            <li><a data-toggle="pill" href="#articles">ARTICLES</a></li>
-            <li><a data-toggle="pill" href="#discography">DISCOGRAPHY</a></li>
-            <li><a data-toggle="pill" href="#artists">ARTISTS</a></li>
-            <li><a data-toggle="pill" href="#locations">LOCATIONS</a></li>
-            <li><a data-toggle="pill" href="#mail">MAIL</a></li>
-            <li><a data-toggle="pill" href="#shop">SHOP</a></li>
-            <li><a data-toggle="pill" href="#edit">EDIT</a></li>
-            <li><a data-toggle="pill" href="#remove">REMOVE</a></li>
-        </ul>
+        <div class="nav nav-pills justify-content-center">
+            <a class="nav-link active" data-toggle="pill" href="#home">HOME</a>
+            <a class="nav-link" data-toggle="pill" href="#articles">ARTICLES</a>
+            <a class="nav-link" data-toggle="pill" href="#discography">DISCOGRAPHY</a>
+            <a class="nav-link" data-toggle="pill" href="#artists">ARTISTS</a>
+            <a class="nav-link" data-toggle="pill" href="#locations">LOCATIONS</a>
+            <a class="nav-link" data-toggle="pill" href="#mail">MAIL</a>
+            <a class="nav-link" data-toggle="pill" href="#shop">SHOP</a>
+            <a class="nav-link" data-toggle="pill" href="#edit">EDIT</a>
+            <a class="nav-link" data-toggle="pill" href="#remove">REMOVE</a>
+        </div>
+
         <div class="tab-content container">
-            <div id="home" class="creation tab-pane fade in active">
+            <div id="home" class="creation tab-pane fade show active">
             <%- include ('partials/admin/home') -%>
             </div>
 
@@ -150,12 +151,12 @@
             });
         });
 
-       $(".input-group .input-item :input").on("change keyup", function() {
+       $(".input-item :input").on("change keyup", function() {
             var $groupInputs = $(this).closest(".input-item").find(":input");
             var notEmpty = $groupInputs.filter(function() { return this.value }).length > 0;
             $groupInputs.attr("required", notEmpty);
         });
-        $(".input-group .input-item button").click(function(e) {
+        $(".input-item button").click(function(e) {
             e.preventDefault();
             var $form = $(this).closest("form");
             var $item = $(this).closest(".input-item");

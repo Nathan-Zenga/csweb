@@ -1,21 +1,21 @@
 <%- include ('partials/header') -%>
     <div class="container">
         <form method="POST" action="/mailing-list/new" id="sign-up-form">
-            <div class="input-group" style="display: block">
-                <div class="col-sm-6">
+            <div class="row">
+                <div class="col-sm-6 float-left">
                     <label>FIRST NAME</label>
                     <input type="text" name="firstname" id="firstname" required>
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-6 float-left">
                     <label>LAST NAME</label>
                     <input type="text" name="lastname" id="lastname" required>
                 </div>
             </div>
             <label>EMAIL</label>
             <input type="email" name="email" id="email" required>
-            <div class="input-group" style="display: block">
+            <div class="row">
                 <%_ var sizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"]; _%>
-                <div class="col-sm-6">
+                <div class="col-sm-6 float-left">
                     <label>SIZE (TOP) <i class="fas fa-chevron-down"></i></label>
                     <select name="size_top" id="size_top" required>
                         <option value="">Select size</option>
@@ -24,7 +24,7 @@
                         <%_ }) _%>
                     </select>
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-6 float-left">
                     <label>SIZE (BOTTOMS) <i class="fas fa-chevron-down"></i></label>
                     <select name="size_bottom" id="size_bottom" required>
                         <option value="">Select size</option>

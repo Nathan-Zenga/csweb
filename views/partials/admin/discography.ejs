@@ -1,10 +1,12 @@
 <form method="post" action="/discography/project/new">
     <label>ARTWORK</label>
-    <div class="input-group file-upload-container row" style="display: block">
-        <div class="col-sm-6 col-xs-9"><input type="file" id="artwork_file" accept=".jpg,.jpeg,.png,.bmp"></div>
-        <input type="hidden" name="artwork_file">
-        <div class="col-sm-6 col-xs-3"><button class="clear-uploads" data-id="artwork_file">CLEAR</button></div>
-        <div class="col-sm-12"><input type="url" name="artwork_url" id="artwork_url" placeholder="Or enter the image URL"></div>
+    <div class="file-upload-container">
+        <div class="row">
+            <div class="col-sm-6 col-9 float-left"><input type="file" id="artwork_file" accept=".jpg,.jpeg,.png,.bmp"></div>
+            <input type="hidden" name="artwork_file">
+            <div class="col-sm-6 col-3 float-left"><button class="clear-uploads" data-id="artwork_file">CLEAR</button></div>
+            <div class="col-sm-12 float-left"><input type="url" name="artwork_url" id="artwork_url" placeholder="Or enter the image URL"></div>
+        </div>
     </div>
 
     <label>TITLE</label>
@@ -18,9 +20,9 @@
     <input type="number" name="year" id="year" min="2000" max="<%= thisYear %>" value="<%= thisYear %>" required>
 
     <label>LINKS (OPTIONAL) <i class="fas fa-chevron-down"></i></label>
-    <div class="link-item-group input-group row" style="display: block">
-        <div class="link-item input-item">
-            <div class="col-sm-4">
+    <div class="link-item-group">
+        <div class="link-item input-item row">
+            <div class="col-sm-4 float-left">
                 <select name="link_name" class="link-name">
                     <option value="">Choose link name</option>
                     <%_ ["Twitter", "Instagram", "Facebook", "Spotify", "SoundCloud", "Apple Music", "Tidal", "Bandcamp", "Deezer", "Google Play", "Linktree"].forEach(social => { _%>
@@ -28,10 +30,10 @@
                     <%_ }) _%>
                 </select>
             </div>
-            <div class="col-sm-8">
+            <div class="col-sm-8 float-left">
                 <input type="url" name="link_url" class="link-url" placeholder="Enter URL">
             </div>
-            <div class="col-sm-12" style="text-align: right; margin-top: -1em;">
+            <div class="col-sm-12 float-left" style="text-align: right; margin-top: -1em;">
                 <button class="add">ADD</button>
                 <button class="remove">REMOVE</button>
             </div>

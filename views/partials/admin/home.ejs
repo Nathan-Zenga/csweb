@@ -30,17 +30,6 @@
 </form>
 <br>
 
-<style>
-    #mailing-list-stats h1 {
-        padding-bottom: 1em;
-        font-size: 1em;
-    }
-
-    #mailing-list-stats tr > * {
-        width: 33.333%;
-    }
-</style>
-
 <form method="POST" action="/homepage/content" id="homepage_content_form">
     <label for="banner_text">BANNER TEXT</label>
     <input type="text" name="banner_text" id="banner_text" value="<%= homepage_contents[0] ? homepage_contents[0].banner_text : '' %>">
@@ -49,9 +38,9 @@
     <input type="text" name="footnote_text" id="footnote_text" value="<%= homepage_contents[0] ? homepage_contents[0].footnote_text : '' %>">
 
     <label>CS SOCIALS <i class="fas fa-chevron-down"></i></label>
-    <div class="social-media-input-group input-group row" style="display: block">
-        <div class="social-media-input input-item">
-            <div class="col-sm-4">
+    <div class="social-media-input-group">
+        <div class="social-media-input input-item row">
+            <div class="col-sm-4 float-left">
                 <select name="socials_name" class="socials-name">
                     <option value="">Choose social</option>
                     <%_ ["Twitter", "Instagram", "Facebook", "Spotify", "YouTube", "SoundCloud", "Apple Music", "Tidal", "Bandcamp", "Deezer", "Google Play"].forEach(social => { _%>
@@ -59,10 +48,10 @@
                     <%_ }) _%>
                 </select>
             </div>
-            <div class="col-sm-8">
+            <div class="col-sm-8 float-left">
                 <input type="url" name="socials_url" class="socials-url" placeholder="Enter URL">
             </div>
-            <div class="col-sm-12" style="text-align: right; margin-top: -1em;">
+            <div class="col-sm-12 float-left" style="text-align: right; margin-top: -1em;">
                 <button class="add">ADD</button>
                 <button class="remove">REMOVE</button>
             </div>
@@ -75,10 +64,12 @@
 
 <form method="POST" action="/homepage/image/save" id="homepage_images_form">
     <label for="homepage_image_input">HOMEPAGE IMAGE UPLOAD</label><br>
-    <div class="input-group file-upload-container row" style="display: block">
-        <div class="col-sm-6 col-xs-9"><input type="file" id="homepage_image_file" accept="image/*" required></div>
-        <input type="hidden" name="image">
-        <div class="col-sm-6 col-xs-3"><button class="clear-uploads" data-id="homepage_image_file">CLEAR</button></div>
+    <div class="file-upload-container">
+        <div class="row">
+            <div class="col-sm-6 col-9 float-left"><input type="file" id="homepage_image_file" accept="image/*" required></div>
+            <input type="hidden" name="image">
+            <div class="col-sm-6 col-3 float-left"><button class="clear-uploads" data-id="homepage_image_file">CLEAR</button></div>
+        </div>
     </div>
 
     <label for="homepage_image_filename">IMAGE NAME <span>(Automatically appears when you upload images, but feel free to rename)</span></label>

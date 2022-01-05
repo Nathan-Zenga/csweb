@@ -1,4 +1,4 @@
-﻿main {
+main {
     position: relative;
     overflow-x: hidden;
 }
@@ -31,7 +31,7 @@ nav a {
 
 @media (min-width: 768px) {
     header {
-        padding: 2em 0;
+        padding: 3em 0;
     }
 
     header .container {
@@ -83,16 +83,22 @@ nav a {
     background-color: rgba(0, 0, 0, .85);
 }
 
-.modal-backdrop.in {
+.modal-backdrop.show {
     opacity: 1;
 }
 
-.modal-open .modal {
-    padding: 0!important;
+.modal .modal-dialog {
+    max-width: none!important;
+    height: 100%;
+}
+
+.modal .modal-content {
+    background-color: transparent;
+    border: none;
 }
 
 .modal .modal-body {
-    padding: 50px 0;
+    padding: 0;
 }
 
 .modal .modal-icons {
@@ -118,28 +124,15 @@ nav a {
 }
 
 .nav.nav-pills {
-    display: table;
-    margin: 0 auto;
     font-weight: bold;
-    padding: 0 15px;
-    text-align: center;
 }
 
-.nav.nav-pills > li {
-    float: none;
-    display: inline-block;
-}
-
-.nav.nav-pills > .active > a,
-.nav.nav-pills > .active > a:focus,
-.nav.nav-pills > .active > a:hover {
+.nav.nav-pills .nav-link.active,
+.nav.nav-pills .nav-link.active:focus,
+.nav.nav-pills .nav-link.active:hover {
     background-color: black;
     color: white;
     opacity: 1;
-}
-
-.nav.nav-pills.nav-stacked > li {
-    display: block;
 }
 
 form {
@@ -164,6 +157,15 @@ form {
     border: 1px solid rgb(169, 169, 169);
     border-top: none;
     max-height: 150px;
+}
+
+#mailing-list-stats h1 {
+    padding-bottom: 1em;
+    font-size: 1em;
+}
+
+#mailing-list-stats tr > * {
+    width: 33.333%;
 }
 
 form label {
@@ -241,12 +243,6 @@ input[type=file] {
 
 label span {
     font-weight: normal;
-}
-
-@media (min-width: 768px) {
-    .input-group > *[class*=col-]:not(:first-child) {
-        padding-left: 20px;
-    }
 }
 
 .content-container {
@@ -539,6 +535,10 @@ article.full .textbody-media iframe:not([src*=youtu]) {
 
 .artist-bio .text {
     padding: 30px;
+}
+
+.artist-bio .text p {
+    margin: 0;
 }
 
 .artist-bio .text .socials {

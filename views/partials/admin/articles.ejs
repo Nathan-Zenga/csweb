@@ -5,19 +5,19 @@
     </div>
     <input type="text" name="headline" id="headline" required>
     <label>MAIN IMAGE(S) (OPTIONAL)</label>
-    <div class="input-group row" style="display: block">
-        <div class="col-sm-6 col-xs-9">
+    <div class="row">
+        <div class="col-sm-6 col-9 float-left">
             <input type="file" id="headline_images" accept="image/*" multiple>
             <div class="headline-image-data"></div>
         </div>
-        <div class="col-sm-6 col-xs-3"><button class="clear-uploads" data-id="headline_images">CLEAR</button></div>
+        <div class="col-sm-6 col-3 float-left"><button class="clear-uploads" data-id="headline_images">CLEAR</button></div>
     </div>
-    <div class="input-group headline-image-thumb-choice" style="display: none"></div>
+    <div class="headline-image-thumb-choice" style="display: none"></div>
     <label>ARTICLE BODY <br><span>Place an "X" on a separate line to your spot for any additional images/videos to upload.</span></label>
     <div class="text-emphasis-styles" data-id="textbody">
         <button><b>B</b></button><button><i>I</i></button><button><u>U</u></button>
     </div>
     <textarea name="textbody" id="textbody" rows="10" required></textarea>
-    <div class="input-group textbody_media"></div>
+    <div class="textbody_media"></div>
     <input type="submit" value="POST">
 </form>

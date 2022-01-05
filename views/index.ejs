@@ -14,9 +14,11 @@
         </div>
     </section>
     <section class="homepage-images-section container">
+        <div class="row">
         <%_ images.forEach(img => { _%>
-        <div class="homepage-images content-container col-md-4 col-sm-6"><div class="image content" style="background-image: url(<%= img.url %>)"></div></div>
+            <div class="homepage-images content-container col-md-4 col-sm-6 float-left"><div class="image content" style="background-image: url(<%= img.url %>)"></div></div>
         <%_ }) _%>
+        </div>
     </section>
 
     <%_ if (content) { _%>

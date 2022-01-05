@@ -1,310 +1,318 @@
-<div class="col-md-3 sidebar" id="edit-sidebar">
-    <div class="mb-view-md section-dropdown-options" style="font-weight: bold; max-width: 250px; margin: 0 auto">
-        <label>SELECT OPTION <i class="fas fa-chevron-down"></i></label>
-        <select>
-            <option value="#edit-artist">ARTIST</option>
-            <option value="#edit-article">ARTICLE</option>
-            <option value="#reorder-article">REORDER ARTICLE</option>
-            <option value="#edit-project">PROJECT</option>
-            <option value="#edit-location">LOCATION</option>
-            <option value="#edit-member">MEMBER</option>
-            <option value="#edit-product">SHOP PRODUCT</option>
-            <option value="#reorder-homepage-image">REORDER HOMEPAGE IMAGE</option>
-        </select>
+<div class="row">
+    <div class="col-md-3 float-left sidebar" id="edit-sidebar">
+        <div class="mb-view-md section-dropdown-options" style="font-weight: bold; max-width: 250px; margin: 0 auto">
+            <label>SELECT OPTION <i class="fas fa-chevron-down"></i></label>
+            <select>
+                <option value="#edit-artist">ARTIST</option>
+                <option value="#edit-article">ARTICLE</option>
+                <option value="#reorder-article">REORDER ARTICLE</option>
+                <option value="#edit-project">PROJECT</option>
+                <option value="#edit-location">LOCATION</option>
+                <option value="#edit-member">MEMBER</option>
+                <option value="#edit-product">SHOP PRODUCT</option>
+                <option value="#reorder-homepage-image">REORDER HOMEPAGE IMAGE</option>
+            </select>
+        </div>
+        <div class="nav nav-pills flex-column nav-justified dt-view-md">
+            <a class="nav-link active" data-toggle="pill" href="#edit-artist">ARTIST</a>
+            <a class="nav-link" data-toggle="pill" href="#edit-article">ARTICLE</a>
+            <a class="nav-link" data-toggle="pill" href="#reorder-article">REORDER ARTICLE</a>
+            <a class="nav-link" data-toggle="pill" href="#edit-project">PROJECT</a>
+            <a class="nav-link" data-toggle="pill" href="#edit-location">LOCATION</a>
+            <a class="nav-link" data-toggle="pill" href="#edit-member">MEMBER</a>
+            <a class="nav-link" data-toggle="pill" href="#edit-product">SHOP PRODUCT</a>
+            <a class="nav-link" data-toggle="pill" href="#reorder-homepage-image">REORDER HOMEPAGE IMAGE</a>
+        </div>
     </div>
-    <ul class="nav nav-pills nav-stacked dt-view-md">
-        <li class="active"><a data-toggle="pill" href="#edit-artist">ARTIST</a></li>
-        <li><a data-toggle="pill" href="#edit-article">ARTICLE</a></li>
-        <li><a data-toggle="pill" href="#reorder-article">REORDER ARTICLE</a></li>
-        <li><a data-toggle="pill" href="#edit-project">PROJECT</a></li>
-        <li><a data-toggle="pill" href="#edit-location">LOCATION</a></li>
-        <li><a data-toggle="pill" href="#edit-member">MEMBER</a></li>
-        <li><a data-toggle="pill" href="#edit-product">SHOP PRODUCT</a></li>
-        <li><a data-toggle="pill" href="#reorder-homepage-image">REORDER HOMEPAGE IMAGE</a></li>
-    </ul>
-</div>
-<div class="col-md-9">
-    <div class="tab-content" style="padding-top: 10px;">
+    <div class="col-md-9 float-left">
+        <div class="tab-content" style="padding-top: 10px;">
 
-        <div id="edit-artist" class="tab-pane fade in active">
-            <form method="post" action="/team/edit">
-                <label>CHOOSE ARTIST <i class="fas fa-chevron-down"></i></label>
-                <select name="artist_id" id="artist_id" required>
-                    <option value="">-</option>
-                    <%_ artists.forEach(artist => { _%>
-                    <option value="<%= artist._id %>"><%= artist.name %></option>
+            <div id="edit-artist" class="tab-pane fade show active">
+                <form method="post" action="/team/edit">
+                    <label>CHOOSE ARTIST <i class="fas fa-chevron-down"></i></label>
+                    <select name="artist_id" id="artist_id" required>
+                        <option value="">-</option>
+                        <%_ artists.forEach(artist => { _%>
+                        <option value="<%= artist._id %>"><%= artist.name %></option>
+                        <%_ }) _%>
+                    </select>
+                    <label>NAME</label>
+                    <input type="text" name="name" id="artist_name_edit">
+                    <label>BIO</label>
+                    <div class="text-emphasis-styles" data-id="artist_bio_edit">
+                        <button><b>B</b></button><button><i>I</i></button><button><u>U</u></button>
+                    </div>
+                    <textarea type="text" name="artist_bio" id="artist_bio_edit" rows="5"></textarea>
+                    <label>PROFILE PICTURE (OPTIONAL)</label>
+                    <div class="file-upload-container">
+                        <div class="row">
+                            <div class="col-sm-6 col-9 float-left"><input type="file" id="profile_image_change" accept="image/*"></div>
+                            <input type="hidden" name="profile_image">
+                            <div class="col-sm-6 col-3 float-left"><button class="clear-uploads" data-id="profile_image_change">CLEAR</button></div>
+                        </div>
+                    </div>
+                    <label>SOCIAL MEDIA LINKS</label>
+                    <div class="social-media-input-group">
+                        <div class="social-media-input input-item row">
+                            <div class="col-sm-4 float-left">
+                                <select name="social_media_name" class="social-media-name edit">
+                                    <option value="">Choose social</option>
+                                    <%_ ["Twitter", "Instagram", "Facebook", "Spotify", "SoundCloud", "Apple Music", "Tidal", "Bandcamp", "Deezer", "Google Play", "Linktree"].forEach(social => { _%>
+                                    <option value="<%= social.toLowerCase().replace(/[ _]/g, '') %>"><%= social %></option>
+                                    <%_ }) _%>
+                                </select>
+                            </div>
+                            <div class="col-sm-8 float-left">
+                                <input type="url" name="social_media_url" class="social-media-url edit" placeholder="Enter URL">
+                            </div>
+                            <div class="col-sm-12 float-left" style="text-align: right; margin-top: -1em;">
+                                <button class="add">ADD</button>
+                                <button class="remove">REMOVE</button>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="submit" value="UPDATE ARTIST">
+                </form>
+            </div>
+
+            <div id="edit-article" class="tab-pane fade">
+                <form method="post" action="/news/article/edit">
+                    <label>CHOOSE ARTICLE <i class="fas fa-chevron-down"></i></label>
+                    <select name="article_id" id="article_id" required>
+                        <option value="">-</option>
+                        <%_ articles.forEach(article => { _%>
+                        <option value="<%= article._id %>"><%= article.headline %></option>
+                        <%_ }) _%>
+                    </select>
+                    <label>HEADLINE</label>
+                    <div class="text-emphasis-styles" data-id="headline_edit">
+                        <button><i>I</i></button><button><u>U</u></button>
+                    </div>
+                    <input type="text" name="headline" id="headline_edit">
+                    <label>MAIN IMAGE(S) (OPTIONAL)</label>
+                    <div class="row">
+                        <div class="col-sm-6 col-9 float-left">
+                            <input type="file" id="headline_images_change" accept="image/*" multiple>
+                            <div class="headline-image-data"></div>
+                        </div>
+                        <div class="col-sm-6 col-3 float-left"><button class="clear-uploads" data-id="headline_images_change">CLEAR</button></div>
+                    </div>
+                    <div class="headline-image-thumb-choice" style="display: none"></div>
+                    <label>ARTICLE BODY <br><span>Place an "X" on a separate line to your spot for any additional images/videos to upload.</span></label>
+                    <div class="text-emphasis-styles" data-id="textbody_edit">
+                        <button><b>B</b></button><button><i>I</i></button><button><u>U</u></button>
+                    </div>
+                    <textarea name="textbody" id="textbody_edit" rows="10"></textarea>
+                    <div class="textbody_media"></div>
+                    <input type="submit" value="UPDATE ARTICLE">
+                </form>
+            </div>
+
+            <div id="reorder-article" class="tab-pane fade">
+                <%_ if (articles.length) { _%>
+                <form method="post" action="/news/article/edit/reorder">
+                    <label>REORDER ARTICLE</label>
+                    <%_ articles.forEach((article, i) => { _%>
+                    <input type="radio" name="id" value="<%= article._id %>" required> <%= i+1 %>) <span><%= article.headline %></span><br>
                     <%_ }) _%>
-                </select>
-                <label>NAME</label>
-                <input type="text" name="name" id="artist_name_edit">
-                <label>BIO</label>
-                <div class="text-emphasis-styles" data-id="artist_bio_edit">
-                    <button><b>B</b></button><button><i>I</i></button><button><u>U</u></button>
-                </div>
-                <textarea type="text" name="artist_bio" id="artist_bio_edit" rows="5"></textarea>
-                <label>PROFILE PICTURE (OPTIONAL)</label>
-                <div class="input-group file-upload-container row" style="display: block">
-                    <div class="col-sm-6 col-xs-9"><input type="file" id="profile_image_change" accept="image/*"></div>
-                    <input type="hidden" name="profile_image">
-                    <div class="col-sm-6 col-xs-3"><button class="clear-uploads" data-id="profile_image_change">CLEAR</button></div>
-                </div>
-                <label>SOCIAL MEDIA LINKS</label>
-                <div class="social-media-input-group input-group row" style="display: block">
-                    <div class="social-media-input input-item row">
-                        <div class="col-sm-4">
-                            <select name="social_media_name" class="social-media-name edit">
-                                <option value="">Choose social</option>
-                                <%_ ["Twitter", "Instagram", "Facebook", "Spotify", "SoundCloud", "Apple Music", "Tidal", "Bandcamp", "Deezer", "Google Play", "Linktree"].forEach(social => { _%>
-                                <option value="<%= social.toLowerCase().replace(/[ _]/g, '') %>"><%= social %></option>
+                    <br><br>
+                    <div class="row">
+                        <div class="col-sm-4 float-left"><label>POSITION NUMBER</label></div>
+                        <div class="col-sm-8 float-left"><input type="number" name="index" min="1" max="<%= articles.length %>" required></div>
+                    </div>
+                    <input type="submit" value="RE-ORDER ARTICLE">
+                </form>
+                <%_ } else { _%>
+                <p style="text-align: center; margin-top: 2em"><b>NO ARTICLES TO RE-ORDER</b></p>
+                <%_ } _%>
+            </div>
+
+            <div id="edit-project" class="tab-pane fade">
+                <form action="/discography/project/edit">
+                    <label>CHOOSE PROJECT <i class="fas fa-chevron-down"></i></label>
+                    <select name="project_id" id="project_id" required>
+                        <option value="">-</option>
+                        <%_ projects.forEach(project => { _%>
+                        <option value="<%= project._id %>"><%= project.title %></option>
+                        <%_ }) _%>
+                    </select>
+                    <label>ARTWORK</label>
+                    <div class="file-upload-container">
+                        <div class="row">
+                            <div class="col-sm-6 col-9 float-left"><input type="file" id="artwork_file_change" accept=".jpg,.jpeg,.png,.bmp"></div>
+                            <input type="hidden" name="artwork_file">
+                            <div class="col-sm-6 col-3 float-left"><button class="clear-uploads" data-id="artwork_file_change">CLEAR</button></div>
+                            <div class="col-sm-12 float-left"><input type="url" name="artwork_url" id="artwork_url_edit" placeholder="Or enter the image URL"></div>
+                        </div>
+                    </div>
+                    <label>TITLE</label>
+                    <input type="text" name="title" id="title_edit">
+                    <label>ARTIST</label>
+                    <input type="text" name="artist" id="artist_edit">
+                    <label>YEAR</label>
+                    <%_ var thisYear = new Date().getFullYear(); _%>
+                    <input type="number" name="year" id="year_edit" min="2000" max="<%= thisYear %>" value="<%= thisYear %>">
+                    <label>LINKS (OPTIONAL)</label>
+                    <div class="link-item-group">
+                        <div class="link-item input-item row">
+                            <div class="col-sm-4 float-left">
+                                <select name="link_name" class="link-name">
+                                    <option value="">Choose link name</option>
+                                    <%_ ["Twitter", "Instagram", "Facebook", "Spotify", "SoundCloud", "Apple Music", "Tidal", "Bandcamp", "Deezer", "Google Play", "Linktree"].forEach(social => { _%>
+                                    <option value="<%= social.toLowerCase().replace(/[ _]/g, '') %>"><%= social %></option>
+                                    <%_ }) _%>
+                                </select>
+                            </div>
+                            <div class="col-sm-8 float-left">
+                                <input type="url" name="link_url" class="link-url" placeholder="Enter URL">
+                            </div>
+                            <div class="col-sm-12 float-left" style="text-align: right; margin-top: -1em;">
+                                <button class="add">ADD</button>
+                                <button class="remove">REMOVE</button>
+                            </div>
+                        </div>
+                    </div>
+                    <label><span>Check the box in case entering every link is unnecessary</span></label>
+                    <input type="checkbox" name="all_platforms" id="all_platforms_change"> <b>ALL PLATFORMS?</b> <br>
+                    <input type="submit" value="UPDATE PROJECT">
+                </form>
+            </div>
+
+            <div id="edit-location" class="tab-pane fade">
+                <form method="post" action="/map/location/edit">
+                    <label>CHOOSE LOCATION <i class="fas fa-chevron-down"></i></label>
+                    <select name="location_id" id="location_id" required>
+                        <option value="">-</option>
+                        <%_ locations.forEach(location => { _%>
+                        <option value="<%= location._id %>"><%= location.name +" - "+ location.city +", "+ location.country %></option>
+                        <%_ }) _%>
+                    </select>
+
+                    <label>NAME</label>
+                    <input type="text" name="name_edit" id="location_name_edit" required>
+
+                    <label>STREET ADDRESS / BOROUGH / AREA</label>
+                    <input type="text" name="street_address_edit" id="street_address_edit" required>
+
+                    <label>CITY</label>
+                    <input type="text" name="city_edit" id="city_edit" required>
+
+                    <label>STATE / COUNTRY</label>
+                    <input type="text" name="country_edit" id="country_edit" required>
+
+                    <label>ZIP / POST CODE (OPTIONAL)</label>
+                    <input type="text" name="postcode_edit" id="postcode_edit">
+
+                    <input type="submit" value="UPDATE LOCATION">
+                </form>
+            </div>
+
+            <div id="edit-member" class="tab-pane fade">
+                <form method="POST" action="/mailing-list/update">
+                    <label>CHOOSE MEMBER <i class="fas fa-chevron-down"></i></label>
+                    <select name="member_id" id="member_id">
+                        <option value="">-</option>
+                        <%_ members.forEach(member => { _%>
+                        <option value="<%= member._id %>"><%= member.firstname + " " + member.lastname %></option>
+                        <%_ }) _%>
+                    </select>
+                    <div class="row">
+                        <div class="col-sm-6 float-left">
+                            <label>FIRST NAME</label>
+                            <input type="text" name="firstname" id="firstname_edit" required>
+                        </div>
+                        <div class="col-sm-6 float-left">
+                            <label>LAST NAME</label>
+                            <input type="text" name="lastname" id="lastname_edit" required>
+                        </div>
+                    </div>
+                    <label>EMAIL</label>
+                    <input type="email" name="email" id="email_edit" required>
+                    <div class="row">
+                        <%_ var sizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"]; _%>
+                        <div class="col-sm-6 float-left">
+                            <label>SIZE (TOP)</label>
+                            <select name="size_top" id="size_top_edit" required>
+                                <option value="">Select size</option>
+                                <%_ sizes.forEach(size => { _%>
+                                <option value="<%= size %>"><%= size %></option>
                                 <%_ }) _%>
                             </select>
                         </div>
-                        <div class="col-sm-8">
-                            <input type="url" name="social_media_url" class="social-media-url edit" placeholder="Enter URL">
-                        </div>
-                        <div class="col-sm-12" style="text-align: right; margin-top: -1em;">
-                            <button class="add">ADD</button>
-                            <button class="remove">REMOVE</button>
-                        </div>
-                    </div>
-                </div>
-                <input type="submit" value="UPDATE ARTIST">
-            </form>
-        </div>
-
-        <div id="edit-article" class="tab-pane fade">
-            <form method="post" action="/news/article/edit">
-                <label>CHOOSE ARTICLE <i class="fas fa-chevron-down"></i></label>
-                <select name="article_id" id="article_id" required>
-                    <option value="">-</option>
-                    <%_ articles.forEach(article => { _%>
-                    <option value="<%= article._id %>"><%= article.headline %></option>
-                    <%_ }) _%>
-                </select>
-                <label>HEADLINE</label>
-                <div class="text-emphasis-styles" data-id="headline_edit">
-                    <button><i>I</i></button><button><u>U</u></button>
-                </div>
-                <input type="text" name="headline" id="headline_edit">
-                <label>MAIN IMAGE(S) (OPTIONAL)</label>
-                <div class="input-group row" style="display: block">
-                    <div class="col-sm-6 col-xs-9">
-                        <input type="file" id="headline_images_change" accept="image/*" multiple>
-                        <div class="headline-image-data"></div>
-                    </div>
-                    <div class="col-sm-6 col-xs-3"><button class="clear-uploads" data-id="headline_images_change">CLEAR</button></div>
-                </div>
-                <div class="input-group headline-image-thumb-choice" style="display: none"></div>
-                <label>ARTICLE BODY <br><span>Place an "X" on a separate line to your spot for any additional images/videos to upload.</span></label>
-                <div class="text-emphasis-styles" data-id="textbody_edit">
-                    <button><b>B</b></button><button><i>I</i></button><button><u>U</u></button>
-                </div>
-                <textarea name="textbody" id="textbody_edit" rows="10"></textarea>
-                <div class="input-group textbody_media"></div>
-                <input type="submit" value="UPDATE ARTICLE">
-            </form>
-        </div>
-
-        <div id="reorder-article" class="tab-pane fade">
-            <%_ if (articles.length) { _%>
-            <form method="post" action="/news/article/edit/reorder">
-                <label>REORDER ARTICLE</label>
-                <%_ articles.forEach((article, i) => { _%>
-                <input type="radio" name="id" value="<%= article._id %>" required> <%= i+1 %>) <span><%= article.headline %></span><br>
-                <%_ }) _%>
-                <br><br>
-                <div class="input-group" style="display: block">
-                    <div class="col-sm-4"><label>POSITION NUMBER</label></div>
-                    <div class="col-sm-8"><input type="number" name="index" min="1" max="<%= articles.length %>" required></div>
-                </div>
-                <input type="submit" value="RE-ORDER ARTICLE">
-            </form>
-            <%_ } else { _%>
-            <p style="text-align: center; margin-top: 2em"><b>NO ARTICLES TO RE-ORDER</b></p>
-            <%_ } _%>
-        </div>
-
-        <div id="edit-project" class="tab-pane fade">
-            <form action="/discography/project/edit">
-                <label>CHOOSE PROJECT <i class="fas fa-chevron-down"></i></label>
-                <select name="project_id" id="project_id" required>
-                    <option value="">-</option>
-                    <%_ projects.forEach(project => { _%>
-                    <option value="<%= project._id %>"><%= project.title %></option>
-                    <%_ }) _%>
-                </select>
-                <label>ARTWORK</label>
-                <div class="input-group file-upload-container row" style="display: block">
-                    <div class="col-sm-6 col-xs-9"><input type="file" id="artwork_file_change" accept=".jpg,.jpeg,.png,.bmp"></div>
-                    <input type="hidden" name="artwork_file">
-                    <div class="col-sm-6 col-xs-3"><button class="clear-uploads" data-id="artwork_file_change">CLEAR</button></div>
-                    <div class="col-sm-12"><input type="url" name="artwork_url" id="artwork_url_edit" placeholder="Or enter the image URL"></div>
-                </div>
-                <label>TITLE</label>
-                <input type="text" name="title" id="title_edit">
-                <label>ARTIST</label>
-                <input type="text" name="artist" id="artist_edit">
-                <label>YEAR</label>
-                <%_ var thisYear = new Date().getFullYear(); _%>
-                <input type="number" name="year" id="year_edit" min="2000" max="<%= thisYear %>" value="<%= thisYear %>">
-                <label>LINKS (OPTIONAL)</label>
-                <div class="link-item-group input-group row" style="display: block">
-                    <div class="link-item input-item">
-                        <div class="col-sm-4">
-                            <select name="link_name" class="link-name">
-                                <option value="">Choose link name</option>
-                                <%_ ["Twitter", "Instagram", "Facebook", "Spotify", "SoundCloud", "Apple Music", "Tidal", "Bandcamp", "Deezer", "Google Play", "Linktree"].forEach(social => { _%>
-                                <option value="<%= social.toLowerCase().replace(/[ _]/g, '') %>"><%= social %></option>
+                        <div class="col-sm-6 float-left">
+                            <label>SIZE (BOTTOMS)</label>
+                            <select name="size_bottom" id="size_bottom_edit" required>
+                                <option value="">Select size</option>
+                                <%_ sizes.forEach(size => { _%>
+                                <option value="<%= size %>"><%= size %></option>
                                 <%_ }) _%>
                             </select>
                         </div>
-                        <div class="col-sm-8">
-                            <input type="url" name="link_url" class="link-url" placeholder="Enter URL">
+                    </div>
+                    <label>EXTRA INFO (OPTIONAL)</label>
+                    <textarea name="extra_info" id="extra_info_edit"></textarea>
+                    <input type="submit" value="UPDATE MAILING LIST">
+                </form>
+            </div>
+
+            <div id="edit-product" class="tab-pane fade">
+                <form method="post" action="/shop/stock/edit">
+                    <label>CHOOSE PRODUCT <i class="fas fa-chevron-down"></i></label>
+                    <select name="product_id" id="product_id">
+                        <option value="">-</option>
+                        <%_ products.forEach(item => { _%>
+                        <option value="<%= item._id %>"><%= item.name %></option>
+                        <%_ }) _%>
+                    </select>
+
+                    <label>PRODUCT NAME</label>
+                    <input type="text" name="name" id="product_name_edit" required>
+
+                    <label>PRICE (GBP £)</label>
+                    <input type="number" name="price" id="price_edit" min="0.01" step="0.01" required>
+
+                    <label>TOTAL IN STOCK</label>
+                    <input type="number" name="stock_qty" id="stock_qty_edit" min="1" value="1" required>
+
+                    <label>PRODUCT INFO <span>(OPTIONAL)</span></label>
+                    <textarea name="info" id="product_info_edit" rows="10"></textarea>
+
+                    <label>PRODUCT IMAGE</label>
+                    <div class="file-upload-container">
+                        <div class="row">
+                            <div class="col-sm-6 col-9 float-left"><input type="file" id="product_image_file_edit" accept=".jpg,.jpeg,.png,.bmp"></div>
+                            <input type="hidden" name="image_file">
+                            <div class="col-sm-6 col-3 float-left"><button class="clear-uploads" data-id="product_image_file_edit">CLEAR</button></div>
+                            <div class="col-sm-12 float-left"><input type="url" name="image_url" id="product_image_url_edit" placeholder="Or enter the image URL"></div>
                         </div>
-                        <div class="col-sm-12" style="text-align: right; margin-top: -1em;">
-                            <button class="add">ADD</button>
-                            <button class="remove">REMOVE</button>
-                        </div>
                     </div>
-                </div>
-                <label><span>Check the box in case entering every link is unnecessary</span></label>
-                <input type="checkbox" name="all_platforms" id="all_platforms_change"> <b>ALL PLATFORMS?</b> <br>
-                <input type="submit" value="UPDATE PROJECT">
-            </form>
-        </div>
 
-        <div id="edit-location" class="tab-pane fade">
-            <form method="post" action="/map/location/edit">
-                <label>CHOOSE LOCATION <i class="fas fa-chevron-down"></i></label>
-                <select name="location_id" id="location_id" required>
-                    <option value="">-</option>
-                    <%_ locations.forEach(location => { _%>
-                    <option value="<%= location._id %>"><%= location.name +" - "+ location.city +", "+ location.country %></option>
+                    <input type="submit" value="SAVE">
+                </form>
+            </div>
+
+            <div id="reorder-homepage-image" class="tab-pane fade">
+                <%_ if (homepage_images.length) { _%>
+                <form action="/homepage/image/reorder" method="post">
+                    <label>SELECT HOMEPAGE IMAGE TO RE-ORDER</label><br>
+                    <%_ homepage_images.forEach((image, i) => { _%>
+                    <div class="homepage-image-container" style="display: inline-block">
+                        <input type="radio" name="id" value="<%= image._id %>" required>
+                        <span><img style="height: 100px; margin-bottom: 10px;" src="<%= image.url %>" alt="<%= image.p_id.replace('homepage/images/', '') %>"></span>
+                    </div>
                     <%_ }) _%>
-                </select>
-
-                <label>NAME</label>
-                <input type="text" name="name_edit" id="location_name_edit" required>
-
-                <label>STREET ADDRESS / BOROUGH / AREA</label>
-                <input type="text" name="street_address_edit" id="street_address_edit" required>
-
-                <label>CITY</label>
-                <input type="text" name="city_edit" id="city_edit" required>
-
-                <label>STATE / COUNTRY</label>
-                <input type="text" name="country_edit" id="country_edit" required>
-
-                <label>ZIP / POST CODE (OPTIONAL)</label>
-                <input type="text" name="postcode_edit" id="postcode_edit">
-
-                <input type="submit" value="UPDATE LOCATION">
-            </form>
-        </div>
-
-        <div id="edit-member" class="tab-pane fade">
-            <form method="POST" action="/mailing-list/update">
-                <label>CHOOSE MEMBER <i class="fas fa-chevron-down"></i></label>
-                <select name="member_id" id="member_id">
-                    <option value="">-</option>
-                    <%_ members.forEach(member => { _%>
-                    <option value="<%= member._id %>"><%= member.firstname + " " + member.lastname %></option>
-                    <%_ }) _%>
-                </select>
-                <div class="input-group" style="display: block">
-                    <div class="col-sm-6">
-                        <label>FIRST NAME</label>
-                        <input type="text" name="firstname" id="firstname_edit" required>
+                    <br><br>
+                    <div class="row">
+                        <div class="col-sm-4 float-left"><label>POSITION NUMBER</label></div>
+                        <div class="col-sm-8 float-left"><input type="number" name="index" min="1" max="<%= homepage_images.length %>" required></div>
                     </div>
-                    <div class="col-sm-6">
-                        <label>LAST NAME</label>
-                        <input type="text" name="lastname" id="lastname_edit" required>
-                    </div>
-                </div>
-                <label>EMAIL</label>
-                <input type="email" name="email" id="email_edit" required>
-                <div class="input-group" style="display: block">
-                    <%_ var sizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"]; _%>
-                    <div class="col-sm-6">
-                        <label>SIZE (TOP)</label>
-                        <select name="size_top" id="size_top_edit" required>
-                            <option value="">Select size</option>
-                            <%_ sizes.forEach(size => { _%>
-                            <option value="<%= size %>"><%= size %></option>
-                            <%_ }) _%>
-                        </select>
-                    </div>
-                    <div class="col-sm-6">
-                        <label>SIZE (BOTTOMS)</label>
-                        <select name="size_bottom" id="size_bottom_edit" required>
-                            <option value="">Select size</option>
-                            <%_ sizes.forEach(size => { _%>
-                            <option value="<%= size %>"><%= size %></option>
-                            <%_ }) _%>
-                        </select>
-                    </div>
-                </div>
-                <label>EXTRA INFO (OPTIONAL)</label>
-                <textarea name="extra_info" id="extra_info_edit"></textarea>
-                <input type="submit" value="UPDATE MAILING LIST">
-            </form>
+                    <input type="submit" value="RE-ORDER IMAGE">
+                </form>
+                <%_ } else { _%>
+                <p style="text-align: center; margin-top: 2em"><b>NO IMAGES TO RE-ORDER</b></p>
+                <%_ } _%>
+            </div>
+
         </div>
-
-        <div id="edit-product" class="tab-pane fade">
-            <form method="post" action="/shop/stock/edit">
-                <label>CHOOSE PRODUCT <i class="fas fa-chevron-down"></i></label>
-                <select name="product_id" id="product_id">
-                    <option value="">-</option>
-                    <%_ products.forEach(item => { _%>
-                    <option value="<%= item._id %>"><%= item.name %></option>
-                    <%_ }) _%>
-                </select>
-
-                <label>PRODUCT NAME</label>
-                <input type="text" name="name" id="product_name_edit" required>
-
-                <label>PRICE (GBP £)</label>
-                <input type="number" name="price" id="price_edit" min="0.01" step="0.01" required>
-
-                <label>TOTAL IN STOCK</label>
-                <input type="number" name="stock_qty" id="stock_qty_edit" min="1" value="1" required>
-
-                <label>PRODUCT INFO <span>(OPTIONAL)</span></label>
-                <textarea name="info" id="product_info_edit" rows="10"></textarea>
-
-                <label>PRODUCT IMAGE</label>
-                <div class="input-group file-upload-container row" style="display: block">
-                    <div class="col-sm-6 col-xs-9"><input type="file" id="product_image_file_edit" accept=".jpg,.jpeg,.png,.bmp"></div>
-                    <input type="hidden" name="image_file">
-                    <div class="col-sm-6 col-xs-3"><button class="clear-uploads" data-id="product_image_file_edit">CLEAR</button></div>
-                    <div class="col-sm-12"><input type="url" name="image_url" id="product_image_url_edit" placeholder="Or enter the image URL"></div>
-                </div>
-
-                <input type="submit" value="SAVE">
-            </form>
-        </div>
-
-        <div id="reorder-homepage-image" class="tab-pane fade">
-            <%_ if (homepage_images.length) { _%>
-            <form action="/homepage/image/reorder" method="post">
-                <label>SELECT HOMEPAGE IMAGE TO RE-ORDER</label><br>
-                <%_ homepage_images.forEach((image, i) => { _%>
-                <div class="homepage-image-container" style="display: inline-block">
-                    <input type="radio" name="id" value="<%= image._id %>" required>
-                    <span><img style="height: 100px; margin-bottom: 10px;" src="<%= image.url %>" alt="<%= image.p_id.replace('homepage/images/', '') %>"></span>
-                </div>
-                <%_ }) _%>
-                <br><br>
-                <div class="input-group" style="display: block">
-                    <div class="col-sm-4"><label>POSITION NUMBER</label></div>
-                    <div class="col-sm-8"><input type="number" name="index" min="1" max="<%= homepage_images.length %>" required></div>
-                </div>
-                <input type="submit" value="RE-ORDER IMAGE">
-            </form>
-            <%_ } else { _%>
-            <p style="text-align: center; margin-top: 2em"><b>NO IMAGES TO RE-ORDER</b></p>
-            <%_ } _%>
-        </div>
-
     </div>
 </div>

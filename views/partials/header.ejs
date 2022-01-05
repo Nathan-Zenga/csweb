@@ -5,47 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="/img/cs-icon.png">
     <title><%= title ? title + " | " : "" %>CS Records</title>
-    <meta name="keywords" content="music, london, soul, merch, merchandise, news">
+    <meta name="keywords" content="london, uk, united kingdom, music hip hop, soul, merch, merchandise, news, cs, thecs, cs records, cs forever, creative souls">
     <meta name="description" content="Creative Souls. Culture Consolidated.">
     <meta name="robots" content="index, follow">
 
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:site" content="@thecsrecords" />
     <meta name="twitter:creator" content="@thecsrecords" />
-    <meta name="twitter:description" content="Culture Consolidated." />
+    <meta name="twitter:description" content="Creative Souls. Culture Consolidated." />
     <meta name="twitter:image" content="<%- location_origin %>/img/cs-logo.png" />
     <meta property="og:url" content="<%- location_origin %>" />
     <meta property="og:title" content="CS Records" />
-    <meta property="og:description" content="Culture Consolidated." />
+    <meta property="og:description" content="Creative Souls. Culture Consolidated." />
     <meta property="og:image" content="<%- location_origin %>/img/cs-logo.png" />
 
     <link rel="stylesheet" type="text/css" href="/css/defaults.css">
     <link rel="stylesheet" type="text/css" href="/css/main.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
     <script src="/js/main.js"></script>
 </head>
 
 <body id="<%= pagename ? pagename+'-page' : '' %>">
     <header>
         <div class="container">
-            <div class="logo-container col-sm-2">
-                <a href="/"><img id="cs-logo" src="/img/cs-logo.png" alt="CS logo"></a>
-            </div>
-            <div class="nav-container col-sm-10">
-                <div id="nav-toggle" role="button" class="mb-view">M E N U</div>
-                <nav>
-                    <a href="/news">NEWS</a>
-                    <a href="/team">TEAM</a>
-                    <a href="/discography">DISCOGRAPHY</a>
-                    <a href="/events">EVENTS</a>
-                    <a href="/shop">SHOP</a>
-                    <a href="/map">MAP</a>
-                    <a href="/mailing-list/sign-up">SIGN UP</a>
-                    <%_ if (user) { _%>
-                    <a href="/admin/logout" style="text-decoration: underline">LOG OUT</a>
-                    <%_ } _%>
-                </nav>
+            <div class="row">
+                <div class="logo-container col-sm-2 float-left">
+                    <a href="/"><img id="cs-logo" src="/img/cs-logo.png" alt="CS logo"></a>
+                </div>
+                <div class="nav-container col-sm-10 float-left">
+                    <div id="nav-toggle" role="button" class="mb-view">M E N U</div>
+                    <nav>
+                        <a href="/news">NEWS</a>
+                        <a href="/team">TEAM</a>
+                        <a href="/discography">DISCOGRAPHY</a>
+                        <a href="/events">EVENTS</a>
+                        <a href="/shop">SHOP</a>
+                        <a href="/map">MAP</a>
+                        <a href="/mailing-list/sign-up">SIGN UP</a>
+                        <%_ if (user) { _%>
+                        <a href="/admin/logout" style="text-decoration: underline">LOG OUT</a>
+                        <%_ } _%>
+                    </nav>
+                </div>
             </div>
         </div>
     </header>
