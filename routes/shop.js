@@ -100,7 +100,7 @@ router.post("/cart/add", async (req, res) => {
     const { id, name, price, image, info, stock_qty } = product;
     const currentItem = req.session.cart.find(item => item.id === id);
 
-    if (!currentItem) {
+    if (currentItem) {
         currentItem.qty += 1;
         if (currentItem.qty > stock_qty) currentItem.qty = stock_qty;
     } else {
