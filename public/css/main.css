@@ -159,16 +159,19 @@ form {
     max-height: 150px;
 }
 
-#admin-page #reorder-article .input-group {
+#admin-page #reorder-article .input-group,
+#admin-page #remove.tab-pane .input-group {
     margin-bottom: 1em;
 }
 
-#admin-page #reorder-article input[type=text] {
+#admin-page #reorder-article .input-group input[type=text],
+#admin-page #remove.tab-pane .input-group input[type=text] {
     font-size: 1em;
     font-weight: bold;
 }
 
-#admin-page #reorder-article input[type=radio] {
+#admin-page #reorder-article .input-group input[type=radio],
+#admin-page #remove.tab-pane input[type=checkbox] {
     margin-bottom: 0;
 }
 

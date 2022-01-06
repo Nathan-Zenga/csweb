@@ -36,7 +36,14 @@
                         var occurrences = socials.filter(s => s.name === social.name).length;
                         var label = social.name.slice(0,1).toUpperCase() + social.name.slice(1).replace(/_/g, " ");
                         label += occurrences > 1 ? " " + social.url : ""; _%>
-                    <input type="checkbox" name="social<%= i %>" value="<%= social.name %>"> <span><%= label %></span><br>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="checkbox" name="social<%= i %>" value="<%= social.name %>">
+                            </div>
+                        </div>
+                        <input type="text" class="form-control" value="<%= label %>" disabled>
+                    </div>
                     <%_ }) _%>
                     <br>
                     <input type="submit" value="DELETE LINKS">
@@ -51,7 +58,14 @@
                 <form action="/team/delete" method="post">
                     <label>DELETE ARTIST(S)</label>
                     <%_ artists.forEach((artist, i) => { _%>
-                    <input type="checkbox" name="artist<%= i %>" value="<%= artist._id %>"> <span><%= artist.name %></span><br>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="checkbox" name="artist<%= i %>" value="<%= artist._id %>">
+                            </div>
+                        </div>
+                        <input type="text" class="form-control" value="<%= artist.name %>" disabled>
+                    </div>
                     <%_ }) _%>
                     <br>
                     <input type="submit" value="DELETE ARTISTS">
@@ -66,7 +80,14 @@
                 <form action="/discography/project/delete" method="post">
                     <label>DELETE PROJECT(S)</label>
                     <%_ projects.forEach((project, i) => { _%>
-                    <input type="checkbox" name="project<%= i %>" value="<%= project._id %>"> <span><%= project.title %></span><br>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="checkbox" name="project<%= i %>" value="<%= project._id %>">
+                            </div>
+                        </div>
+                        <input type="text" class="form-control" value="<%= project.title %>" disabled>
+                    </div>
                     <%_ }) _%>
                     <br>
                     <input type="submit" value="DELETE PROJECTS">
@@ -81,7 +102,14 @@
                 <form action="/news/article/delete" method="post">
                     <label>DELETE ARTICLE(S)</label>
                     <%_ articles.forEach((article, i) => { _%>
-                    <input type="checkbox" name="article<%= i %>" value="<%= article._id %>"> <span><%= article.headline %></span><br>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="checkbox" name="article<%= i %>" value="<%= article._id %>">
+                            </div>
+                        </div>
+                        <input type="text" class="form-control" value="<%= article.headline %>" disabled>
+                    </div>
                     <%_ }) _%>
                     <br>
                     <input type="submit" value="DELETE ARTICLES">
@@ -96,7 +124,14 @@
                 <form action="/map/location/delete" method="post">
                     <label>DELETE LOCATION(S)</label>
                     <%_ locations.forEach((location, i) => { _%>
-                    <input type="checkbox" name="location<%= i %>" value="<%= location._id %>"> <span><%- "<b>"+ location.name +"</b> - "+ location.city +", "+ location.country %></span><br>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="checkbox" name="location<%= i %>" value="<%= location._id %>">
+                            </div>
+                        </div>
+                        <input type="text" class="form-control" value="<%- `${location.name} - ${location.city}, ${location.country}` %>" disabled>
+                    </div>
                     <%_ }) _%>
                     <br>
                     <input type="submit" value="DELETE LOCATIONS">
@@ -111,7 +146,14 @@
                 <form action="/mailing-list/member/delete" method="post">
                     <label>DELETE MEMBER(S) FROM MAILING LIST</label>
                     <%_ members.forEach((member, i) => { _%>
-                    <input type="checkbox" name="member<%= i %>" value="<%= member._id %>"> <span><%= member.firstname +" "+ member.lastname %></span><br>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="checkbox" name="member<%= i %>" value="<%= member._id %>">
+                            </div>
+                        </div>
+                        <input type="text" class="form-control" value="<%- `${member.firstname} ${member.lastname}` %>" disabled>
+                    </div>
                     <%_ }) _%>
                     <br>
                     <input type="submit" value="DELETE MEMBERS">
@@ -126,7 +168,14 @@
                 <form action="/shop/stock/remove" method="post">
                     <label>DELETE PRODUCT(S) FROM STOCK</label>
                     <%_ products.forEach((item, i) => { _%>
-                    <input type="checkbox" name="product<%= i %>" value="<%= item._id %>"> <span><%= item.name %></span><br>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="checkbox" name="product<%= i %>" value="<%= item._id %>">
+                            </div>
+                        </div>
+                        <input type="text" class="form-control" value="<%- item.name %>" disabled>
+                    </div>
                     <%_ }) _%>
                     <br>
                     <input type="submit" value="DELETE PRODUCTS">
