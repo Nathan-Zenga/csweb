@@ -123,9 +123,16 @@
                 <form method="post" action="/news/article/edit/reorder">
                     <label>REORDER ARTICLE</label>
                     <%_ articles.forEach((article, i) => { _%>
-                    <input type="radio" name="id" value="<%= article._id %>" required> <%= i+1 %>) <span><%= article.headline %></span><br>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="radio" name="id" value="<%= article._id %>" required>
+                            </div>
+                        </div>
+                        <input type="text" class="form-control" value="<%= i+1 %>) <%= article.headline %>" disabled>
+                    </div>
                     <%_ }) _%>
-                    <br><br>
+                    <br>
                     <div class="row">
                         <div class="col-sm-4 float-left"><label>POSITION NUMBER</label></div>
                         <div class="col-sm-8 float-left"><input type="number" name="index" min="1" max="<%= articles.length %>" required></div>

@@ -159,8 +159,17 @@ form {
     max-height: 150px;
 }
 
-#admin-page #reorder-article input[type=radio] {
+#admin-page #reorder-article .input-group {
     margin-bottom: 1em;
+}
+
+#admin-page #reorder-article input[type=text] {
+    font-size: 1em;
+    font-weight: bold;
+}
+
+#admin-page #reorder-article input[type=radio] {
+    margin-bottom: 0;
 }
 
 .file-upload-container {
@@ -221,6 +230,10 @@ input[type=text], input[type=password], input[type=number], input[type=url], inp
 
 input[type=text], input[type=password], input[type=number], input[type=url], input[type=email], textarea, select {
     padding: 10px;
+}
+
+input[type=text]:disabled {
+    border-bottom: none;
 }
 
 input:not([type=submit]):disabled, textarea:disabled, select:disabled {
