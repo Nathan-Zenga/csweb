@@ -65,10 +65,15 @@
 <form method="POST" action="/homepage/image/save" id="homepage_images_form">
     <label for="homepage_image_input">HOMEPAGE IMAGE UPLOAD</label><br>
     <div class="file-upload-container">
-        <div class="row">
-            <div class="col-sm-6 col-9 float-left"><input type="file" id="homepage_image_file" accept="image/*" required></div>
+        <div class="input-group">
+            <div class="custom-file">
+                <input type="file" class="custom-file-input" id="homepage_image_file" accept="image/*" required>
+                <label class="custom-file-label">Choose image</label>
+            </div>
+            <div class="input-group-append">
+                <button class="btn btn-secondary clear-uploads" type="button" data-id="homepage_image_file">CLEAR</button>
+            </div>
             <input type="hidden" name="image">
-            <div class="col-sm-6 col-3 float-left"><button class="clear-uploads" data-id="homepage_image_file">CLEAR</button></div>
         </div>
     </div>
 

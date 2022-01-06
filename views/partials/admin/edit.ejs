@@ -45,10 +45,15 @@
                     <textarea type="text" name="artist_bio" id="artist_bio_edit" rows="5"></textarea>
                     <label>PROFILE PICTURE (OPTIONAL)</label>
                     <div class="file-upload-container">
-                        <div class="row">
-                            <div class="col-sm-6 col-9 float-left"><input type="file" id="profile_image_change" accept="image/*"></div>
+                        <div class="input-group">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="profile_image_change" accept="image/*">
+                                <label class="custom-file-label">Choose image</label>
+                            </div>
+                            <div class="input-group-append">
+                                <button class="btn btn-secondary clear-uploads" type="button" data-id="profile_image_change">CLEAR</button>
+                            </div>
                             <input type="hidden" name="profile_image">
-                            <div class="col-sm-6 col-3 float-left"><button class="clear-uploads" data-id="profile_image_change">CLEAR</button></div>
                         </div>
                     </div>
                     <label>SOCIAL MEDIA LINKS</label>
@@ -90,12 +95,17 @@
                     </div>
                     <input type="text" name="headline" id="headline_edit">
                     <label>MAIN IMAGE(S) (OPTIONAL)</label>
-                    <div class="row">
-                        <div class="col-sm-6 col-9 float-left">
-                            <input type="file" id="headline_images_change" accept="image/*" multiple>
+                    <div class="file-upload-container">
+                        <div class="input-group">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="headline_images_change" accept="image/*" multiple>
+                                <label class="custom-file-label">Choose image</label>
+                            </div>
                             <div class="headline-image-data"></div>
+                            <div class="input-group-append">
+                                <button class="btn btn-secondary clear-uploads" type="button" data-id="headline_images_change">CLEAR</button>
+                            </div>
                         </div>
-                        <div class="col-sm-6 col-3 float-left"><button class="clear-uploads" data-id="headline_images_change">CLEAR</button></div>
                     </div>
                     <div class="headline-image-thumb-choice" style="display: none"></div>
                     <label>ARTICLE BODY <br><span>Place an "X" on a separate line to your spot for any additional images/videos to upload.</span></label>
@@ -138,12 +148,17 @@
                     </select>
                     <label>ARTWORK</label>
                     <div class="file-upload-container">
-                        <div class="row">
-                            <div class="col-sm-6 col-9 float-left"><input type="file" id="artwork_file_change" accept=".jpg,.jpeg,.png,.bmp"></div>
+                        <div class="input-group">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="artwork_file_change" accept=".jpg,.jpeg,.png,.bmp">
+                                <label class="custom-file-label">Choose image</label>
+                            </div>
+                            <div class="input-group-append">
+                                <button class="btn btn-secondary clear-uploads" type="button" data-id="artwork_file_change">CLEAR</button>
+                            </div>
                             <input type="hidden" name="artwork_file">
-                            <div class="col-sm-6 col-3 float-left"><button class="clear-uploads" data-id="artwork_file_change">CLEAR</button></div>
-                            <div class="col-sm-12 float-left"><input type="url" name="artwork_url" id="artwork_url_edit" placeholder="Or enter the image URL"></div>
                         </div>
+                        <input type="url" name="artwork_url" id="artwork_url_edit" placeholder="Or enter the image URL">
                     </div>
                     <label>TITLE</label>
                     <input type="text" name="title" id="title_edit">
@@ -279,12 +294,17 @@
 
                     <label>PRODUCT IMAGE</label>
                     <div class="file-upload-container">
-                        <div class="row">
-                            <div class="col-sm-6 col-9 float-left"><input type="file" id="product_image_file_edit" accept=".jpg,.jpeg,.png,.bmp"></div>
+                        <div class="input-group">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="product_image_file_edit" accept=".jpg,.jpeg,.png,.bmp">
+                                <label class="custom-file-label">Choose image</label>
+                            </div>
+                            <div class="input-group-append">
+                                <button class="btn btn-secondary clear-uploads" type="button" data-id="product_image_file_edit">CLEAR</button>
+                            </div>
                             <input type="hidden" name="image_file">
-                            <div class="col-sm-6 col-3 float-left"><button class="clear-uploads" data-id="product_image_file_edit">CLEAR</button></div>
-                            <div class="col-sm-12 float-left"><input type="url" name="image_url" id="product_image_url_edit" placeholder="Or enter the image URL"></div>
                         </div>
+                        <input type="url" name="image_url" id="product_image_url_edit" placeholder="Or enter the image URL">
                     </div>
 
                     <input type="submit" value="SAVE">

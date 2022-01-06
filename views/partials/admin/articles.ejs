@@ -4,14 +4,21 @@
         <button><i>I</i></button><button><u>U</u></button>
     </div>
     <input type="text" name="headline" id="headline" required>
+
     <label>MAIN IMAGE(S) (OPTIONAL)</label>
-    <div class="row">
-        <div class="col-sm-6 col-9 float-left">
-            <input type="file" id="headline_images" accept="image/*" multiple>
+    <div class="file-upload-container">
+        <div class="input-group">
+            <div class="custom-file">
+                <input type="file" class="custom-file-input" id="headline_images" accept="image/*" multiple>
+                <label class="custom-file-label">Choose image</label>
+            </div>
             <div class="headline-image-data"></div>
+            <div class="input-group-append">
+                <button class="btn btn-secondary clear-uploads" type="button" data-id="headline_images">CLEAR</button>
+            </div>
         </div>
-        <div class="col-sm-6 col-3 float-left"><button class="clear-uploads" data-id="headline_images">CLEAR</button></div>
     </div>
+
     <div class="headline-image-thumb-choice" style="display: none"></div>
     <label>ARTICLE BODY <br><span>Place an "X" on a separate line to your spot for any additional images/videos to upload.</span></label>
     <div class="text-emphasis-styles" data-id="textbody">

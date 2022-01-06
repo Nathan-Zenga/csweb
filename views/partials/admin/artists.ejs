@@ -8,10 +8,15 @@
     <textarea type="text" name="bio" id="bio" rows="5" required></textarea>
     <label>PROFILE PICTURE (OPTIONAL)</label>
     <div class="file-upload-container">
-        <div class="row">
-            <div class="col-sm-6 col-9 float-left"><input type="file" id="profile_image" accept="image/*"></div>
+        <div class="input-group">
+            <div class="custom-file">
+                <input type="file" class="custom-file-input" id="profile_image" accept="image/*">
+                <label class="custom-file-label">Choose image</label>
+            </div>
+            <div class="input-group-append">
+                <button class="btn btn-secondary clear-uploads" type="button" data-id="profile_image">CLEAR</button>
+            </div>
             <input type="hidden" name="profile_image">
-            <div class="col-sm-6 col-3 float-left"><button class="clear-uploads" data-id="profile_image">CLEAR</button></div>
         </div>
     </div>
 

@@ -159,6 +159,24 @@ form {
     max-height: 150px;
 }
 
+#admin-page #reorder-article input[type=radio] {
+    margin-bottom: 1em;
+}
+
+.file-upload-container {
+    margin-bottom: 1em;
+}
+
+.file-upload-container .input-group .custom-file-label {
+    border-radius: 0;
+}
+
+.file-upload-container .input-group .clear-uploads {
+    padding-top: 0;
+    padding-bottom: 0;
+    border-radius: 0;
+}
+
 #mailing-list-stats h1 {
     padding-bottom: 1em;
     font-size: 1em;
@@ -235,6 +253,10 @@ button {
 
 button + button {
     margin-left: 10px;
+}
+
+.input-group button {
+    margin-bottom: 0;
 }
 
 input[type=file] {
@@ -776,10 +798,6 @@ article.full .textbody-media iframe:not([src*=youtu]) {
 
 .cart-item .item-qty-control {
     max-width: 350px;
-}
-
-.cart-item .item-qty-control .input-group .qty-control-btn {
-    margin: 0;
 }
 
 .cart-item .item-qty-control .input-group input[type=number],
