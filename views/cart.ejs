@@ -5,44 +5,31 @@
                 <%_ cart.forEach(item => { _%>
                 <div class="cart-item">
                     <div class="row">
-                        <div class="item-img col-md-4 float-left" style="background-image:url('<%- item.image %>')"></div>
-                        <div class="item-info col-md-4 float-left">
+                        <div class="col-md-3 float-left item-img" style="background-image:url('<%- item.image %>')"></div>
+                        <div class="col-md-6 float-left item-info">
                             <p class="item-name" style="font-weight: bold"><%- item.name %></p>
                             <p class="item-price" style="font-weight: bold"><%- currency_symbol %><span><%- converted_price(item.price).toFixed(2) %></span></p>
                             <p><%= item.info.replace(/\r?\n/g, "<br>") %></p>
                         </div>
-                        <div class="item-qty-control col-md-4 float-left">
-                            <div class="row">
-                                <div class="col-md-12 col-3 float-left order-sm-0 order-xs-6">
-                                    <form class="qty-control-form" action="/shop/cart/increment">
-                                        <input type="hidden" name="id" value="<%- item.id %>">
-                                        <input type="hidden" name="increment" value="1">
-                                        <button type="submit">
-                                            <i class="mb-view fas fa-chevron-right"></i>
-                                            <i class="dt-view fas fa-chevron-up"></i>
-                                        </button>
-                                    </form>
+                        <div class="col-md-3 float-left">
+                            <form class="item-qty-control" action="/shop/cart/increment">
+                                <input type="hidden" name="id" value="<%- item.id %>">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <button type="button" class="btn btn-secondary qty-control-btn" value="-1">-</button>
+                                    </div>
+                                    <input class="form-control qty-count" type="number" name="quantity" value="<%- item.qty %>">
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-secondary qty-control-btn" value="1">+</button>
+                                    </div>
                                 </div>
-                                <div class="col-md-12 col-3 float-left qty-count" style="padding: 10px 0"><%- item.qty %></div>
-                                <div class="col-md-12 col-3 float-left order-sm-0 order-xs-6">
-                                    <form class="qty-control-form" action="/shop/cart/increment">
-                                        <input type="hidden" name="id" value="<%- item.id %>">
-                                        <input type="hidden" name="increment" value="-1">
-                                        <button type="submit">
-                                            <i class="mb-view fas fa-chevron-left"></i>
-                                            <i class="dt-view fas fa-chevron-down"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                                <div class="col-md-12 col-3 float-left">
-                                    <form class="item-remove-form" action="/shop/cart/remove">
-                                        <input type="hidden" name="id" value="<%- item.id %>">
-                                        <button type="submit" class="btn-danger remove-btn">
-                                            <i class="fas fa-trash-alt" style="font-weight: normal"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
+                            </form>
+                            <form class="remove-item" action="/shop/cart/remove">
+                                <input type="hidden" name="id" value="<%- item.id %>">
+                                <button type="submit" class="btn btn-danger remove-item-btn">
+                                    <i class="fas fa-trash-alt" style="font-weight: normal"></i>
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -50,45 +37,39 @@
             </div>
             <br><br>
             <div style="text-align: center; font-weight: bold">
-                <p id="price-total">Total: <%- currency_symbol %><span></span></p>
+                <%_ var price_total = !cart.length ? 0 : cart.map(itm => itm.price * itm.qty).reduce((t, p) => t + p) _%>
+                <p id="price-total">Total: <%- currency_symbol %><span><%- (price_total / 100).toFixed(2) %></span></p>
                 <%- !cart.length ? '' : '<p id="checkout-link"><a href="/shop/checkout"><button>PROCEED TO CHECKOUT</button></a></p>' %>
             </div>
         </div>
     </div>
     <script>
-        $(".qty-control-form, .item-remove-form").submit(function(e) {
+        $(".qty-control-btn").click(function() {
+            var $form = $(this).closest(".item-qty-control");
+            var $qty_count = $form.find(".qty-count");
+            $qty_count.get(0).stepUp(this.value);
+            $(this).closest(".item-qty-control").submit();
+        });
+
+        $(".item-qty-control .qty-count").keyup(function(e) {
+            if (isNaN(e.key)) return;
+            $(this).closest(".item-qty-control").submit();
+        });
+
+        $(".item-qty-control, .remove-item").submit(function(e) {
             e.preventDefault();
-            $.post(this.action, $(this).serializeArray(), function(quantity) {
-                $(e.target).closest(".cart-item").find(".qty-count").text(quantity);
-                if ($(e.target).is(".item-remove-form")) {
-                    $(e.target).closest(".cart-item").addClass("deleted").hide(function() { $(this).remove() });
-                    if ($(".deleted").length === 1) $(e.target).closest("#checkout-link").hide(function() { $(this).remove() });
-                }
-                var prices = $(".cart-item:not(.deleted) .item-price span").map(function(i, item) { return parseFloat(item.innerText) * 100 }).get();
-                var quantities = $(".cart-item:not(.deleted) .qty-count").map(function(i, qty) { return parseInt(qty.innerText) }).get();
-                try {
-                    var total = prices.map(function(price, i) { return price * quantities[i] }).reduce(function(sum, val) { return sum + val });
-                } catch(e) {
-                    var total = 0;
-                }
-                var prev_value = $("#price-total span").text();
-                $("#price-total span").text((total ? total / 100 : 0).toFixed(2));
-                $("#cart-item-count").text($(".cart-item:not(.deleted)").length);
-                if ($("#cart-item-count").text() == 0) $("#cart-icon").removeClass("visible");
-                if (prev_value === $("#price-total span").text()) alert("Max / min item quantity limit reached");
+            var form = this;
+            var $cart_item = $(form).closest(".cart-item");
+            var buttons = $(form).find("button").attr("disabled", true);
+            $.post(form.action, $(form).serializeArray(), function(r) {
+                $(form).find(".qty-count").val(r.quantity);
+                if (!r.quantity) $cart_item.hide(function() { $(this).remove() });
+                $("#price-total span").text((r.total ? r.total / 100 : 0).toFixed(2));
             }).fail(function(err) {
                 alert(err.responseText);
+            }).always(function() {
+                buttons.attr("disabled", false);
             })
         });
-        $("#price-total span").text(function() {
-            var total = 0, result = 0, length = $(".cart-item").length;
-            if (length) result = $(".cart-item").get().map(function(e) {
-                var price = parseFloat($(e).find(".item-price span").text());
-                var qty = parseFloat($(e).find(".qty-count").text());
-                total += price * qty;
-                return total;
-            }).reduce(function(sum, val) { return sum + val });
-            return result.toFixed(2);
-        })
     </script>
 <%- include ('partials/footer') -%>

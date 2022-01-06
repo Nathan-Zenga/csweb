@@ -114,31 +114,36 @@ router.post("/cart/remove", (req, res) => {
     const cartItemIndex = req.session.cart.findIndex(item => item.id === req.body.id);
     if (cartItemIndex === -1) return res.status(400).send("The selected item is not found in your cart");
     req.session.cart.splice(cartItemIndex, 1);
-    res.send(`${req.session.cart.length}`);
+    const total = req.session.cart.length ? req.session.cart.map(itm => itm.price * itm.qty).reduce((t, p) => t + p) : 0;
+    res.send({ total, quantity: 0 });
 });
 
 router.post("/cart/increment", (req, res) => {
-    const { id, increment } = req.body;
+    const { id, quantity } = req.body;
     const currentItem = req.session.cart.find(item => item.id === id);
     if (!currentItem) return res.status(400).send("The selected item is not found in your cart");
-    const newQuantity = currentItem.qty + parseInt(increment);
-    const ltMin = newQuantity < 1;
-    const gtMax = newQuantity > currentItem.stock_qty;
-    currentItem.qty = ltMin ? 1 : gtMax ? currentItem.stock_qty : newQuantity;
-    res.send(`${currentItem.qty}`);
+    if (isNaN(quantity)) return res.status(400).send("Invalid value for quantity");
+    const newQuantity = parseInt(quantity);
+    const underMin = newQuantity < 1;
+    const overMax = newQuantity > currentItem.stock_qty;
+    currentItem.qty = underMin ? 1 : overMax ? currentItem.stock_qty : newQuantity;
+    const total = req.session.cart.map(itm => itm.price * itm.qty).reduce((t, p) => t + p);
+    res.send({ total, quantity: currentItem.qty });
 });
 
-router.post("/checkout/payment-intent/create", (req, res) => {
+router.post("/checkout/payment-intent/create", async (req, res) => {
     const { firstname, lastname, email, address_l1, address_l2, city, postcode } = req.body;
     const { cart, currency_symbol, converted_price } = req.session;
-    const name = firstname + " " + lastname;
+    const name = `${firstname} ${lastname}`;
     const address = { line1: address_l1, line2: address_l2, city, postal_code: postcode };
+
+    const customer = await Stripe.customers.create({ name, email, shipping: { name, address } });
+
     Stripe.paymentIntents.create({ // Create a PaymentIntent with the order details
-        receipt_email: email,
+        customer: customer.id,
         description: cart.map(p => `${p.name} (${currency_symbol}${converted_price(p.price).toFixed(2)} X ${p.qty})`).join(", \r\n"),
         amount: cart.map(p => p.price * p.qty).reduce((sum, val) => sum + val),
-        currency: "gbp",
-        shipping: { name, address }
+        currency: "gbp"
     }).then(pi => {
         req.session.paymentIntentID = pi.id;
         res.send({ clientSecret: pi.client_secret, pk: STRIPE_PK });
@@ -147,33 +152,34 @@ router.post("/checkout/payment-intent/create", (req, res) => {
 
 router.post("/checkout/payment-intent/complete", async (req, res) => {
     try {
-        const pi = await Stripe.paymentIntents.retrieve(req.session.paymentIntentID);
+        const pi = await Stripe.paymentIntents.retrieve(req.session.paymentIntentID, { expand: "customer" });
         const products = await Product.find();
         if (!pi) return res.status(404).send("Invalid payment session");
         if (pi.status !== "succeeded") return res.status(500).send(pi.status.replace(/_/g, " "));
-        if (production) req.session.cart.forEach(item => {
+        if (production) await Promise.all(req.session.cart.map(item => {
             const product = products.find(p => p.id === item.id);
-            if (product) {
-                product.stock_qty -= item.qty;
-                if (product.stock_qty < 0) product.stock_qty = 0;
-                product.save();
-            }
-        });
+            if (!product) return null;
+            product.stock_qty -= item.qty;
+            if (product.stock_qty < 0) product.stock_qty = 0;
+            return product.save();
+        }));
         req.session.cart = [];
         req.session.paymentIntentID = undefined;
 
         const { line1, line2, city, postal_code } = pi.shipping.address;
         const transporter = new MailingListMailTransporter({ req, res });
+        console.log(pi);
+        const receipt_email = pi.receipt_email || pi.customer.email;
         const subject = "Purchase Nofication: Payment Successful";
         const message = `Hi ${pi.shipping.name},\n\n` +
         `Your payment was successful. Below is a summary of your purchase:\n\n${pi.charges.data[0].description}\n\n` +
         `If you have not yet received your receipt via email, you can view it here instead:\n${pi.charges.data[0].receipt_url}\n\n` +
         "Thank you for shopping with us!\n\n- CS";
-        transporter.setRecipient(pi.receipt_email).sendMail({ subject, message }, err => {
+        transporter.setRecipient(receipt_email).sendMail({ subject, message }, err => {
             if (err) console.error(err), res.status(500);
             const subject = "Purchase Report: You Got Paid!";
             const message = "You've received a new purchase from a new customer. Summary shown below\n\n" +
-            `- Name: ${pi.shipping.name}\n- Email: ${pi.receipt_email}\n- Purchased items: ${pi.charges.data[0].description}\n` +
+            `- Name: ${pi.shipping.name}\n- Email: ${receipt_email}\n- Purchased items: ${pi.charges.data[0].description}\n` +
             `- Address:\n\t${line1},${line2 ? "\n\t"+line2+"," : ""}\n\t${city},\n\t${postal_code}\n\n` +
             `- Date of purchase: ${Date(pi.created * 1000)}\n` +
             `- Total amount: £${pi.amount / 100}\n\n` +
