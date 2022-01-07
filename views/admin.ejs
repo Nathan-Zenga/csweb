@@ -106,26 +106,43 @@
             if ($tbm_container.html()) $tbm_container.empty();
             if (!spots.length) return;
             spots.forEach(function(spot, i) {
-                var $fileInput = $("<input>").attr({ class: "input-"+i, type: "file", id: "upload-"+i }).css({ display: "initial", width: "auto" });
-                var $clearUploadsButton = $("<button>").attr({ class: "clear-uploads", "data-id": "upload-"+i }).text("CLEAR FILE UPLOAD");
-                var $textInput = $("<input>").attr({ class: "input-"+i, type: "text", name: "textbody_media", required: true, placeholder: "...or enter image URL or embed code" });
-                $fileInput.add($clearUploadsButton).add($textInput.val(current_values[i])).appendTo($tbm_container);
+                $('<div class="file-upload-container">' +
+                    '<div class="input-group">' +
+                        '<div class="custom-file">' +
+                            `<input type="file" class="custom-file-input" id="upload${i}" accept="image/*,video/*,audio/*" required>` +
+                            '<label class="custom-file-label">Choose media file</label>' +
+                        '</div>' +
+                        '<div class="input-group-append">' +
+                            `<button class="btn btn-secondary clear-uploads" type="button" data-id="upload${i}">CLEAR FILE UPLOAD</button>` +
+                        '</div>' +
+                        '<input type="hidden" name="image">' +
+                    '</div>' +
+                    '<input type="text" name="textbody_media" placeholder="...or enter media URL or embed code" required>' +
+                '</div>').appendTo($tbm_container);
             });
 
             $tbm_container.find("input:file").change(function() {
                 var files = this.files;
-                var $textInput = $(this).nextAll("input:text." + this.className);
+                var $upload_container = $(this).closest(".file-upload-container");
+                var $textInput = $upload_container.find("input:text");
                 var filesPresent = files && files.length;
+                var $file_label = $upload_container.find(".custom-file-label");
+                var initial_label_value = $file_label.data("initial-value") || $file_label.text();
+                $file_label.data("initial-value", initial_label_value).text(initial_label_value);
                 $textInput.val(filesPresent ? "N/A" : "").attr("disabled", false).next(":hidden").remove();
                 if (!filesPresent) return this;
+                var $submitBtn = $(this).closest("form").children("input:submit").attr("disabled", true);
                 readDataURLs(files, function(err, urls) {
+                    $submitBtn.attr("disabled", false);
                     if (err) return alert(err.message);
+                    $file_label.text(files[0].name);
                     $textInput.val("N/A").attr("disabled", true).after($("<input>").attr({ type: "hidden", name: "textbody_media", value: urls[0] }));
                 });
             }).end().find(".clear-uploads").click(function(e) {
                 e.preventDefault(); $tbm_container.find(":file#"+this.dataset.id).val("").change()
             });
         });
+
         $(".clear-uploads").click(function(e) {
             e.preventDefault();
             $("#"+this.dataset.id).val("").change();
@@ -139,15 +156,20 @@
 
         $(".file-upload-container :file").change(function() {
             var files = this.files;
-            var $image_data = $(this).closest(".file-upload-container").find(":hidden").val("");
-            var $image_url = $(this).closest(".file-upload-container").find("input[type=url]").attr("disabled", false).val("");
+            var $container = $(this).closest(".file-upload-container");
+            var $image_data = $container.find(":hidden").val("");
+            var $image_url = $container.find("input[type=url]").attr("disabled", false).val("");
+            var $file_label = $container.find(".custom-file-label");
+            var initial_label_value = $file_label.data("initial-value") || $file_label.text();
+            $file_label.data("initial-value", initial_label_value).text(initial_label_value);
             if (!files || !files.length) return;
-            var $submitInput = $(this).closest("form").children("input:submit").attr("disabled", true);
+            var $submitBtn = $(this).closest("form").children("input:submit").attr("disabled", true);
             readDataURLs(files, function(err, urls) {
-                $submitInput.attr("disabled", false);
+                $submitBtn.attr("disabled", false);
                 if (err) return alert(err.message);
                 $image_data.val(urls[0]);
                 $image_url.attr("disabled", true).val(files[0].name);
+                $file_label.text(files[0].name);
             });
         });
 
@@ -156,6 +178,7 @@
             var notEmpty = $groupInputs.filter(function() { return this.value }).length > 0;
             $groupInputs.attr("required", notEmpty);
         });
+
         $(".input-item button").click(function(e) {
             e.preventDefault();
             var $form = $(this).closest("form");
