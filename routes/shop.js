@@ -31,7 +31,7 @@ router.post("/fx", (req, res) => {
     const symbol = curr_symbols[req.body.currency];
     const currency = req.session.currency = req.body.currency.toLowerCase();
     req.session.fx_rate = rate;
-    req.session.currency_symbol = symbol;
+    req.session.currency_symbol = symbol || currency.toUpperCase();
     res.send({ rate, symbol, currency });
 });
 

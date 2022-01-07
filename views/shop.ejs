@@ -3,7 +3,7 @@
         <div style="text-align: right; font-weight: bold">
             <select id="fx-select" name="currency" style="color: black; width: 150px">
                 <%_ const currency_default = currency.toUpperCase(); _%>
-                <option value="<%= currency_default %>"><%- `${currency_default} (${currency_symbol || ""})` %></option>
+                <option value="<%= currency_default %>"><%- `${currency_default} (${currency_symbol !== currency_default ? currency_symbol : ""})` %></option>
                 <%_ Object.keys(rates).sort().forEach(c => { _%>
                 <option value="<%= c %>"><%= `${c} (${curr_symbols[c] || ""})` %></option>
                 <%_ }) _%>
@@ -22,7 +22,7 @@
                     <div class="text">
                         <p class="name" style="font-size: 1.5em;"><%= item.name %></p>
                         <p class="price" style="font-size: 2em; text-align: right" data-gbp-price="<%= (item.price / 100).toFixed(2) %>">
-                            <span><%- currency_symbol || currency %></span>
+                            <span><%- (currency_symbol || currency).toUpperCase() %></span>
                             <span><%= converted_price(item.price).toFixed(2) %></span>
                         </p>
                         <p><%= item.info.replace(/\r?\n/g, "<br>") %></p>

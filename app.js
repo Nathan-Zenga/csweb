@@ -49,10 +49,7 @@ app.use(async (req, res, next) => {
     res.locals.fx_rate = req.session.fx_rate = req.session.fx_rate || 1;
     res.locals.currency = req.session.currency = req.session.currency || "gbp";
     res.locals.currency_symbol = req.session.currency_symbol = req.session.currency_symbol || "£";
-    res.locals.converted_price = req.session.converted_price = price => {
-        const value = parseFloat(price / 100), {currency, fx_rate} = req.session;
-        return Function(`return (${value} ${currency === "EUR" ? "/" : "*"} ${fx_rate})`)();
-    };
+    res.locals.converted_price = req.session.converted_price = price => parseFloat(price / 100) * req.session.fx_rate;
     if (!req.session.paymentIntentID) return next();
     try {
         const pi = await Stripe.paymentIntents.retrieve(req.session.paymentIntentID);
