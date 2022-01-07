@@ -115,7 +115,7 @@ router.post("/cart/remove", (req, res) => {
     if (cartItemIndex === -1) return res.status(400).send("The selected item is not found in your cart");
     req.session.cart.splice(cartItemIndex, 1);
     const total = req.session.cart.length ? req.session.cart.map(itm => itm.price * itm.qty).reduce((t, p) => t + p) : 0;
-    res.send({ total, quantity: 0 });
+    res.send({ total: req.session.converted_price(total), quantity: 0 });
 });
 
 router.post("/cart/increment", (req, res) => {
@@ -128,7 +128,7 @@ router.post("/cart/increment", (req, res) => {
     const overMax = newQuantity > currentItem.stock_qty;
     currentItem.qty = underMin ? 1 : overMax ? currentItem.stock_qty : newQuantity;
     const total = req.session.cart.map(itm => itm.price * itm.qty).reduce((t, p) => t + p);
-    res.send({ total, quantity: currentItem.qty });
+    res.send({ total: req.session.converted_price(total), quantity: currentItem.qty });
 });
 
 router.post("/checkout/payment-intent/create", async (req, res) => {

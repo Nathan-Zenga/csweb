@@ -36,7 +36,7 @@
             <br><br>
             <div style="text-align: center; font-weight: bold">
                 <%_ var price_total = !cart.length ? 0 : cart.map(itm => itm.price * itm.qty).reduce((t, p) => t + p) _%>
-                <p id="price-total">Total: <%- currency_symbol %><span><%- (price_total / 100).toFixed(2) %></span></p>
+                <p id="price-total">Total: <%- currency_symbol %><span><%- (converted_price(price_total)).toFixed(2) %></span></p>
                 <%- !cart.length ? '' : '<p id="checkout-link"><a href="/shop/checkout"><button>PROCEED TO CHECKOUT</button></a></p>' %>
             </div>
         </div>
@@ -63,7 +63,7 @@
                 $(form).find(".qty-count").val(r.quantity);
                 if (!r.quantity) $to_remove.hide(function() { $(this).remove() });
                 if (!r.quantity) $("#cart-icon").removeClass("visible");
-                $("#price-total span").text((r.total ? r.total / 100 : 0).toFixed(2));
+                $("#price-total span").text(r.total.toFixed(2));
             }).fail(function(err) {
                 alert(err.responseText);
             }).always(function() {
