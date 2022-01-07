@@ -18,7 +18,7 @@
                                     <div class="input-group-prepend">
                                         <button type="button" class="btn btn-secondary qty-control-btn" value="-1">-</button>
                                     </div>
-                                    <input class="form-control qty-count" type="number" name="quantity" value="<%- item.qty %>">
+                                    <input class="form-control qty-count" type="number" name="quantity" min="1" max="<%- item.stock_qty %>" value="<%- item.qty %>">
                                     <div class="input-group-append">
                                         <button type="button" class="btn btn-secondary qty-control-btn" value="1">+</button>
                                     </div>
@@ -26,9 +26,7 @@
                             </form>
                             <form class="remove-item" action="/shop/cart/remove">
                                 <input type="hidden" name="id" value="<%- item.id %>">
-                                <button type="submit" class="btn btn-danger remove-item-btn">
-                                    <i class="fas fa-trash-alt" style="font-weight: normal"></i>
-                                </button>
+                                <button type="submit" class="btn remove-item-btn">REMOVE</button>
                             </form>
                         </div>
                     </div>
@@ -59,11 +57,12 @@
         $(".item-qty-control, .remove-item").submit(function(e) {
             e.preventDefault();
             var form = this;
-            var $cart_item = $(form).closest(".cart-item");
+            var $to_remove = $(form).closest(".cart-item").add("#checkout-link");
             var buttons = $(form).find("button").attr("disabled", true);
             $.post(form.action, $(form).serializeArray(), function(r) {
                 $(form).find(".qty-count").val(r.quantity);
-                if (!r.quantity) $cart_item.hide(function() { $(this).remove() });
+                if (!r.quantity) $to_remove.hide(function() { $(this).remove() });
+                if (!r.quantity) $("#cart-icon").removeClass("visible");
                 $("#price-total span").text((r.total ? r.total / 100 : 0).toFixed(2));
             }).fail(function(err) {
                 alert(err.responseText);
