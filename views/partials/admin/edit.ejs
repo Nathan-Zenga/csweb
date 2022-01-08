@@ -122,8 +122,14 @@
                 <%_ if (articles.length) { _%>
                 <form method="post" action="/news/article/edit/reorder">
                     <label>REORDER ARTICLE</label>
+                    <div class="input-group filter-search-container">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text"><i class="fas fa-search"></i></label>
+                        </div>
+                        <input type="search" class="form-control filter-search-input" placeholder="Search to filter">
+                    </div>
                     <%_ articles.forEach((article, i) => { _%>
-                    <div class="input-group">
+                    <div class="input-group list-item">
                         <div class="input-group-prepend">
                             <div class="input-group-text">
                                 <input type="radio" name="id" value="<%= article._id %>" required>

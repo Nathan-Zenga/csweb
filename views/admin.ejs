@@ -297,9 +297,9 @@
         });
 
         $("#homepage_image_file").change(function() {
-            var $form = $(this).closest("form");
             var files = this.files;
-            $form.find("#homepage_image_filename").val(files && files.length ? files[0].name.replace(/\.[a-zA-Z0-9]{3,4}$/gi, "") : "");
+            var filename = files && files.length ? files[0].name.replace(/\.[a-zA-Z0-9]{3,4}$/gi, "") : "";
+            $(this).closest("form").find("#homepage_image_filename").val(filename);
         });
 
         $(".creation form, #edit form").submit(function(e) {
@@ -336,6 +336,13 @@
             }).always(function() {
                 btnController.finish();
             });
+        });
+
+        $(".filter-search-input").on("input", function(e) {
+            var $items = $(e.target).closest("form").find(".list-item");
+            var regex = new RegExp(`\\b${e.target.value.replace(/\W/g, function(m) { return `\\${m}` })}(\\S+)?`, "gi");
+            var filter = function() { return regex.test($(this).find("input:text").val()) };
+            !e.target.value ? $items.show() : $items.hide().filter(filter).show();
         });
     </script>
 <%- include ('partials/footer') -%>

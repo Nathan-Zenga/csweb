@@ -160,6 +160,11 @@ form {
     overflow: auto;
 }
 
+#admin-page form .input-group input,
+#admin-page form .input-group label {
+    font-size: 1em;
+}
+
 #admin-page #reorder-article .input-group,
 #admin-page #remove.tab-pane .input-group {
     margin-bottom: 1em;
@@ -167,7 +172,6 @@ form {
 
 #admin-page #reorder-article .input-group input[type=text],
 #admin-page #remove.tab-pane .input-group input[type=text] {
-    font-size: 1em;
     font-weight: bold;
 }
 

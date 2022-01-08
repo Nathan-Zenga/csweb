@@ -32,11 +32,17 @@
                     if (socials.length) { _%>
                 <form action="/cs/links/delete" method="post">
                     <label>DELETE SOCIAL LINK(S)</label>
+                    <div class="input-group filter-search-container">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text"><i class="fas fa-search"></i></label>
+                        </div>
+                        <input type="search" class="form-control filter-search-input" placeholder="Search to filter">
+                    </div>
                     <%_ socials.forEach((social, i) => {
                         var occurrences = socials.filter(s => s.name === social.name).length;
                         var label = social.name.slice(0,1).toUpperCase() + social.name.slice(1).replace(/_/g, " ");
                         label += occurrences > 1 ? " " + social.url : ""; _%>
-                    <div class="input-group">
+                    <div class="input-group list-item">
                         <div class="input-group-prepend">
                             <div class="input-group-text">
                                 <input type="checkbox" name="social<%= i %>" value="<%= social.name %>">
@@ -57,8 +63,14 @@
                 <%_ if (artists.length) { _%>
                 <form action="/team/delete" method="post">
                     <label>DELETE ARTIST(S)</label>
+                    <div class="input-group filter-search-container">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text"><i class="fas fa-search"></i></label>
+                        </div>
+                        <input type="search" class="form-control filter-search-input" placeholder="Search to filter">
+                    </div>
                     <%_ artists.forEach((artist, i) => { _%>
-                    <div class="input-group">
+                    <div class="input-group list-item">
                         <div class="input-group-prepend">
                             <div class="input-group-text">
                                 <input type="checkbox" name="artist<%= i %>" value="<%= artist._id %>">
@@ -79,8 +91,14 @@
                 <%_ if (projects.length) { _%>
                 <form action="/discography/project/delete" method="post">
                     <label>DELETE PROJECT(S)</label>
+                    <div class="input-group filter-search-container">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text"><i class="fas fa-search"></i></label>
+                        </div>
+                        <input type="search" class="form-control filter-search-input" placeholder="Search to filter">
+                    </div>
                     <%_ projects.forEach((project, i) => { _%>
-                    <div class="input-group">
+                    <div class="input-group list-item">
                         <div class="input-group-prepend">
                             <div class="input-group-text">
                                 <input type="checkbox" name="project<%= i %>" value="<%= project._id %>">
@@ -101,8 +119,14 @@
                 <%_ if (articles.length) { _%>
                 <form action="/news/article/delete" method="post">
                     <label>DELETE ARTICLE(S)</label>
+                    <div class="input-group filter-search-container">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text"><i class="fas fa-search"></i></label>
+                        </div>
+                        <input type="search" class="form-control filter-search-input" placeholder="Search to filter">
+                    </div>
                     <%_ articles.forEach((article, i) => { _%>
-                    <div class="input-group">
+                    <div class="input-group list-item">
                         <div class="input-group-prepend">
                             <div class="input-group-text">
                                 <input type="checkbox" name="article<%= i %>" value="<%= article._id %>">
@@ -123,8 +147,14 @@
                 <%_ if (locations.length) { _%>
                 <form action="/map/location/delete" method="post">
                     <label>DELETE LOCATION(S)</label>
+                    <div class="input-group filter-search-container">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text"><i class="fas fa-search"></i></label>
+                        </div>
+                        <input type="search" class="form-control filter-search-input" placeholder="Search to filter">
+                    </div>
                     <%_ locations.forEach((location, i) => { _%>
-                    <div class="input-group">
+                    <div class="input-group list-item">
                         <div class="input-group-prepend">
                             <div class="input-group-text">
                                 <input type="checkbox" name="location<%= i %>" value="<%= location._id %>">
@@ -145,8 +175,14 @@
                 <%_ if (members.length) { _%>
                 <form action="/mailing-list/member/delete" method="post">
                     <label>DELETE MEMBER(S) FROM MAILING LIST</label>
+                    <div class="input-group filter-search-container">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text"><i class="fas fa-search"></i></label>
+                        </div>
+                        <input type="search" class="form-control filter-search-input" placeholder="Search to filter">
+                    </div>
                     <%_ members.forEach((member, i) => { _%>
-                    <div class="input-group">
+                    <div class="input-group list-item">
                         <div class="input-group-prepend">
                             <div class="input-group-text">
                                 <input type="checkbox" name="member<%= i %>" value="<%= member._id %>">
@@ -167,8 +203,14 @@
                 <%_ if (products.length) { _%>
                 <form action="/shop/stock/remove" method="post">
                     <label>DELETE PRODUCT(S) FROM STOCK</label>
+                    <div class="input-group filter-search-container">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text"><i class="fas fa-search"></i></label>
+                        </div>
+                        <input type="search" class="form-control filter-search-input" placeholder="Search to filter">
+                    </div>
                     <%_ products.forEach((item, i) => { _%>
-                    <div class="input-group">
+                    <div class="input-group list-item">
                         <div class="input-group-prepend">
                             <div class="input-group-text">
                                 <input type="checkbox" name="product<%= i %>" value="<%= item._id %>">
