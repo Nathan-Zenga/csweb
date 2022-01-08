@@ -49,8 +49,7 @@
             $(this).closest(".item-qty-control").submit();
         });
 
-        $(".item-qty-control .qty-count").keyup(function(e) {
-            if (isNaN(e.key)) return;
+        $(".item-qty-control .qty-count").on("input", function(e) {
             $(this).closest(".item-qty-control").submit();
         });
 

@@ -123,7 +123,7 @@ router.post("/cart/increment", (req, res) => {
     const currentItem = req.session.cart.find(item => item.id === id);
     if (!currentItem) return res.status(400).send("The selected item is not found in your cart");
     if (isNaN(quantity)) return res.status(400).send("Invalid value for quantity");
-    const newQuantity = parseInt(quantity);
+    const newQuantity = parseInt(quantity) || 1;
     const underMin = newQuantity < 1;
     const overMax = newQuantity > currentItem.stock_qty;
     currentItem.qty = underMin ? 1 : overMax ? currentItem.stock_qty : newQuantity;
