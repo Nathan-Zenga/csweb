@@ -53,7 +53,6 @@
             </div>
         </div>
     </article>
-    <style> .text a { text-decoration: underline } </style>
     <script>
         if (!("object-fit" in document.body.style)) $(".img-reel img").css("width", "auto");
         if ($(".img-reel img").length > 1) {
@@ -65,14 +64,14 @@
                 $img = left ? $img.prev() : $img.next();
                 $img = left && !$img.length ? $(".img-reel img:first") : right && !$img.length ? $(".img-reel img:last") : $img;
                 var centeredPos = ($(".img-reel").width() - $img.width()) / 2;
-                $(".img-reel").stop().animate({ scrollLeft: direction + (Math.abs($img.offset().left - $(".img-reel").offset().left - centeredPos)) });
+                $(".img-reel").stop().animate({ scrollLeft: direction + (Math.abs($img.offset().left - $(".img-reel").offset().left - centeredPos)) }, 200);
             });
         }
         $(window).on("load resize", function() {
             var lastImgOffsetRight = $(".img-reel img:last").offset().left + $(".img-reel img:last").width();
             var imgReelOffsetRight = $(".img-reel").offset().left + $(".img-reel").width();
             var overflowing = lastImgOffsetRight > imgReelOffsetRight;
-            $(".img-reel-nav")[overflowing ? "slideDown" : "slideUp"]();
+            $(".img-reel-nav").stop()[overflowing ? "slideDown" : "slideUp"](200);
         });
         $("img[data-toggle=modal]").click(function() { $("#image-modal .modal-body").html("<img src='"+ $(this).attr("src") +"'>") })
 

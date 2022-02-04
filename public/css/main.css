@@ -426,6 +426,12 @@ article .article-content > * {
 
 article.full .article-content .text {
     font-weight: bold;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+article.full .article-content .text a {
+    text-decoration: underline;
 }
 
 article:not(.full) .article-content .text {
@@ -484,15 +490,11 @@ article.full h1 {
 
 article.full .article-content {
     background-color: transparent;
-    max-width: 900px;
-    margin: 0 auto;
 }
 
 article.full .img-reel {
     white-space: nowrap;
     overflow: hidden;
-    padding-left: 0;
-    padding-right: 0;
     text-align: center;
 }
 
@@ -554,6 +556,11 @@ article.full .textbody-media iframe:not([src*=youtu]) {
 }
 
 @media (max-width: 767px) {
+    article.full .img-reel {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
     article.full .article-content img {
         object-fit: contain;
         width: 100%;
