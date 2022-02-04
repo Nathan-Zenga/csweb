@@ -48,7 +48,7 @@
                                 <input type="checkbox" name="social<%= i %>" value="<%= social.name %>">
                             </div>
                         </div>
-                        <input type="text" class="form-control" value="<%= label %>" disabled>
+                        <label class="form-control list-item-label"><%= label %></label>
                     </div>
                     <%_ }) _%>
                     <br>
@@ -76,7 +76,7 @@
                                 <input type="checkbox" name="artist<%= i %>" value="<%= artist._id %>">
                             </div>
                         </div>
-                        <input type="text" class="form-control" value="<%= artist.name %>" disabled>
+                        <label class="form-control list-item-label"><%= artist.name %></label>
                     </div>
                     <%_ }) _%>
                     <br>
@@ -104,7 +104,7 @@
                                 <input type="checkbox" name="project<%= i %>" value="<%= project._id %>">
                             </div>
                         </div>
-                        <input type="text" class="form-control" value="<%= project.title %>" disabled>
+                        <label class="form-control list-item-label"><%= project.title %></label>
                     </div>
                     <%_ }) _%>
                     <br>
@@ -132,7 +132,7 @@
                                 <input type="checkbox" name="article<%= i %>" value="<%= article._id %>">
                             </div>
                         </div>
-                        <input type="text" class="form-control" value="<%= article.headline %>" disabled>
+                        <label class="form-control list-item-label"><%= article.headline %></label>
                     </div>
                     <%_ }) _%>
                     <br>
@@ -160,7 +160,7 @@
                                 <input type="checkbox" name="location<%= i %>" value="<%= location._id %>">
                             </div>
                         </div>
-                        <input type="text" class="form-control" value="<%- `${location.name} - ${location.city}, ${location.country}` %>" disabled>
+                        <label class="form-control list-item-label"><%- `${location.name} - ${location.city}, ${location.country}` %></label>
                     </div>
                     <%_ }) _%>
                     <br>
@@ -188,7 +188,7 @@
                                 <input type="checkbox" name="member<%= i %>" value="<%= member._id %>">
                             </div>
                         </div>
-                        <input type="text" class="form-control" value="<%- `${member.firstname} ${member.lastname}` %>" disabled>
+                        <label class="form-control list-item-label"><%- `${member.firstname} ${member.lastname}` %></label>
                     </div>
                     <%_ }) _%>
                     <br>
@@ -216,7 +216,7 @@
                                 <input type="checkbox" name="product<%= i %>" value="<%= item._id %>">
                             </div>
                         </div>
-                        <input type="text" class="form-control" value="<%- item.name %>" disabled>
+                        <label class="form-control list-item-label"><%- item.name %></label>
                     </div>
                     <%_ }) _%>
                     <br>

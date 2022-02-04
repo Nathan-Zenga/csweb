@@ -1,4 +1,4 @@
-﻿main {
+main {
     position: relative;
     overflow-x: hidden;
 }
@@ -170,9 +170,11 @@ form {
     margin-bottom: 1em;
 }
 
-#admin-page #reorder-article .input-group input[type=text],
-#admin-page #remove.tab-pane .input-group input[type=text] {
+#admin-page #reorder-article .input-group .list-item-label,
+#admin-page #remove.tab-pane .input-group .list-item-label {
     font-weight: bold;
+    background-color: rgb(220, 220, 220);
+    height: auto;
 }
 
 #admin-page #reorder-article .input-group input[type=radio],
