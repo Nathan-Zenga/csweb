@@ -39,7 +39,8 @@
             });
         })();
 
-        var $videos = $("#bg-video-player video");
+        var $player = $("#bg-video-player");
+        var $videos = $player.children("video");
         $videos.one("canplay canplaythrough", function(e) { $(e.target).prop("currentTime", 13).trigger("play") })
         $(window).on("touchstart", function() {
             $videos.each((i, v) => {
@@ -47,5 +48,20 @@
                 if (!playing) v.play();
             });
         });
+
+        if ($videos.length > 1) {
+            $videos.filter(":gt(0)").fadeTo(0, 0);
+            setInterval(() => {
+                $player.children("video:first")
+                .fadeTo(500, 0)
+                .dequeue()
+                .next()
+                .trigger("play")
+                .fadeTo(500, 1)
+                .end()
+                // .trigger("pause")
+                .appendTo($player);
+            }, 4000);
+        }
     </script>
 <%- include ('partials/footer') -%>
