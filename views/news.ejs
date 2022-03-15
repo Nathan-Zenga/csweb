@@ -2,17 +2,26 @@
     <div class="container">
         <div class="row">
         <%_ articles.forEach((article, i) => { _%>
-            <article class="content-container col-md-4 col-sm-6 float-left">
+            <article class="preview content-container col-md-4 col-sm-6 float-left">
                 <div class="article-content">
                     <%_ const img = article.headline_image_thumb || "/img/cs-logo.png";
                         const link = `/news/article/${ article.headline.split("").map(c => /\W/.test(c) && c != "$" ? "-" : c).join("").replace(/\-+/g, "-").replace(/\W+$/, '') }`.toLowerCase(); _%>
-                    <a class="img" href="<%- link %>" style="background-image: url('<%= img %>')"></a>
+                    <a class="img" href="<%- link %>" style="background-image: url('<%= img %>'); opacity: 0"></a>
                     <div class="text"><h1><a href="<%- link %>"><%- article.headline %></a></h1></div>
-                    <div class="overflow-fade-sheet"><a href="<%- link %>">READ MORE</a></div>
+                    <a class="read-more-link" href="<%- link %>">Read more</a>
                 </div>
             </article>
             <%- (i + 1) % 3 == 0 ? '<div class="breakpoint row dt-view-md"></div>' : '' %>
         <%_ }) _%>
         </div>
     </div>
+    <script>
+        $("article .img").each(function(i, img) {
+            var url_pattern = /(?:(?:https?|ftp|file|data):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$])/gi;
+            var image = new Image();
+            image.src = img.src || $(img).css("background-image").match(url_pattern)[0];
+            image.onload = function() { $(img).fadeTo(1000, 1) };
+            image.onerror = function() { $(img).css("background-image", "url('/img/cs-logo.png')").fadeTo(1000, 1) };
+        });
+    </script>
 <%- include ('partials/footer') -%>

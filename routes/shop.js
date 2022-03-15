@@ -137,17 +137,19 @@ router.post("/checkout/payment-intent/create", async (req, res) => {
     const name = `${firstname} ${lastname}`;
     const address = { line1: address_l1, line2: address_l2, city, postal_code: postcode };
 
-    const customer = await Stripe.customers.create({ name, email, shipping: { name, address } });
+    try {
+        const customer = await Stripe.customers.create({ name, email, shipping: { name, address } });
 
-    Stripe.paymentIntents.create({ // Create a PaymentIntent with the order details
-        customer: customer.id,
-        description: cart.map(p => `${p.name} (${currency_symbol}${converted_price(p.price).toFixed(2)} X ${p.qty})`).join(", \r\n"),
-        amount: cart.map(p => p.price * p.qty).reduce((sum, val) => sum + val),
-        currency: "gbp"
-    }).then(pi => {
+        const pi = await Stripe.paymentIntents.create({ // Create a PaymentIntent with the order details
+            customer: customer.id,
+            description: cart.map(p => `${p.name} (${currency_symbol}${converted_price(p.price).toFixed(2)} X ${p.qty})`).join(", \r\n"),
+            amount: cart.map(p => p.price * p.qty).reduce((sum, val) => sum + val),
+            currency: "gbp"
+        });
+
         req.session.paymentIntentID = pi.id;
         res.send({ clientSecret: pi.client_secret, pk: STRIPE_PK });
-    }).catch(err => res.status(err.statusCode).send(err.message));
+    } catch (err) { res.status(err.statusCode).send(err.message) }
 });
 
 router.post("/checkout/payment-intent/complete", async (req, res) => {
@@ -168,7 +170,6 @@ router.post("/checkout/payment-intent/complete", async (req, res) => {
 
         const { line1, line2, city, postal_code } = pi.shipping.address;
         const transporter = new MailingListMailTransporter({ req, res });
-        console.log(pi);
         const receipt_email = pi.receipt_email || pi.customer.email;
         const subject = "Purchase Nofication: Payment Successful";
         const message = `Hi ${pi.shipping.name},\n\n` +

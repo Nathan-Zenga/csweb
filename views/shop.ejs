@@ -1,6 +1,6 @@
 <%- include ('partials/header') -%>
     <div class="container">
-        <div style="text-align: right; font-weight: bold">
+        <div style="text-align: right; font-weight: 600">
             <select id="fx-select" name="currency" style="color: black; width: 150px">
                 <%_ const currency_default = currency.toUpperCase(); _%>
                 <option value="<%= currency_default %>"><%- `${currency_default} (${currency_symbol !== currency_default ? currency_symbol : ""})` %></option>
@@ -25,7 +25,13 @@
                             <span><%- (currency_symbol || currency).toUpperCase() %></span>
                             <span><%= converted_price(item.price).toFixed(2) %></span>
                         </p>
-                        <p><%= item.info.replace(/\r?\n/g, "<br>") %></p>
+                        <div class="description">
+                            <p><span><%= item.info %></span></p>
+                            <a class="expand-toggler">
+                                <span class="expand-label">See more</span>
+                                <span class="collapse-label">See less</span>
+                            </a>
+                        </div>
                     </div>
                     <div class="cart-options">
                         <form class="add-to-cart" action="/shop/cart/add">
@@ -55,7 +61,8 @@
                 setTimeout(function() { $submitBtn.val(initialVal) }, 2000);
             })
         });
-        var prices = $(".product-thumb .price").get().map(function(e) { return parseFloat($(e).data("gbp-price")) });
+
+        const prices = $(".product-thumb .price").map(function() { return parseFloat($(this).data("gbp-price")) });
         Object.freeze(prices);
         $("#fx-select").change(function() {
             $.post("/shop/fx", { currency: this.value }, function(res) {
@@ -71,6 +78,19 @@
             }).fail(function(err) {
                 alert(err.responseText);
             })
-        })
+        });
+
+        $(".product-thumb .description .expand-toggler").click(function() {
+            $(this).closest(".description").toggleClass("expanded");
+        });
+
+        $(window).on("load resize", function() {
+            $(".product-thumb .description").removeClass("expanded").each(function(i, elm) {
+                var p = $(elm).find("p");
+                var span = $(elm).find("p span");
+                var overflowing = span.width() > p.width();
+                $(elm).find(".expand-toggler").fadeTo(0, Number(overflowing));
+            });
+        });
     </script>
 <%- include ('partials/footer') -%>

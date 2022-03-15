@@ -1,24 +1,18 @@
 <%- include ('partials/header') -%>
-    <section>
-        <div class="banner-container content-container">
-            <div class="banner content">
-                <%_ if (content) { _%>
-                <div class="banner-item" style="left: 100%">
-                    <div class="banner-text"><%= content.banner_text %></div>
-                    <%_ content.banner_media.forEach(url => { _%>
-                    <img class="banner-item-media" src="<%= url %>">
-                    <%_ }) _%>
-                </div>
-                <%_ } _%>
+    <section class="banner-container">
+        <div class="banner content">
+            <%_ if (content) { _%>
+            <div class="banner-item" style="left: 100%">
+                <div class="banner-text"><%= content.banner_text %></div>
+                <%_ content.banner_media.forEach(url => { _%>
+                <img class="banner-item-media" src="<%= url %>">
+                <%_ }) _%>
             </div>
+            <%_ } _%>
         </div>
     </section>
     <section class="homepage-images-section container">
-        <div class="row">
-        <%_ images.forEach(img => { _%>
-            <div class="homepage-images content-container col-md-4 col-sm-6 float-left"><div class="image content" style="background-image: url(<%= img.url %>)"></div></div>
-        <%_ }) _%>
-        </div>
+        <img id="cs-logo-large" class="cs-logo main-img" src="/img/cs-logo.png" alt="CS logo">
     </section>
 
     <%_ if (content) { _%>

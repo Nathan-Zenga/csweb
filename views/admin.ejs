@@ -113,9 +113,9 @@
                             '<label class="custom-file-label">Choose media file</label>' +
                         '</div>' +
                         '<div class="input-group-append">' +
-                            `<button class="btn btn-secondary clear-uploads" type="button" data-id="upload${i}">CLEAR FILE UPLOAD</button>` +
+                            '<input type="hidden" name="image">' +
+                            `<button class="btn btn-secondary clear-uploads" type="button" data-id="upload${i}">Clear file upload</button>` +
                         '</div>' +
-                        '<input type="hidden" name="image">' +
                     '</div>' +
                     '<input type="text" name="textbody_media" placeholder="...or enter media URL or embed code" required>' +
                 '</div>').appendTo($tbm_container);
@@ -311,7 +311,6 @@
             $.post(form.action, $(form).serializeArray(), function(result) {
                 showMessage(result);
                 $(form).find("#homepage_image_index").attr({ max, value }).val(value).end().find(".clear-uploads").click();
-                form.reset();
             }).fail(function(err, status, codeMessage) {
                 alert(codeMessage + (err ? ": " + err.responseText : ""));
             }).always(function() {

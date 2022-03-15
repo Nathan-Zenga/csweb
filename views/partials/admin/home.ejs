@@ -1,13 +1,13 @@
 <form id="mailing-list-stats">
     <h1>MAILING LIST STATS</h1>
     <ul>
-        <li>TOTAL SIGN UPS: <b><%= members.length %></b></li>
+        <li>TOTAL SIGN UPS: <span id="stats"><%= members.length %></span></li>
     </ul>
     <br>
 
     <h1>NUMBER OF REQUESTS PER SIZE</h1>
     <div class='table-responsive'>
-        <table id="total-reqs-per-size-table" class="table table-borderless table-hover">
+        <table id="total-reqs-per-size-table" class="table table-hover">
             <thead>
                 <tr>
                     <th></th>
@@ -52,8 +52,8 @@
                 <input type="url" name="socials_url" class="socials-url" placeholder="Enter URL">
             </div>
             <div class="col-sm-12 float-left" style="text-align: right; margin-top: -1em;">
-                <button class="add">ADD</button>
-                <button class="remove">REMOVE</button>
+                <button class="add">Add</button>
+                <button class="remove">Remove</button>
             </div>
         </div>
     </div>
@@ -71,9 +71,9 @@
                 <label class="custom-file-label">Choose image</label>
             </div>
             <div class="input-group-append">
-                <button class="btn btn-secondary clear-uploads" type="button" data-id="homepage_image_file">CLEAR</button>
+                <input type="hidden" name="image">
+                <button class="btn btn-secondary clear-uploads" type="button" data-id="homepage_image_file">Clear</button>
             </div>
-            <input type="hidden" name="image">
         </div>
     </div>
 

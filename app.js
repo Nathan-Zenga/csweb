@@ -57,7 +57,7 @@ app.use(async (req, res, next) => {
         if (!pi || pi.status === "succeeded") return next();
         await Stripe.paymentIntents.cancel(pi.id, { cancellation_reason: "requested_by_customer" });
         next();
-    } catch (err) { console.log(err.message || err); next() }
+    } catch (err) { console.error(err.message); next() }
 });
 
 app.use('/', require('./routes/index'));

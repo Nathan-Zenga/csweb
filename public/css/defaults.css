@@ -1,9 +1,9 @@
-@import url('https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css');
+@import url('https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css');
 @import url('https://use.fontawesome.com/releases/v5.2.0/css/all.css');
-@import url('https://fonts.googleapis.com/css2?family=Cutive+Mono&family=Rock+Salt&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@100;300;400;600;800&family=Rock+Salt&display=swap');
 
 body {
-    font-family: 'Cutive Mono', 'Courier New', monospace;
+    font-family: 'Be Vietnam Pro', sans-serif;
     font-feature-settings: 'liga' 0;
     background-color: black;
     color: white;
@@ -11,7 +11,7 @@ body {
 }
 
 h1, h2 {
-    font-weight: bold;
+    font-weight: 600;
     margin-top: 0;
 }
 

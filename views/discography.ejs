@@ -10,13 +10,11 @@
                     <div class="text">
                         <h2 class="title" title="<%= project.title %>"><%= project.title %></h2>
                         <p><%= project.artist + " | " + project.year %></p>
+                        <p> Available on<%= project.all_platforms && !project.links.length ? " all platforms" : "" %></p>
                         <p>
-                            OUT NOW
-                        <%_ if (project.all_platforms && !project.links.length) { _%>
-                            ON ALL PLATFORMS
-                        <%_ } else if (project.links.length) { project.links.forEach(link => { _%>
+                        <%_ if (!project.all_platforms) project.links.forEach(link => { _%>
                             <a class="link" target="_blank" href="<%= link.url %>"><img style="height: 1.5em; vertical-align: top" src="https://cdn.jsdelivr.net/npm/simple-icons@5.21.1/icons/<%- link.name %>.svg"></a>
-                        <%_ })} _%>
+                        <%_ }) _%>
                         </p>
                     </div>
                 </div>
@@ -25,5 +23,5 @@
         <%_ }) _%>
         </div>
     </div>
-    <style> .text .link { margin-left: 10px; } </style>
+    <style> .text .link:not(:first-child) { margin-left: 10px } </style>
 <%- include ('partials/footer') -%>

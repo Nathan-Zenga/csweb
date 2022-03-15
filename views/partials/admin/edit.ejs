@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-md-3 float-left sidebar" id="edit-sidebar">
-        <div class="mb-view-md section-dropdown-options" style="font-weight: bold; max-width: 250px; margin: 0 auto">
+        <div class="mb-view-md section-dropdown-options" style="font-weight: 600; max-width: 250px; margin: 0 auto">
             <label>SELECT OPTION <i class="fas fa-chevron-down"></i></label>
             <select>
                 <option value="#edit-artist">ARTIST</option>
@@ -51,9 +51,9 @@
                                 <label class="custom-file-label">Choose image</label>
                             </div>
                             <div class="input-group-append">
-                                <button class="btn btn-secondary clear-uploads" type="button" data-id="profile_image_change">CLEAR</button>
+                                <input type="hidden" name="profile_image">
+                                <button class="btn btn-secondary clear-uploads" type="button" data-id="profile_image_change">Clear</button>
                             </div>
-                            <input type="hidden" name="profile_image">
                         </div>
                     </div>
                     <label>SOCIAL MEDIA LINKS</label>
@@ -71,8 +71,8 @@
                                 <input type="url" name="social_media_url" class="social-media-url edit" placeholder="Enter URL">
                             </div>
                             <div class="col-sm-12 float-left" style="text-align: right; margin-top: -1em;">
-                                <button class="add">ADD</button>
-                                <button class="remove">REMOVE</button>
+                                <button class="add">Add</button>
+                                <button class="remove">Remove</button>
                             </div>
                         </div>
                     </div>
@@ -103,7 +103,7 @@
                             </div>
                             <div class="headline-image-data"></div>
                             <div class="input-group-append">
-                                <button class="btn btn-secondary clear-uploads" type="button" data-id="headline_images_change">CLEAR</button>
+                                <button class="btn btn-secondary clear-uploads" type="button" data-id="headline_images_change">Clear</button>
                             </div>
                         </div>
                     </div>
@@ -132,10 +132,10 @@
                     <div class="input-group list-item">
                         <div class="input-group-prepend">
                             <div class="input-group-text">
-                                <input type="radio" name="id" value="<%= article._id %>" required>
+                                <input type="radio" id="<%= article._id %>" name="id" value="<%= article._id %>" required>
                             </div>
                         </div>
-                        <label class="form-control list-item-label"><%= i+1 %>) <%= article.headline %></label>
+                        <label class="form-control list-item-label" for="<%= article._id %>"><%= i+1 %>) <%= article.headline %></label>
                     </div>
                     <%_ }) _%>
                     <br>
@@ -167,9 +167,9 @@
                                 <label class="custom-file-label">Choose image</label>
                             </div>
                             <div class="input-group-append">
-                                <button class="btn btn-secondary clear-uploads" type="button" data-id="artwork_file_change">CLEAR</button>
+                                <input type="hidden" name="artwork_file">
+                                <button class="btn btn-secondary clear-uploads" type="button" data-id="artwork_file_change">Clear</button>
                             </div>
-                            <input type="hidden" name="artwork_file">
                         </div>
                         <input type="url" name="artwork_url" id="artwork_url_edit" placeholder="Or enter the image URL">
                     </div>
@@ -195,8 +195,8 @@
                                 <input type="url" name="link_url" class="link-url" placeholder="Enter URL">
                             </div>
                             <div class="col-sm-12 float-left" style="text-align: right; margin-top: -1em;">
-                                <button class="add">ADD</button>
-                                <button class="remove">REMOVE</button>
+                                <button class="add">Add</button>
+                                <button class="remove">Remove</button>
                             </div>
                         </div>
                     </div>
@@ -303,7 +303,7 @@
                     <input type="number" name="stock_qty" id="stock_qty_edit" min="1" value="1" required>
 
                     <label>PRODUCT INFO <span>(OPTIONAL)</span></label>
-                    <textarea name="info" id="product_info_edit" rows="10"></textarea>
+                    <input type="text" name="info" id="product_info_edit"></input>
 
                     <label>PRODUCT IMAGE</label>
                     <div class="file-upload-container">
@@ -313,9 +313,9 @@
                                 <label class="custom-file-label">Choose image</label>
                             </div>
                             <div class="input-group-append">
-                                <button class="btn btn-secondary clear-uploads" type="button" data-id="product_image_file_edit">CLEAR</button>
+                                <input type="hidden" name="image_file">
+                                <button class="btn btn-secondary clear-uploads" type="button" data-id="product_image_file_edit">Clear</button>
                             </div>
-                            <input type="hidden" name="image_file">
                         </div>
                         <input type="url" name="image_url" id="product_image_url_edit" placeholder="Or enter the image URL">
                     </div>

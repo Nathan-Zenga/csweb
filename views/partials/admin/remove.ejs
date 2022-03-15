@@ -1,6 +1,6 @@
 <div class="row">
     <div class="col-md-3 float-left sidebar" id="remove-sidebar">
-        <div class="mb-view-md section-dropdown-options" style="font-weight: bold; max-width: 250px; margin: 0 auto">
+        <div class="mb-view-md section-dropdown-options" style="font-weight: 600; max-width: 250px; margin: 0 auto">
             <label>SELECT OPTION <i class="fas fa-chevron-down"></i></label>
             <select>
                 <option value="#remove-cs-link">CS LINKS</option>
@@ -45,10 +45,10 @@
                     <div class="input-group list-item">
                         <div class="input-group-prepend">
                             <div class="input-group-text">
-                                <input type="checkbox" name="social<%= i %>" value="<%= social.name %>">
+                                <input type="checkbox" id="<%= social._id %>" name="social<%= i %>" value="<%= social.name %>">
                             </div>
                         </div>
-                        <label class="form-control list-item-label"><%= label %></label>
+                        <label class="form-control list-item-label" for="<%= social._id %>"><%= label %></label>
                     </div>
                     <%_ }) _%>
                     <br>
@@ -73,10 +73,10 @@
                     <div class="input-group list-item">
                         <div class="input-group-prepend">
                             <div class="input-group-text">
-                                <input type="checkbox" name="artist<%= i %>" value="<%= artist._id %>">
+                                <input type="checkbox" id="<%= artist._id %>" name="artist<%= i %>" value="<%= artist._id %>">
                             </div>
                         </div>
-                        <label class="form-control list-item-label"><%= artist.name %></label>
+                        <label class="form-control list-item-label" for="<%= artist._id %>"><%= artist.name %></label>
                     </div>
                     <%_ }) _%>
                     <br>
@@ -101,10 +101,10 @@
                     <div class="input-group list-item">
                         <div class="input-group-prepend">
                             <div class="input-group-text">
-                                <input type="checkbox" name="project<%= i %>" value="<%= project._id %>">
+                                <input type="checkbox" id="<%= project._id %>" name="project<%= i %>" value="<%= project._id %>">
                             </div>
                         </div>
-                        <label class="form-control list-item-label"><%= project.title %></label>
+                        <label class="form-control list-item-label" for="<%= project._id %>"><%= project.title %></label>
                     </div>
                     <%_ }) _%>
                     <br>
@@ -129,10 +129,10 @@
                     <div class="input-group list-item">
                         <div class="input-group-prepend">
                             <div class="input-group-text">
-                                <input type="checkbox" name="article<%= i %>" value="<%= article._id %>">
+                                <input type="checkbox" id="<%= article._id %>-to-remove" name="article<%= i %>" value="<%= article._id %>">
                             </div>
                         </div>
-                        <label class="form-control list-item-label"><%= article.headline %></label>
+                        <label class="form-control list-item-label" for="<%= article._id %>-to-remove"><%= article.headline %></label>
                     </div>
                     <%_ }) _%>
                     <br>
@@ -157,10 +157,10 @@
                     <div class="input-group list-item">
                         <div class="input-group-prepend">
                             <div class="input-group-text">
-                                <input type="checkbox" name="location<%= i %>" value="<%= location._id %>">
+                                <input type="checkbox" id="<%= location._id %>" name="location<%= i %>" value="<%= location._id %>">
                             </div>
                         </div>
-                        <label class="form-control list-item-label"><%- `${location.name} - ${location.city}, ${location.country}` %></label>
+                        <label class="form-control list-item-label" for="<%= location._id %>"><%- `${location.name} - ${location.city}, ${location.country}` %></label>
                     </div>
                     <%_ }) _%>
                     <br>
@@ -185,10 +185,10 @@
                     <div class="input-group list-item">
                         <div class="input-group-prepend">
                             <div class="input-group-text">
-                                <input type="checkbox" name="member<%= i %>" value="<%= member._id %>">
+                                <input type="checkbox" id="<%= member._id %>" name="member<%= i %>" value="<%= member._id %>">
                             </div>
                         </div>
-                        <label class="form-control list-item-label"><%- `${member.firstname} ${member.lastname}` %></label>
+                        <label class="form-control list-item-label" for="<%= member._id %>"><%- `${member.firstname} ${member.lastname}` %></label>
                     </div>
                     <%_ }) _%>
                     <br>
@@ -213,10 +213,10 @@
                     <div class="input-group list-item">
                         <div class="input-group-prepend">
                             <div class="input-group-text">
-                                <input type="checkbox" name="product<%= i %>" value="<%= item._id %>">
+                                <input type="checkbox" id="<%= item._id %>" name="product<%= i %>" value="<%= item._id %>">
                             </div>
                         </div>
-                        <label class="form-control list-item-label"><%- item.name %></label>
+                        <label class="form-control list-item-label" for="<%= item._id %>"><%- item.name %></label>
                     </div>
                     <%_ }) _%>
                     <br>
