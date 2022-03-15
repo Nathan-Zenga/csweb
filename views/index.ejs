@@ -11,8 +11,11 @@
             <%_ } _%>
         </div>
     </section>
-    <section class="homepage-images-section container">
-        <img id="cs-logo-large" class="cs-logo main-img" src="/img/cs-logo.png" alt="CS logo">
+
+    <section class="homepage-main-content-section">
+        <div id="bg-video-player">
+            <video src="<%- media.length ? media[0].url : '' %>" autoplay playsinline muted loop></video>
+        </div>
     </section>
 
     <%_ if (content) { _%>
@@ -33,5 +36,14 @@
                 banner_autoplay();
             });
         })();
+
+        var $videos = $("#bg-video-player video");
+        $videos.one("canplay canplaythrough", function(e) { $(e.target).prop("currentTime", 13).trigger("play") })
+        $(window).on("touchstart", function() {
+            $videos.each((i, v) => {
+                var playing = v.currentTime > 0 && !v.paused && !v.ended && v.readyState > 2;
+                if (!playing) v.play();
+            });
+        });
     </script>
 <%- include ('partials/footer') -%>

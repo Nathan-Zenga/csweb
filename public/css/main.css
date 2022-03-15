@@ -310,22 +310,25 @@ button + button {
     width: 50px;
 }
 
-.homepage-images-section {
-    padding-top: 3em;
-    padding-bottom: 3em;
+.homepage-main-content-section {
+    position: relative;
+    margin-top: 3em;
+    margin-bottom: 3em;
 }
 
-.homepage-images {
-    padding: 10px;
-    background-color: transparent;
+.homepage-main-content-section #bg-video-player {
+    width: 100%;
+    height: auto;
+    padding-top: 56.25%;
+    -webkit-filter: contrast(50%);
+    filter: contrast(50%);
 }
 
-.homepage-images .image {
-    border-radius: 7px;
-    background-color: white;
-    background-size: cover;
-    background-position: center;
-    height: 300px;
+.homepage-main-content-section #bg-video-player video {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
 }
 
 .homepage-footnote-text {
@@ -349,7 +352,7 @@ button + button {
     }
 }
 
-.cs-logo {
+#cs-logo {
     height: 100%;
     border-radius: 50%;
     border: 2px solid;
@@ -357,7 +360,7 @@ button + button {
     text-align: center;
 }
 
-.cs-logo.fixed {
+#cs-logo.fixed {
     position: fixed;
     height: 300px;
     left: 50%;
@@ -365,15 +368,6 @@ button + button {
     transform: translateX(-50%);
     border: 0;
     padding: 0;
-}
-
-.cs-logo.main-img {
-    display: block;
-    max-width: 90%;
-    max-height: 450px;
-    margin: 0 auto;
-    padding: 0;
-    border: none;
 }
 
 footer {

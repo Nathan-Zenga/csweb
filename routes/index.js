@@ -6,8 +6,8 @@ const { Homepage_content, Homepage_image } = require('../models/models');
 
 router.get('/', async (req, res) => {
     const content = await Homepage_content.findOne();
-    const images = await Homepage_image.find({ p_id: { $regex: /^homepage\/images/ } }).sort({index: 1}).exec();
-    res.render('index', { title: null, pagename: "home", content, images })
+    const media = await Homepage_image.find({ p_id: { $regex: /^homepage\/videos/ } }).sort({ index: 1 }).exec();
+    res.render('index', { title: null, pagename: "home", content, media })
 });
 
 router.get('/events', (req, res, next) => { res.status(404); next() });

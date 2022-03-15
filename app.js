@@ -3,13 +3,16 @@ const app = express();
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const path = require('path'); // core module
+const fs = require('fs'); // core module
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MemoryStore = require('memorystore')(session);
 const passport = require('passport');
 const { STRIPE_SK, CSDB, NODE_ENV, PORT = 4001 } = process.env;
 const Stripe = new (require('stripe').Stripe)(STRIPE_SK);
-const { Homepage_content } = require('./models/models');
+const { Homepage_content, Homepage_image } = require('./models/models');
+const { v2: cloud } = require('cloudinary');
+const ytdl = require('ytdl-core');
 const production = NODE_ENV === "production";
 
 mongoose.connect(CSDB).then(() => { console.log("Connected to DB") });
@@ -76,4 +79,28 @@ app.get("*", (req, res) => {
 
 app.post("*", (req, res) => res.status(400).send("Sorry, your request currently cannot be processed"));
 
-app.listen(PORT, () => { console.log(`Server started${!production ? " on port " + PORT : ""}`) });
+app.listen(PORT, async () => {
+    const media = await Homepage_image.find({ p_id: { $regex: /^homepage\/videos/ } });
+    await cloud.api.delete_resources(media.map(m => m.p_id)).catch(e => e);
+    await Homepage_image.deleteMany({ _id: { $in: media.map(m => m.id) } });
+    if (fs.existsSync("./public/media")) fs.rmSync("./public/media", { recursive: true, force: true });
+
+    const file = "./public/media/homepage-bg-vid-1.mp4";
+    if (!fs.existsSync("./public/media")) fs.mkdirSync("./public/media");
+    if (!fs.existsSync(file)) {
+        const url = "https://www.youtube.com/watch?v=rCLf32SexXQ";
+        const videoID = ytdl.getURLVideoID(url);
+        const info = await ytdl.getInfo(videoID);
+        const format = ytdl.chooseFormat(info.formats, { filter: fmt => fmt.initRange && fmt.indexRange && fmt.hasVideo, quality: "highest" });
+        const stream = ytdl(url, { format }).pipe(fs.createWriteStream(file));
+
+        stream.on("finish", async () => {
+            const media = await Homepage_image.find({ p_id: { $regex: /^homepage\/videos/ } });
+            const public_id = `homepage/videos/homepage-bg-vid-${media.length + 1}`;
+            const result = await cloud.uploader.upload(file, { public_id, resource_type: "video" });
+            Homepage_image.create({ p_id: result.public_id, url: result.secure_url, index: media.length + 1 });
+        });
+    }
+
+    console.log(`Server started${!production ? " on port " + PORT : ""}`)
+});
