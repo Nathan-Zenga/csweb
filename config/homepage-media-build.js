@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const { parallel } = require('async');
 
 mongoose.connect(process.env.CSDB).then(async ({ connection }) => {
-    const basepath = "./public/media";
+    const basepath = "./media_temp";
     const media = await Homepage_image.find({ p_id: { $regex: /^homepage\/videos/ } });
 
     await cloud.api.delete_resources(media.map(m => m.p_id)).catch(e => e);
@@ -29,16 +29,16 @@ mongoose.connect(process.env.CSDB).then(async ({ connection }) => {
                 stream.on("error", async err => { console.error(err.message); cb() });
                 stream.on("ready", () => { console.log("Piping...") });
                 stream.on("finish", async () => {
-                    const media = await Homepage_image.find({ p_id: { $regex: /^homepage\/videos/ } });
                     const public_id = `homepage/videos/homepage-bg-vid-${i}`;
                     const result = await cloud.uploader.upload(file, { public_id, resource_type: "video" });
-                    await Homepage_image.create({ p_id: result.public_id, url: result.secure_url, index: media.length + 1 });
+                    await Homepage_image.create({ p_id: result.public_id, url: result.secure_url, index: i });
                     console.log("Done... homepage media uploaded");
                     cb();
                 });
             });
         }));
 
+        fs.rmSync(basepath, { recursive: true, force: true });
         await connection.close();
     });
 });
