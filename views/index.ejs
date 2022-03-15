@@ -14,7 +14,9 @@
 
     <section class="homepage-main-content-section">
         <div id="bg-video-player">
-            <video src="<%- media.length ? media[0].url : '' %>" autoplay playsinline muted loop></video>
+            <%_ media.forEach(m => { _%>
+            <video src="<%- m.url %>" autoplay playsinline muted loop></video>
+            <%_ }) _%>
         </div>
     </section>
 
