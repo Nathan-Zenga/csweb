@@ -4,11 +4,10 @@
         <%_ articles.forEach((article, i) => { _%>
             <article class="preview content-container col-md-4 col-sm-6 float-left">
                 <div class="article-content">
-                    <%_ const img = article.headline_image_thumb || "/img/cs-logo.png";
-                        const link = `/news/article/${ article.headline.split("").map(c => /\W/.test(c) && c != "$" ? "-" : c).join("").replace(/\-+/g, "-").replace(/\W+$/, '') }`.toLowerCase(); _%>
-                    <a class="img" href="<%- link %>" style="background-image: url('<%= img %>'); opacity: 0"></a>
-                    <div class="text"><h1><a href="<%- link %>"><%- article.headline %></a></h1></div>
-                    <a class="read-more-link" href="<%- link %>">Read more</a>
+                    <%_ const img = article.headline_image_thumb || "/img/cs-logo.png"; _%>
+                    <a class="img" href="<%- article.link %>" title="<%- article.headline %>" style="background-image: url('<%= img %>'); opacity: 0"></a>
+                    <div class="text"><h1><a href="<%- article.link %>"><%- article.headline %></a></h1></div>
+                    <a class="read-more-link" href="<%- article.link %>">Read more</a>
                 </div>
             </article>
             <%- (i + 1) % 3 == 0 ? '<div class="breakpoint row dt-view-md"></div>' : '' %>

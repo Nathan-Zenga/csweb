@@ -37,7 +37,7 @@ router.post('/login', (req, res) => {
                 "Please click the link below to activate the account, as this will only be " +
                 "<u>available for the next 2 hours</u> from the time of this email received:\n\n" +
                 `${res.locals.location_origin}/admin/activate/${doc.password}\n\n`;
-            new MailingListMailTransporter({ req, res }, { email }).sendMail({ subject, message }, err => {
+            new MailingListMailTransporter({ email }).sendMail({ subject, message }, err => {
                 if (err) return res.status(500).send(err.message || err);
                 res.status(400).send(info.message);
             });

@@ -169,7 +169,7 @@ router.post("/checkout/payment-intent/complete", async (req, res) => {
         req.session.paymentIntentID = undefined;
 
         const { line1, line2, city, postal_code } = pi.shipping.address;
-        const transporter = new MailingListMailTransporter({ req, res });
+        const transporter = new MailingListMailTransporter();
         const receipt_email = pi.receipt_email || pi.customer.email;
         const subject = "Purchase Nofication: Payment Successful";
         const message = `Hi ${pi.shipping.name},\n\n` +

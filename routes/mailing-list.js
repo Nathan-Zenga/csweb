@@ -56,7 +56,7 @@ router.post('/send/mail', isAuthed, async (req, res) => {
     const { email, subject, message } = req.body;
     const members = await MailingList.find(email === "all" ? {} : { email: email || "null" });
     if (!members.length) return res.status(404).send("Member(s) not found");
-    const transporter = new MailTransporter({ req, res });
+    const transporter = new MailTransporter();
 
     for (let i = 0; i < members.length; i++) setTimeout(() => {
         transporter.setRecipient(members[i]).sendMail({ subject, message }, err => {
