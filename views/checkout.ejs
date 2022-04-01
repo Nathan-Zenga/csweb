@@ -2,7 +2,7 @@
     <%- include ('partials/stripe-checkout-css') -%>
     <div class="content-container" id="payment-form-container">
         <div class="content container">
-            <form id="payment-details-form" action="/shop/checkout/payment-intent/create">
+            <form id="payment-details-form" action="/shop/checkout/payment/create">
                 <div class="row">
                     <div class="col-sm-6 float-left">
                         <label for="firstname">FIRST NAME</label>
@@ -13,19 +13,33 @@
                         <input type="text" name="lastname" id="lastname" required>
                     </div>
                 </div>
+
                 <label for="email">EMAIL</label>
                 <input type="email" name="email" id="email" required>
+
                 <label for="address_l1">ADDRESS</label>
                 <input type="text" name="address_l1" id="address_l1" placeholder="LINE 1" required>
                 <input type="text" name="address_l2" id="address_l2" placeholder="LINE 2 (OPTIONAL)">
+
                 <div class="row">
                     <div class="col-sm-6 float-left">
                         <label for="city">CITY</label>
                         <input type="text" name="city" id="city" required>
                     </div>
+
+                    <div class="col-sm-6 float-left">
+                        <label for="country">COUNTRY</label>
+                        <input type="text" name="country" id="country" required>
+                    </div>
+
                     <div class="col-sm-6 float-left">
                         <label for="postcode">POST / ZIP CODE</label>
                         <input type="text" name="postcode" id="postcode" required>
+                    </div>
+
+                    <div class="col-sm-6 float-left">
+                        <label for="state">STATE</label>
+                        <input type="text" name="state" id="state" placeholder="OPTIONAL">
                     </div>
                 </div>
                 <input type="submit" value="CONTINUE TO PAYMENT">
@@ -87,7 +101,7 @@
                             if (res.error) return btnControl.finish(), showError(res.error.message);
                             window.onbeforeunload = null;
                             $("#cart-item-count").text(0);
-                            $.post("/shop/checkout/payment-intent/complete").fail(function(err, status, codeMessage) {
+                            $.post("/shop/checkout/payment/complete").fail(function(err, status, codeMessage) {
                                 console.error(codeMessage + (err ? ": " + err.responseText : ""));
                             }).always(function() {
                                 btnControl.finish();

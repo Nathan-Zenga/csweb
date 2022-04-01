@@ -64,11 +64,10 @@ router.post('/stock/edit', isAuthed, async (req, res) => {
         });
 
         const saved = await product.save();
-        if (!image_url && !image_file) return res.send("Product details updated successfully");
         const public_id = `shop/stock/${saved.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
-        await cloud.api.delete_resources([prev_p_id]);
-        const result = await cloud.uploader.upload(image_url || image_file, { public_id });
-        saved.image = result.secure_url;
+        if (image_url || image_file) await cloud.api.delete_resources([prev_p_id]);
+        const result = image_url || image_file ? await cloud.uploader.upload(image_url || image_file, { public_id }) : null;
+        if (result) saved.image = result.secure_url;
         await saved.save();
         for (const item of req.session.cart) if (item.id === saved.id) item.image = result.secure_url;
         res.send("Product details updated successfully");
@@ -95,7 +94,7 @@ router.post("/stock/remove", isAuthed, async (req, res) => {
 });
 
 router.post("/cart/add", async (req, res) => {
-    const product = await Product.findById(req.body.id).catch(err => null);
+    const product = await Product.findById(req.body.id).catch(e => null);
     if (!product || product.stock_qty < 1) return res.status(!product ? 404 : 400).send("Item currently not in stock");
     const { id, name, price, image, info, stock_qty } = product;
     const currentItem = req.session.cart.find(item => item.id === id);
@@ -131,30 +130,49 @@ router.post("/cart/increment", (req, res) => {
     res.send({ total: req.session.converted_price(total), quantity: currentItem.qty });
 });
 
-router.post("/checkout/payment-intent/create", async (req, res) => {
-    const { firstname, lastname, email, address_l1, address_l2, city, postcode } = req.body;
-    const { cart, currency_symbol, converted_price } = req.session;
+router.post("/checkout/payment/create", async (req, res) => {
+    const { firstname, lastname, email, address_l1, address_l2, city, country, state, postcode } = req.body;
     const name = `${firstname} ${lastname}`;
-    const address = { line1: address_l1, line2: address_l2, city, postal_code: postcode };
+    const address = { line1: address_l1, line2: address_l2, city, country, state, postal_code: postcode };
 
     try {
         const customer = await Stripe.customers.create({ name, email, shipping: { name, address } });
 
-        const pi = await Stripe.paymentIntents.create({ // Create a PaymentIntent with the order details
-            customer: customer.id,
-            description: cart.map(p => `${p.name} (${currency_symbol}${converted_price(p.price).toFixed(2)} X ${p.qty})`).join(", \r\n"),
-            amount: cart.map(p => p.price * p.qty).reduce((sum, val) => sum + val),
-            currency: "gbp"
-        });
+        await (async function add_invoice_items(items) {
+            const item = items[0];
+            if (!item) return;
+
+            const product = await Stripe.products.create({
+                name: item.name,
+                images: item.image ? [item.image] : undefined
+            });
+
+            await Stripe.invoiceItems.create({
+                customer: customer.id,
+                price_data: {
+                    product: product.id,
+                    unit_amount: req.session.converted_price(item.price) * 100,
+                    currency: req.session.currency
+                },
+                description: item.info || undefined,
+                quantity: item.qty
+            });
+
+            await add_invoice_items(items.slice(1))
+        })(req.session.cart);
+
+        const invoice = await Stripe.invoices.create({ customer: customer.id, description: "CS Store Purchase Invoice" });
+        const invoice_final = await Stripe.invoices.finalizeInvoice(invoice.id);
+        const pi = await Stripe.paymentIntents.retrieve(invoice_final.payment_intent);
 
         req.session.paymentIntentID = pi.id;
         res.send({ clientSecret: pi.client_secret, pk: STRIPE_PK });
-    } catch (err) { res.status(err.statusCode).send(err.message) }
+    } catch (err) { res.status(err.statusCode || 500).send(err.message) }
 });
 
-router.post("/checkout/payment-intent/complete", async (req, res) => {
+router.post("/checkout/payment/complete", async (req, res) => {
     try {
-        const pi = await Stripe.paymentIntents.retrieve(req.session.paymentIntentID, { expand: "customer" });
+        const pi = await Stripe.paymentIntents.retrieve(req.session.paymentIntentID, { expand: ["customer"] });
         const products = await Product.find();
         if (!pi) return res.status(404).send("Invalid payment session");
         if (pi.status !== "succeeded") return res.status(500).send(pi.status.replace(/_/g, " "));
@@ -168,23 +186,23 @@ router.post("/checkout/payment-intent/complete", async (req, res) => {
         req.session.cart = [];
         req.session.paymentIntentID = undefined;
 
-        const { line1, line2, city, postal_code } = pi.shipping.address;
+        const { line1, line2, city, postal_code, state, country } = pi.customer.shipping.address;
         const transporter = new MailingListMailTransporter();
-        const receipt_email = pi.receipt_email || pi.customer.email;
+        const email = pi.receipt_email || pi.customer.email;
         const subject = "Purchase Nofication: Payment Successful";
-        const message = `Hi ${pi.shipping.name},\n\n` +
+        const message = `Hi ${pi.customer.name},\n\n` +
         `Your payment was successful. Below is a summary of your purchase:\n\n${pi.charges.data[0].description}\n\n` +
         `If you have not yet received your receipt via email, you can view it here instead:\n${pi.charges.data[0].receipt_url}\n\n` +
         "Thank you for shopping with us!\n\n- CS";
-        transporter.setRecipient(receipt_email).sendMail({ subject, message }, err => {
+        transporter.setRecipient({ email }).sendMail({ subject, message }, err => {
             if (err) console.error(err), res.status(500);
             const subject = "Purchase Report: You Got Paid!";
             const message = "You've received a new purchase from a new customer. Summary shown below\n\n" +
-            `- Name: ${pi.shipping.name}\n- Email: ${receipt_email}\n- Purchased items: ${pi.charges.data[0].description}\n` +
-            `- Address:\n\t${line1},${line2 ? "\n\t"+line2+"," : ""}\n\t${city},\n\t${postal_code}\n\n` +
-            `- Date of purchase: ${Date(pi.created * 1000)}\n` +
-            `- Total amount: £${pi.amount / 100}\n\n` +
-            `- And finally, a copy of their receipt:\n${pi.charges.data[0].receipt_url}`;
+            `- Name: ${pi.customer.name}\n- Email: ${email}\n- Purchased items: ${pi.charges.data[0].description}\n` +
+            `- Address:\n\t${line1},${line2 ? "\n\t"+line2+"," : ""}\n\t${city}, ${country},` + (state ? ` ${state},` : "") + `\n\t${postal_code}\n\n` +
+            `- Date of purchase: ${Date(pi.created * 1000)}\n\n` +
+            `- Total amount: ${pi.currency.toUpperCase()} ${pi.amount / 100}\n\n` +
+            `And finally, a copy of their receipt:\n${pi.charges.data[0].receipt_url}`;
             transporter.setRecipient({ email: "info@thecs.co" }).sendMail({ subject, message }, err => {
                 if (err) { console.error(err); if (res.statusCode !== 500) res.status(500) }
                 res.end();
