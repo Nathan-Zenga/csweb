@@ -23,7 +23,7 @@
                         <p class="name" style="font-size: 1.5em;"><%= item.name %></p>
                         <p class="price" style="font-size: 2em; text-align: right" data-gbp-price="<%= (item.price / 100).toFixed(2) %>">
                             <span><%- (currency_symbol || currency).toUpperCase() %></span>
-                            <span><%= converted_price(item.price).toFixed(2) %></span>
+                            <span><%= converted_price(item.price).toFixed(2).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","); %></span>
                         </p>
                         <div class="description">
                             <p><span><%= item.info %></span></p>
@@ -71,7 +71,7 @@
                     setTimeout(function() {
                         $(".product-thumb .price").fadeTo(500, 1).each(function(i, e) {
                             $(e).find("span").eq(0).text(res.symbol || res.currency.toUpperCase());
-                            $(e).find("span").eq(1).text((prices[i] * res.rate).toFixed(2));
+                            $(e).find("span").eq(1).text((prices[i] * res.rate).toFixed(2).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
                         });
                     }, 200);
                 });
