@@ -14,9 +14,9 @@ $(function() {
     };
     window.submitBtnController = submitBtnController;
 
-    var state = window.pageYOffset > $("main").offset().top+20;
+    var state, homepage = location.pathname === "/";
     $(window).on("load scroll", function() {
-        if (state != window.pageYOffset > $("main").offset().top+20 && !$("#home-page").length) {
+        if (state != window.pageYOffset > $("main").offset().top+20 && !homepage) {
             state = window.pageYOffset > $("main").offset().top+20;
             $("#cs-logo").fadeOut(200, function() {
                 $(this).toggleClass("fixed", state).parent("a").attr("href", "/").removeAttr(state ? "href" : "").end().fadeIn(200);

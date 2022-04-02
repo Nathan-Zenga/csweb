@@ -12,16 +12,17 @@
         </div>
         <%_ if (!products.length) { _%>
         <div style="padding: 50px 10px; text-align: center;"><h1>STOCKING UP<br>MERCH COMING SOON</h1></div>
+        <%_ } else { _%>
         <div class="row">
-        <%_ } products.forEach(item => { var soldOut = item.stock_qty < 1; _%>
+            <%_ products.forEach(item => { var soldOut = item.stock_qty < 1; _%>
             <div class="product-thumb thumb content-container col-md-4 col-sm-6 float-left">
                 <div class="content">
-                    <div class="img-wrapper" style="padding: 0;">
+                    <p class="name"><%= item.name %></p>
+                    <div class="img-wrapper">
                         <div class="img" style="background-image: url('<%- item.image %>');<%= soldOut ? 'opacity:.5' : '' %>"></div>
                     </div>
                     <div class="text">
-                        <p class="name" style="font-size: 1.5em;"><%= item.name %></p>
-                        <p class="price" style="font-size: 2em; text-align: right" data-gbp-price="<%= (item.price / 100).toFixed(2) %>">
+                        <p class="price" data-gbp-price="<%= (item.price / 100).toFixed(2) %>">
                             <span><%- (currency_symbol || currency).toUpperCase() %></span>
                             <span><%= converted_price(item.price).toFixed(2).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","); %></span>
                         </p>
@@ -41,8 +42,9 @@
                     </div>
                 </div>
             </div>
-        <%_ }) _%>
+            <%_ }) _%>
         </div>
+        <%_ } _%>
     </div>
     <script>
         $(".add-to-cart").submit(function(e) {

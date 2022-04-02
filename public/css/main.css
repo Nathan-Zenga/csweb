@@ -384,7 +384,8 @@ button + button {
     -webkit-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
     max-width: 90%;
-    max-height: 450px;
+    max-height: 100%;
+    height: auto;
     margin: 0 auto;
     padding: 0;
     border: none;
@@ -443,7 +444,7 @@ article .article-content .img {
 }
 
 article.preview .article-content {
-    background-color: rgba(0, 0, 0, .8);
+    background-color: rgba(0, 0, 0, .75);
     color: white;
 }
 
@@ -771,6 +772,44 @@ article.preview .read-more-link {
 
 .product-thumb .description.expanded .expand-toggler > .expand-label {
     display: none;
+}
+
+.product-thumb .content {
+    background-color: rgba(0, 0, 0, .75);
+    border-radius: 7px;
+    color: white;
+    text-align: center;
+}
+
+.product-thumb .img-wrapper {
+    padding: 0;
+}
+
+.product-thumb .img {
+    border-radius: 7px;
+}
+
+.product-thumb .name {
+    font-weight: 700;
+    margin-bottom: 0;
+    font-size: 1.5em;
+}
+
+.product-thumb .price {
+    font-size: 1.5em;
+    font-weight: 700;
+}
+
+.product-thumb input[type=submit] {
+    background-color: white;
+}
+
+@media (min-width: 576px) {
+    .product-thumb .name {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow-x: hidden;
+    }
 }
 
 #map {
