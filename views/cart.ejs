@@ -36,7 +36,7 @@
             <br><br>
             <div style="text-align: center; font-weight: bold">
                 <%_ var price_total = !cart.length ? 0 : cart.map(itm => itm.price * itm.qty).reduce((t, p) => t + p) _%>
-                <p id="price-total">Total: <%- currency_symbol %> <span><%- (converted_price(price_total)).toFixed(2).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") %></span></p>
+                <p id="price-total">Total: <%- currency_symbol %> <span><%- converted_price(price_total).toFixed(2).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") %></span></p>
                 <%- !cart.length ? '' : '<p id="checkout-link"><a href="/shop/checkout"><button>PROCEED TO CHECKOUT</button></a></p>' %>
             </div>
         </div>
