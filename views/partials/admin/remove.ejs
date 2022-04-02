@@ -25,10 +25,10 @@
         </div>
     </div>
     <div class="col-md-9 float-left">
-        <div class="tab-content" style="padding-top: 10px;">
+        <div class="tab-content" style="padding-top: 10px">
 
             <div id="remove-cs-link" class="tab-pane fade show active">
-                <%_ var { socials } = homepage_contents[0];
+                <%_ const { socials } = homepage_contents[0];
                     if (socials.length) { _%>
                 <form action="/cs/links/delete" method="post">
                     <label>DELETE SOCIAL LINK(S)</label>
@@ -45,10 +45,10 @@
                     <div class="input-group list-item">
                         <div class="input-group-prepend">
                             <div class="input-group-text">
-                                <input type="checkbox" id="<%= social._id %>" name="social<%= i %>" value="<%= social.name %>">
+                                <input type="checkbox" id="<%= social.url %>" name="social<%= i %>" value="<%= social.name %>">
                             </div>
                         </div>
-                        <label class="form-control list-item-label" for="<%= social._id %>"><%= label %></label>
+                        <label class="form-control list-item-label" for="<%= social.url %>"><%= label %></label>
                     </div>
                     <%_ }) _%>
                     <br>
@@ -231,12 +231,16 @@
                 <%_ if (homepage_images.length) { _%>
                 <form action="/homepage/image/delete" method="post">
                     <label>DELETE HOMEPAGE IMAGE(S)</label><br>
-                    <%_ homepage_images.forEach((image, i) => { _%>
-                    <div style="display: inline-block">
-                        <input type="checkbox" name="image<%= i %>" value="<%= image.p_id %>">
-                        <span><img style="height: 100px; margin-bottom: 10px;" src="<%= image.url %>" alt="<%= image.p_id.replace('homepage/images/', '') %>"></span>
+                    <div class="row">
+                    <%_ homepage_images.forEach((image, i) => { if (/^homepage\/images/.test(image.p_id)) { _%>
+                        <div class="col-md-4 col-6 float-left" style="text-align: center; margin-bottom: 10px">
+                            <label for="image<%= i %>">
+                                <img style="max-width: 100%; max-height: 100px" src="<%= image.url %>" alt="<%= image.p_id.replace('homepage/images/', '') %>">
+                            </label>
+                            <input type="checkbox" id="image<%= i %>" name="image<%= i %>" value="<%= image.p_id %>">
+                        </div>
+                    <%_ }}) _%>
                     </div>
-                    <%_ }) _%>
                     <br><br>
                     <input type="submit" value="DELETE IMAGES">
                 </form>

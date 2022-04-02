@@ -201,7 +201,8 @@
                         </div>
                     </div>
                     <label><span>Check the box in case entering every link is unnecessary</span></label>
-                    <input type="checkbox" name="all_platforms" id="all_platforms_change"> <b>ALL PLATFORMS?</b> <br>
+                    <input type="checkbox" name="all_platforms" id="all_platforms_change">
+                    <label for="all_platforms_change" style="display: inline-block"><b>ALL PLATFORMS?</b></label>
                     <input type="submit" value="UPDATE PROJECT">
                 </form>
             </div>
@@ -328,13 +329,17 @@
                 <%_ if (homepage_images.length) { _%>
                 <form action="/homepage/image/reorder" method="post">
                     <label>SELECT HOMEPAGE IMAGE TO RE-ORDER</label><br>
-                    <%_ homepage_images.forEach((image, i) => { _%>
-                    <div class="homepage-image-container" style="display: inline-block">
-                        <input type="radio" name="id" value="<%= image._id %>" required>
-                        <span><img style="height: 100px; margin-bottom: 10px;" src="<%= image.url %>" alt="<%= image.p_id.replace('homepage/images/', '') %>"></span>
+                    <div class="row">
+                    <%_ homepage_images.forEach((image, i) => { if (/^homepage\/images/.test(image.p_id)) { _%>
+                        <div class="col-md-4 col-6 float-left" style="text-align: center; margin-bottom: 10px">
+                            <label for="image-id-<%= i %>">
+                                <img style="max-width: 100%; max-height: 100px" src="<%= image.url %>" alt="<%= image.p_id.replace('homepage/images/', '') %>">
+                            </label>
+                            <input type="radio" id="image-id-<%= i %>" name="id" value="<%= image.p_id %>" style="margin-bottom: 0" required>
+                        </div>
+                    <%_ }}) _%>
                     </div>
-                    <%_ }) _%>
-                    <br><br>
+                    <br>
                     <div class="row">
                         <div class="col-sm-4 float-left"><label>POSITION NUMBER</label></div>
                         <div class="col-sm-8 float-left"><input type="number" name="index" min="1" max="<%= homepage_images.length %>" required></div>

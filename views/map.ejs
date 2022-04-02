@@ -11,7 +11,7 @@
                 var map = new google.maps.Map(document.getElementById("map"), { center, zoom: 15 });
                 var infowindow = null;
 
-                locations.forEach(function(location, i) {
+                locations.forEach(function(location, i, arr) {
                     var position = { lat: location.latitude, lng: location.longitude };
                     var marker = new google.maps.Marker({ position, map, icon: "/img/cs-marker.png" });
                     marker.addListener('click', function() {
@@ -23,7 +23,7 @@
                         infowindow.open(map, marker);
                     });
                     bounds.extend(position);
-                    if (locations.length > 1 && i === locations.length-1) map.fitBounds(bounds);
+                    if (arr.length > 1 && i === arr.length-1) map.fitBounds(bounds);
                 });
             })
         }

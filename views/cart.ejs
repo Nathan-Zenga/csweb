@@ -8,7 +8,7 @@
                         <div class="col-md-3 float-left item-img" style="background-image:url('<%- item.image %>')"></div>
                         <div class="col-md-6 float-left item-info">
                             <p class="item-name" style="font-weight: bold"><%- item.name %></p>
-                            <p class="item-price" style="font-weight: bold"><%- currency_symbol %><span><%- converted_price(item.price).toFixed(2).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") %></span></p>
+                            <p class="item-price" style="font-weight: bold"><%- currency_symbol %> <span><%- converted_price(item.price).toFixed(2).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") %></span></p>
                             <p><%= item.info.replace(/\r?\n/g, "<br>") %></p>
                         </div>
                         <div class="col-md-3 float-left">
@@ -36,7 +36,7 @@
             <br><br>
             <div style="text-align: center; font-weight: bold">
                 <%_ var price_total = !cart.length ? 0 : cart.map(itm => itm.price * itm.qty).reduce((t, p) => t + p) _%>
-                <p id="price-total">Total: <%- currency_symbol %><span><%- (converted_price(price_total)).toFixed(2).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") %></span></p>
+                <p id="price-total">Total: <%- currency_symbol %> <span><%- (converted_price(price_total)).toFixed(2).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") %></span></p>
                 <%- !cart.length ? '' : '<p id="checkout-link"><a href="/shop/checkout"><button>PROCEED TO CHECKOUT</button></a></p>' %>
             </div>
         </div>
