@@ -327,9 +327,6 @@ button + button {
 .homepage-main-content-section #bg-video-player video {
     position: absolute;
     top: 0;
-    left: 50%;
-    -webkit-transform: translateX(-50%);
-    transform: translateX(-50%);
     width: 100%;
     height: 100%;
 }
@@ -376,6 +373,7 @@ button + button {
     transform: translateX(-50%);
     border: 0;
     padding: 0;
+    opacity: .5;
 }
 
 .cs-logo.main-img {
@@ -419,6 +417,7 @@ footer > a:not(:first-child) {
 footer .social-icon {
     -webkit-filter: invert(1);
     filter: invert(1);
+    height: 1em;
 }
 
 article.content-container {
@@ -737,11 +736,23 @@ article.preview .read-more-link {
     word-wrap: break-word;
 }
 
-.thumb .socials-icon {
-    position: relative;
-    top: 3px;
-    font-size: 1.5em;
-    font-weight: normal;
+#discography-page .thumb .text .link:not(:first-child) {
+    margin-left: 10px;
+}
+
+#discography-page .thumb .text .link .socials-icon {
+    height: 1.5em;
+    vertical-align: top;
+}
+
+#discography-page .thumb .img {
+    -webkit-transition: 2s filter;
+    transition: 2s filter;
+}
+
+#discography-page .thumb .img.invisible {
+    -webkit-filter: contrast(5) brightness(5) opacity(0);
+    filter: contrast(5) brightness(5) opacity(0);
 }
 
 .product-thumb .description:not(.expanded) p {
