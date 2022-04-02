@@ -23,7 +23,7 @@ class MailingListMailTransporter {
     };
 
     /**
-     * Establishes authentication and passes transport objects to sendMail method
+     * Passes transport objects to sendMail method for authentication
      * @returns {Promise<SMTPTransport.Options>} transporter options
      */
     async #getTransportOpts() {
@@ -68,19 +68,16 @@ class MailingListMailTransporter {
             if (!subject || !message) throw Error("Subject and message cannot be empty");
 
             const template = path.join(__dirname, '../views/templates/mail.ejs');
-            const member = this.#member;
             const socials = (await Homepage_content.find())[0]?.socials || [];
             const location_origin = production ? "https://www.thecs.co" : `http://localhost:${PORT}`;
-            const html = await renderFile(template, { message, member, socials, location_origin });
+            const html = await renderFile(template, { message, member: this.#member, socials, location_origin });
 
             const transport_opts = await this.#getTransportOpts();
             const attachments = [{ path: 'public/img/cs-logo.png', cid: 'logo' }];
             socials.forEach((s, i) => attachments.push({ path: `public/img/socials/${s.name}.png`, cid: `social_icon_${i}` }));
-            await nodemailer.createTransport(transport_opts).sendMail({
-                from: "CS <info@thecs.co>",
-                to: member?.email || this.#members.map(m => m.email),
-                subject, html, attachments
-            });
+            const from = "CS <info@thecs.co>";
+            const to = this.#member?.email || this.#members.map(m => m.email);
+            await nodemailer.createTransport(transport_opts).sendMail({ from, to, subject, html, attachments });
             cb?.();
         } catch (err) { if (!cb) throw err; cb(err) }
     };

@@ -810,6 +810,12 @@ article.preview .read-more-link {
         white-space: nowrap;
         overflow-x: hidden;
     }
+
+    .product-thumb .name:hover {
+        text-overflow: initial;
+        white-space: normal;
+        overflow-x: visible;
+    }
 }
 
 #map {

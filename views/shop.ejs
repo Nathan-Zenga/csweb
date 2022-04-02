@@ -17,7 +17,7 @@
             <%_ products.forEach(item => { var soldOut = item.stock_qty < 1; _%>
             <div class="product-thumb thumb content-container col-md-4 col-sm-6 float-left">
                 <div class="content">
-                    <p class="name"><%= item.name %></p>
+                    <p class="name" title="<%= item.name %>"><%= item.name %></p>
                     <div class="img-wrapper">
                         <div class="img" style="background-image: url('<%- item.image %>');<%= soldOut ? 'opacity:.5' : '' %>"></div>
                     </div>
