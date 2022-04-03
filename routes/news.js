@@ -10,11 +10,11 @@ router.get('/', async (req, res) => {
 
 router.get('/article/:title', async (req, res, next) => {
     const title = req.params.title.replace(/\-|\$/g, "\\W+");
-    const a = await Article.findById(req.params.title).catch(err => null);
+    const a = await Article.findById(req.params.title).catch(e => null);
     const article = a || await Article.findOne({ headline: RegExp(`^${title}(\\W+|_+)?$`, "i") });
     if (!article) return next();
-    const headline = article.headline.length > 25 ? article.headline.slice(0, 25).trim() + "..." : article.headline;
-    res.render('news-article', { title: headline + " | News", pagename: "news-article", article })
+    const adjacent_articles = await Article.find({ $or: [{ index: article.index-1 }, { index: article.index+1 }] }).sort({ index: 1 });
+    res.render('news-article', { title: article.headline_cropped() + " | News", pagename: "news-article", article, adjacent_articles })
 });
 
 router.post('/article/new', isAuthed, async (req, res) => {

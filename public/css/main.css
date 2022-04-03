@@ -491,6 +491,13 @@ article.preview .read-more-link {
     padding: 0 20px;
 }
 
+#news-article-page article #adjacent-articles-nav {
+    margin: 0 auto;
+    font-weight: 600;
+    max-width: 900px;
+    padding: 1em 30px;
+}
+
 #news-article-page article .article-content {
     background-color: transparent;
 }

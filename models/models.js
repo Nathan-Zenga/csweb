@@ -15,6 +15,10 @@ module.exports.Article = model('Article', (() => {
         return `/news/article/${ doc.headline.split("").map(c => /\W/.test(c) && c != "$" ? "-" : c).join("").replace(/\-+/g, "-").replace(/\W+$/, '') }`.toLowerCase();
     });
 
+    schema.virtual("headline_cropped").get((val, vt, doc) => {
+        return (num = 25) => doc.headline.length > num ? doc.headline.slice(0, num).trim() + "..." : doc.headline;
+    });
+
     return schema;
 })());
 

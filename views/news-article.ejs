@@ -10,6 +10,26 @@
 
     <article class="full content-container">
         <h1><%- article.headline %></h1>
+        <%_ if (adjacent_articles.length) { _%>
+        <div id="adjacent-articles-nav">
+            <div class="row">
+                <div class="col">
+                    <%_ if (adjacent_articles.length == 2 || adjacent_articles[0].index < article.index) { _%>
+                    <span><</span>
+                    <a href="<%- adjacent_articles[0].link %>"><%- adjacent_articles[0].headline_cropped(15) %></a>
+                    <%_ } _%>
+                </div>
+
+                <div class="col" style="text-align: right">
+                    <%_ if (adjacent_articles.length == 2 || adjacent_articles[0].index > article.index) {
+                        var i = adjacent_articles.length > 1 ? 1 : 0; _%>
+                    <a href="<%- adjacent_articles[i].link %>"><%- adjacent_articles[i].headline_cropped(15) %></a>
+                    <span>></span>
+                    <%_ } _%>
+                </div>
+            </div>
+        </div>
+        <%_ } _%>
         <div class="article-content">
             <%_ if (article.headline_images.length) { _%>
             <div class="headline-images img-reel">
