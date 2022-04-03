@@ -28,6 +28,7 @@ a:hover {
 
 ::selection {
     background: rgb(200, 200, 200);
+    color: black;
 }
 
 ::-webkit-scrollbar {

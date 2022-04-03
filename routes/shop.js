@@ -96,7 +96,7 @@ router.post("/stock/remove", isAuthed, async (req, res) => {
 
 router.post("/cart/add", async (req, res) => {
     const product = await Product.findById(req.body.id).catch(e => null);
-    if (!product || product.stock_qty < 1) return res.status(!product ? 404 : 400).send("Item currently not in stock");
+    if (!product || product.stock_qty < 1) return res.status(404).send("Item currently not in stock");
     const { id, name, price, image, info, stock_qty } = product;
     const currentItem = req.session.cart.find(item => item.id === id);
 
@@ -115,7 +115,7 @@ router.post("/cart/remove", (req, res) => {
     if (cartItemIndex === -1) return res.status(400).send("The selected item is not found in your cart");
     req.session.cart.splice(cartItemIndex, 1);
     const total = req.session.cart.length ? req.session.cart.map(itm => itm.price * itm.qty).reduce((t, p) => t + p) : 0;
-    res.send({ total: req.session.converted_price(total), quantity: 0 });
+    res.send({ total: req.session.converted_price(total), quantity: 0, cart_empty: !total });
 });
 
 router.post("/cart/increment", (req, res) => {

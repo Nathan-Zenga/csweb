@@ -1,5 +1,10 @@
 <%- include ('partials/header') -%>
     <div class="container">
+        <%_ if (!products.length) { _%>
+        <div style="padding: 50px 10px; text-align: center;">
+            <h1>STOCKING UP<br>MERCH COMING SOON</h1>
+        </div>
+        <%_ } else { _%>
         <div style="text-align: right; font-weight: 600">
             <select id="fx-select" name="currency" style="color: black; width: 150px">
                 <%_ const currency_default = currency.toUpperCase(); _%>
@@ -10,9 +15,7 @@
             </select>
             <i class="fas fa-chevron-down" id="dropdown-toggle"></i>
         </div>
-        <%_ if (!products.length) { _%>
-        <div style="padding: 50px 10px; text-align: center;"><h1>STOCKING UP<br>MERCH COMING SOON</h1></div>
-        <%_ } else { _%>
+
         <div class="row">
             <%_ products.forEach(item => { var soldOut = item.stock_qty < 1; _%>
             <div class="product-thumb thumb content-container col-md-4 col-sm-6 float-left">

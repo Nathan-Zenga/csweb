@@ -56,12 +56,12 @@
         $(".item-qty-control, .remove-item").submit(function(e) {
             e.preventDefault();
             var form = this;
-            var $to_remove = $(form).closest(".cart-item").add("#checkout-link");
             var buttons = $(form).find("button").attr("disabled", true);
             $.post(form.action, $(form).serializeArray(), function(r) {
                 $(form).find(".qty-count").val(r.quantity);
-                if (!r.quantity) $to_remove.hide(function() { $(this).remove() });
-                if (!r.quantity) $("#cart-icon").removeClass("visible");
+                if (!r.quantity) $(form).closest(".cart-item").hide(function() { $(this).remove() });
+                if (r.cart_empty) $("#checkout-link").hide(function() { $(this).remove() });
+                if (r.cart_empty) $("#cart-icon").removeClass("visible");
                 $("#price-total span").text(r.total.toFixed(2).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
             }).fail(function(err) {
                 alert(err.responseText);
