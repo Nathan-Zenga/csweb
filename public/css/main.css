@@ -495,7 +495,11 @@ article.preview .read-more-link {
     margin: 0 auto;
     font-weight: 600;
     max-width: 900px;
-    padding: 1em 30px;
+    padding: 1em 45px;
+}
+
+#news-article-page article #adjacent-articles-nav .col {
+    padding: 0;
 }
 
 #news-article-page article .article-content {
@@ -705,7 +709,7 @@ article.preview .read-more-link {
 }
 
 .thumb {
-    padding: 10px;
+    padding-bottom: 30px;
     background-color: transparent;
 }
 

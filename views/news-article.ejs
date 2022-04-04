@@ -14,15 +14,15 @@
         <div id="adjacent-articles-nav">
             <div class="row">
                 <div class="col">
-                    <%_ if (adjacent_articles.length == 2 || adjacent_articles[0].index < article.index) { _%>
+                    <%_ if (adjacent_articles[0].index < article.index) { _%>
                     <span><</span>
                     <a href="<%- adjacent_articles[0].link %>"><%- adjacent_articles[0].headline_cropped(15) %></a>
                     <%_ } _%>
                 </div>
 
                 <div class="col" style="text-align: right">
-                    <%_ if (adjacent_articles.length == 2 || adjacent_articles[0].index > article.index) {
-                        var i = adjacent_articles.length > 1 ? 1 : 0; _%>
+                    <%_ var i = adjacent_articles.length > 1 ? 1 : 0;
+                        if (adjacent_articles[i].index > article.index) { _%>
                     <a href="<%- adjacent_articles[i].link %>"><%- adjacent_articles[i].headline_cropped(15) %></a>
                     <span>></span>
                     <%_ } _%>
@@ -74,25 +74,26 @@
         </div>
     </article>
     <script>
-        if (!("object-fit" in document.body.style)) $(".img-reel img").css("width", "auto");
-        if ($(".img-reel img").length > 1) {
-            var $img = $(".img-reel img:first");
-            $(".img-reel-nav a").click(function() {
-                var left = $(this).hasClass("left");
-                var right = $(this).hasClass("right");
-                var direction = left ? "-=" : "+=";
-                $img = left ? $img.prev() : $img.next();
-                $img = left && !$img.length ? $(".img-reel img:first") : right && !$img.length ? $(".img-reel img:last") : $img;
-                var centeredPos = ($(".img-reel").width() - $img.width()) / 2;
-                $(".img-reel").stop().animate({ scrollLeft: direction + (Math.abs($img.offset().left - $(".img-reel").offset().left - centeredPos)) }, 200);
-            });
-        }
-        $(window).on("load resize", function() {
+        !("object-fit" in document.body.style) && $(".img-reel img").css("width", "auto");
+
+        var $img = $(".img-reel img:first");
+        $(".img-reel img").length > 1 && $(".img-reel-nav a").click(function() {
+            var left = $(this).hasClass("left");
+            var right = $(this).hasClass("right");
+            var direction = left ? "-=" : "+=";
+            $img = left ? $img.prev() : $img.next();
+            $img = left && !$img.length ? $(".img-reel img:first") : right && !$img.length ? $(".img-reel img:last") : $img;
+            var centeredPos = ($(".img-reel").width() - $img.width()) / 2;
+            $(".img-reel").stop().animate({ scrollLeft: direction + (Math.abs($img.offset().left - $(".img-reel").offset().left - centeredPos)) }, 200);
+        });
+
+        $(".img-reel img").length && $(window).on("load resize", function() {
             var lastImgOffsetRight = $(".img-reel img:last").offset().left + $(".img-reel img:last").width();
             var imgReelOffsetRight = $(".img-reel").offset().left + $(".img-reel").width();
             var overflowing = lastImgOffsetRight > imgReelOffsetRight;
             $(".img-reel-nav").stop()[overflowing ? "slideDown" : "slideUp"](200);
         });
+
         $("img[data-toggle=modal]").click(function() { $("#image-modal .modal-body").html("<img src='"+ $(this).attr("src") +"'>") })
 
         $("iframe").each(function(i, iframe) {
