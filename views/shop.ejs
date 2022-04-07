@@ -86,7 +86,7 @@
         });
 
         $(".product-thumb .description .expand-toggler").click(function() {
-            $(this).closest(".description").toggleClass("expanded");
+            parseInt($(this).css("opacity")) == 1 && $(this).closest(".description").toggleClass("expanded");
         });
 
         $(window).on("load resize", function() {
