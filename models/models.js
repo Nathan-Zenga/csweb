@@ -38,14 +38,19 @@ module.exports.Artist = model('Artist', new Schema({
     profile_image: String
 }));
 
-module.exports.MailingList = model('MailingList', new Schema({
-    firstname: { type: String, set: v => v.charAt(0).toUpperCase() + v.slice(1) },
-    lastname: { type: String, set: v => v.charAt(0).toUpperCase() + v.slice(1) },
-    email: { type: String, index: true, unique: true },
-    size_top: String,
-    size_bottom: String,
-    extra_info: String
-}));
+module.exports.MailingList = model('MailingList', (() => {
+    const schema = new Schema({
+        firstname: { type: String, set: v => v.charAt(0).toUpperCase() + v.slice(1) },
+        lastname: { type: String, set: v => v.charAt(0).toUpperCase() + v.slice(1) },
+        email: { type: String, index: true, unique: true },
+        size_top: String,
+        size_bottom: String,
+        extra_info: String
+    });
+
+    schema.virtual("fullname").get((val, vt, doc) => `${doc.firstname} ${doc.lastname}`);
+    return schema;
+})());
 
 module.exports.Location = model('Location', new Schema({
     name: String,
@@ -80,6 +85,6 @@ module.exports.Product = model('Product', new Schema({
 
 module.exports.Admin = model('Admin', (() => {
     const schema = new Schema({ email: { type: String, index: true }, password: String, tokenExpiryDate: Date });
-    schema.virtual("username").get(() => this.email);
+    schema.virtual("username").get((val, vt, doc) => doc.email);
     return schema;
 })());

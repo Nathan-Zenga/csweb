@@ -5,16 +5,14 @@ const { renderFile } = require('ejs');
 const { Document: Doc } = require('mongoose');
 const { OAuth2 } = (require("googleapis")).google.auth;
 const { Homepage_content } = require('../models/models');
-const { OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, OAUTH_REFRESH_TOKEN, NODE_ENV, PORT } = process.env;
+const { OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, OAUTH_REFRESH_TOKEN, NODE_ENV } = process.env;
 const production = NODE_ENV === "production";
 
 /** Class for processing mail transports */
 class MailingListMailTransporter {
-    #member; #members; #user; #pass; #oauth2Client;
+    #member; #members; #oauth2Client; #user; #pass;
 
-    /**
-     * @param {Doc | Doc[]} recipient one or more existing mailing list members
-     */
+    /** @param {Doc | Doc[]} recipient one or more existing mailing list members */
     constructor(recipient) {
         this.#member = !Array.isArray(recipient) ? recipient : null;
         this.#members = Array.isArray(recipient) ? recipient : [];
@@ -69,7 +67,7 @@ class MailingListMailTransporter {
 
             const template = path.join(__dirname, '../views/templates/mail.ejs');
             const socials = (await Homepage_content.find())[0]?.socials || [];
-            const location_origin = production ? "https://www.thecs.co" : `http://localhost:${PORT}`;
+            const location_origin = production ? "https://www.thecs.co" : "http://localhost:4001";
             const html = await renderFile(template, { message, member: this.#member, socials, location_origin });
 
             const transport_opts = await this.#getTransportOpts();

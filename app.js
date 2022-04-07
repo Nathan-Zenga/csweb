@@ -12,6 +12,8 @@ const Stripe = new (require('stripe').Stripe)(STRIPE_SK);
 const { Homepage_content } = require('./models/models');
 const MailingListMailTransporter = require('./config/mailingListMailTransporter');
 const production = NODE_ENV === "production";
+const socketio = require('./config/socket.io');
+const { createServer } = require('http');
 
 mongoose.connect(CSDB).then(() => { console.log("Connected to DB") });
 
@@ -77,7 +79,10 @@ app.get("*", (req, res) => {
 
 app.post("*", (req, res) => res.status(400).send("Sorry, your request currently cannot be processed"));
 
-app.listen(PORT, async () => {
+const server = createServer(app);
+socketio(server);
+
+server.listen(PORT, async () => {
     console.log(`Server started${!production ? " on port " + PORT : ""}`);
 
     if (production) try {

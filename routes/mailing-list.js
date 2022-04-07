@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const { MailingList } = require('../models/models');
 const { isAuthed } = require('../config/config');
-const MailTransporter = require('../config/mailingListMailTransporter');
 const { default: axios } = require('axios');
 const { RECAPTCHA_SITE_KEY: recaptcha_site_key, RECAPTCHA_SECRET_KEY } = process.env;
 
@@ -50,21 +49,6 @@ router.post('/update', isAuthed, async (req, res) => {
         if (extra_info)  member.extra_info = extra_info;
         await member.save(); res.send("Member updated");
     } catch (err) { res.status(500).send(err.message) }
-});
-
-router.post('/send/mail', isAuthed, async (req, res) => {
-    const { email, subject, message } = req.body;
-    const members = await MailingList.find(email === "all" ? {} : { email: email || "null" });
-    if (!members.length) return res.status(404).send("Member(s) not found");
-    const transporter = new MailTransporter();
-
-    for (let i = 0; i < members.length; i++) setTimeout(() => {
-        transporter.setRecipient(members[i]).sendMail({ subject, message }, err => {
-            if (err) console.error(`${err.message || err}\nNot sent for ${members[i].firstname+" "+members[i].lastname}`);
-            else console.log(`Message sent!`);
-        });
-    }, i * 2000);
-    res.send(`Message sent to ${email === "all" ? "everyone" : members[0].firstname+" "+members[0].lastname}`);
 });
 
 router.post('/member/delete', async (req, res) => {

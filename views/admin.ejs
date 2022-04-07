@@ -50,7 +50,12 @@
             </div>
         </div>
     </div>
+    <div id="mail-alert-box">
+        <button type="button" id="toggle-display"><i class="fas fa-chevron-right"></i></button>
+        <span class="message"></span>
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/async/3.2.1/async.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <script>
         var readDataURLs = function(files, callback) {
             var urls = [];
@@ -360,6 +365,35 @@
                 var $a = $(".nav.nav-pills:visible a.active[data-toggle='pill']");
                 document.cookie = "active_tab_hrefs=" + JSON.stringify($a.map(function() { return $(this).attr("href") }).get()) + "; path="+ location.pathname +";";
             });
+        });
+
+        var socket = io(), timeout, btnController, emptyMessage = function() { $(this).off("transitionend").find(".message").empty() };
+        $("#mail form").off("submit").submit(function(e) {
+            e.preventDefault();
+            btnController = new submitBtnController(e.target);
+            socket.emit("send mail", $(e.target).serializeArray());
+        });
+
+        socket.on("sent mail result", function(res) {
+            if (res.background_running) return alert("Please wait, emails are still being sent.");
+            var message = (res.error ? res.error.message : res.message || "").replace(/\r?\n/g, "</p><p>");
+            if (message) $("#mail-alert-box").addClass("visible").find(".message").html(`<p>${message}</p>`);
+            if (!res.finished) return;
+            btnController.finish();
+            $("#mail-alert-box").removeClass("visible hidden").on("transitionend", emptyMessage);
+        });
+
+        socket.on("sent mail background update", function(res) {
+            clearTimeout(timeout);
+            $("#mail-alert-box").addClass("visible").find(".message").html(`<p>${res.message}</p>`);
+            btnController && btnController.finish();
+            timeout = setTimeout(function() {
+                $("#mail-alert-box").removeClass("visible hidden").on("transitionend", emptyMessage);
+            }, 4000)
+        });
+
+        $("#mail-alert-box #toggle-display").click(function() {
+            $("#mail-alert-box").hasClass("visible") && $("#mail-alert-box").toggleClass("hidden");
         });
     </script>
 <%- include ('partials/footer') -%>
