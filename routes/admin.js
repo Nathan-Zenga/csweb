@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const crypto = require('crypto');
 const { isAuthed, Collections } = require('../config/config');
-const MailingListMailTransporter = require('../config/mailingListMailTransporter');
+const MailTransporter = require('../config/MailTransporter');
 const { Admin } = require('../models/models');
 const email = "info@thecs.co";
 const passport = require('../config/passport');
@@ -37,7 +37,7 @@ router.post('/login', (req, res) => {
                 "Please click the link below to activate the account, as this will only be " +
                 "<u>available for the next 2 hours</u> from the time of this email received:\n\n" +
                 `${res.locals.location_origin}/admin/activate/${doc.password}\n\n`;
-            new MailingListMailTransporter({ email }).sendMail({ subject, message }, err => {
+            new MailTransporter({ email }).sendMail({ subject, message }, err => {
                 if (err) return res.status(500).send(err.message || err);
                 res.status(400).send(info.message);
             });

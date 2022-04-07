@@ -9,13 +9,13 @@ const { OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, OAUTH_REFRESH_TOKEN, NODE_ENV } = 
 const production = NODE_ENV === "production";
 
 /** Class for processing mail transports */
-class MailingListMailTransporter {
-    #member; #members; #oauth2Client; #user; #pass;
+class MailTransporter {
+    #recipient; #recipients; #oauth2Client; #user; #pass;
 
-    /** @param {Doc | Doc[]} recipient one or more existing mailing list members */
+    /** @param {Doc | Doc[]} recipient one or more existing mailing list recipients */
     constructor(recipient) {
-        this.#member = !Array.isArray(recipient) ? recipient : null;
-        this.#members = Array.isArray(recipient) ? recipient : [];
+        this.#recipient = !Array.isArray(recipient) ? recipient : null;
+        this.#recipients = Array.isArray(recipient) ? recipient : [];
         this.#oauth2Client = new OAuth2( OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, "https://developers.google.com/oauthplayground" );
         this.#oauth2Client.setCredentials({ refresh_token: OAUTH_REFRESH_TOKEN });
     };
@@ -62,37 +62,37 @@ class MailingListMailTransporter {
      */
     async sendMail({ subject, message }, cb) {
         try {
-            if (!this.#member && !this.#members.length) throw Error("Recipient(s) not set");
+            if (!this.#recipient && !this.#recipients.length) throw Error("Recipient(s) not set");
             if (!subject || !message) throw Error("Subject and message cannot be empty");
 
             const template = path.join(__dirname, '../views/templates/mail.ejs');
             const socials = (await Homepage_content.find())[0]?.socials || [];
             const location_origin = production ? "https://www.thecs.co" : "http://localhost:4001";
-            const html = await renderFile(template, { message, member: this.#member, socials, location_origin });
+            const html = await renderFile(template, { message, recipient: this.#recipient, socials, location_origin });
 
             const transport_opts = await this.#getTransportOpts();
             const attachments = [{ path: 'public/img/cs-logo.png', cid: 'logo' }];
             socials.forEach((s, i) => attachments.push({ path: `public/img/socials/${s.name}.png`, cid: `social_icon_${i}` }));
             const from = "CS <info@thecs.co>";
-            const to = this.#member?.email || this.#members.map(m => m.email);
+            const to = this.#recipient?.email || this.#recipients.map(m => m.email);
             await nodemailer.createTransport(transport_opts).sendMail({ from, to, subject, html, attachments });
             cb?.();
         } catch (err) { if (!cb) throw err; cb(err) }
     };
 
-    /** @param {Doc} recipient existing mailing list member */
+    /** @param {Doc} recipient existing mailing list recipient */
     setRecipient(recipient) {
-        this.#members = [];
-        this.#member = recipient;
+        this.#recipients = [];
+        this.#recipient = recipient;
         return this
     };
 
-    /** @param {Doc[]} recipients existing mailing list members */
+    /** @param {Doc[]} recipients existing mailing list recipients */
     setRecipients(recipients) {
-        this.#members = recipients;
-        this.#member = null;
+        this.#recipients = recipients;
+        this.#recipient = null;
         return this
     };
 };
 
-module.exports = MailingListMailTransporter;
+module.exports = MailTransporter;

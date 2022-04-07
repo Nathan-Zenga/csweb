@@ -6,7 +6,7 @@ const { default: axios } = require('axios');
 const { each } = require('async');
 const { isAuthed } = require('../config/config');
 const { Product } = require('../models/models');
-const MailingListMailTransporter = require('../config/mailingListMailTransporter');
+const MailTransporter = require('../config/MailTransporter');
 const curr_symbols = require('../config/currSymbols');
 const production = NODE_ENV === "production";
 const axiosRequestUri = `https://v6.exchangerate-api.com/v6/${EXCHANGERATE_API_KEY}/latest/GBP`;
@@ -191,7 +191,7 @@ router.post("/checkout/payment/complete", async (req, res) => {
         req.session.paymentIntentID = undefined;
 
         const { line1, line2, city, postal_code, state, country } = pi.customer.shipping.address;
-        const transporter = new MailingListMailTransporter();
+        const transporter = new MailTransporter();
         const email = pi.receipt_email || pi.customer.email;
         const subject = "Purchase Nofication: Payment Successful";
         const message = `Hi ${pi.customer.name},\n\n` +

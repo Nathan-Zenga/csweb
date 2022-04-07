@@ -10,7 +10,7 @@ const passport = require('passport');
 const { STRIPE_SK, CSDB, NODE_ENV, PORT = 4001, TEST_EMAIL } = process.env;
 const Stripe = new (require('stripe').Stripe)(STRIPE_SK);
 const { Homepage_content } = require('./models/models');
-const MailingListMailTransporter = require('./config/mailingListMailTransporter');
+const MailTransporter = require('./config/MailTransporter');
 const production = NODE_ENV === "production";
 const socketio = require('./config/socket.io');
 const { createServer } = require('http');
@@ -86,6 +86,6 @@ server.listen(PORT, async () => {
     console.log(`Server started${!production ? " on port " + PORT : ""}`);
 
     if (production) try {
-        await new MailingListMailTransporter({ email: TEST_EMAIL }).sendMail({ subject: "Re: CS test email", message: "This is a test email" });
+        await new MailTransporter({ email: TEST_EMAIL }).sendMail({ subject: "Re: CS test email", message: "This is a test email" });
     } catch (err) { console.error(err.message) }
 });

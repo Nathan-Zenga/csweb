@@ -1,6 +1,6 @@
 const { Server } = require('socket.io');
 const { MailingList } = require('../models/models');
-const MailTransporter = require('./mailingListMailTransporter');
+const MailTransporter = require('./MailTransporter');
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const status = { running: false, count: 0, message: "" };
 
