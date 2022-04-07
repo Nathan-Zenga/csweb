@@ -84,7 +84,24 @@ module.exports.Product = model('Product', new Schema({
 }));
 
 module.exports.Admin = model('Admin', (() => {
-    const schema = new Schema({ email: { type: String, index: true }, password: String, tokenExpiryDate: Date });
+    const schema = new Schema({
+        email: { type: String, index: true },
+        password: String,
+        tokenExpiryDate: Date
+    });
+
     schema.virtual("username").get((val, vt, doc) => doc.email);
     return schema;
 })());
+
+module.exports.MailTest = model('MailTest', (() => {
+    const schema = new Schema({
+        last_sent_date: { type: Date, default: new Date(0) },
+        email: { type: String, default: process.env.TEST_EMAIL },
+        subject: { type: String, default: "Re: CS test email" },
+        message: { type: String, default: "This is a test email" }
+    });
+
+    schema.virtual("newDay").get((val, vt, doc) => doc.last_sent_date.toDateString() != new Date().toDateString());
+    return schema;
+})(), "mail_test");

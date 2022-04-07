@@ -7,9 +7,9 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const MemoryStore = require('memorystore')(session);
 const passport = require('passport');
-const { STRIPE_SK, CSDB, NODE_ENV, PORT = 4001, TEST_EMAIL } = process.env;
+const { STRIPE_SK, CSDB, NODE_ENV, PORT = 4001 } = process.env;
 const Stripe = new (require('stripe').Stripe)(STRIPE_SK);
-const { Homepage_content } = require('./models/models');
+const { Homepage_content, MailTest } = require('./models/models');
 const MailTransporter = require('./config/MailTransporter');
 const production = NODE_ENV === "production";
 const socketio = require('./config/socket.io');
@@ -86,6 +86,10 @@ server.listen(PORT, async () => {
     console.log(`Server started${!production ? " on port " + PORT : ""}`);
 
     if (production) try {
-        await new MailTransporter({ email: TEST_EMAIL }).sendMail({ subject: "Re: CS test email", message: "This is a test email" });
+        const test = await MailTest.findOne() || new MailTest();
+        const { email, subject, message, newDay } = test;
+        newDay && await new MailTransporter({ email }).sendMail({ subject, message });
+        newDay && (test.last_sent_date = Date.now());
+        newDay && await test.save();
     } catch (err) { console.error(err.message) }
 });
