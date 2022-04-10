@@ -118,7 +118,6 @@
                             '<label class="custom-file-label">Choose media file</label>' +
                         '</div>' +
                         '<div class="input-group-append">' +
-                            '<input type="hidden" name="image">' +
                             `<button class="btn btn-secondary clear-uploads" type="button" data-id="upload${i}">Clear file upload</button>` +
                         '</div>' +
                     '</div>' +
@@ -128,10 +127,10 @@
 
             $tbm_container.find("input:file").change(function() {
                 var files = this.files;
-                var $upload_container = $(this).closest(".file-upload-container");
-                var $textInput = $upload_container.find("input:text");
+                var $container = $(this).closest(".file-upload-container");
+                var $textInput = $container.find("input:text");
                 var filesPresent = files && files.length;
-                var $file_label = $upload_container.find(".custom-file-label");
+                var $file_label = $container.find(".custom-file-label");
                 var initial_label_value = $file_label.data("initial-value") || $file_label.text();
                 $file_label.data("initial-value", initial_label_value).text(initial_label_value);
                 $textInput.val(filesPresent ? "N/A" : "").attr("disabled", false).next(":hidden").remove();
@@ -145,6 +144,9 @@
                 });
             }).end().find(".clear-uploads").click(function(e) {
                 e.preventDefault(); $tbm_container.find(":file#"+this.dataset.id).val("").change()
+            }).end().find("input:text").change(function() {
+                var $container = $(this).closest(".file-upload-container");
+                $container.find("input:file").attr("required", !this.value.trim());
             });
         });
 
@@ -159,7 +161,7 @@
                    .end().find(":input").attr({ disabled: this.checked })
         });
 
-        $(".file-upload-container :file").change(function() {
+        $(".file-upload-container").find("input:file").change(function() {
             var files = this.files;
             var $container = $(this).closest(".file-upload-container");
             var $image_data = $container.find(":hidden").val("");
@@ -176,9 +178,12 @@
                 $image_url.attr("disabled", true).val(files[0].name);
                 $file_label.text(files[0].name);
             });
+        }).end().find("input:text").change(function() {
+            var $container = $(this).closest(".file-upload-container");
+            $container.find("input:file").attr("required", !this.value.trim());
         });
 
-       $(".input-item :input").on("change keyup", function() {
+        $(".input-item :input").on("change keyup", function() {
             var $groupInputs = $(this).closest(".input-item").find(":input");
             var notEmpty = $groupInputs.filter(function() { return this.value }).length > 0;
             $groupInputs.attr("required", notEmpty);
