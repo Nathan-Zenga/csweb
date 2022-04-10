@@ -83,9 +83,9 @@
                             if (image) {
                                 media = '<div class="textbody-media img"><img src="'+ media +'"></div>';
                             } else if (video) {
-                                media = '<div class="textbody-media video"><video><source src="'+ media +'" source></video></div>';
+                                media = '<div class="textbody-media video"><video src="'+ media +'" controlsList="nodownload"></video></div>';
                             } else if (audio) {
-                                media = '<div class="textbody-media audio"><audio src="'+ media +'" controls><source src="'+ media +'"></audio></div>';
+                                media = '<div class="textbody-media audio"><audio src="'+ media +'" controls controlsList="nodownload"></audio></div>';
                             } else if (iframeElm) {
                                 media = '<div class="textbody-media iframe">'+ media.match(/<iframe(.*?)<\/iframe>/g)[0] +'</div>';
                             }
