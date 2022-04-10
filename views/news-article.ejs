@@ -1,12 +1,36 @@
 <%- include ('partials/header') -%>
+    <%_ if (article.headline_images.length) { _%>
     <div id="image-modal" class="modal fade" role="dialog">
         <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
-                <div class="modal-icons"><button type="button" class="close close-view" data-dismiss="modal">&times;</button></div>
-                <div class="modal-body"></div>
+                <div class="modal-icons"><button type="button" class="close" data-dismiss="modal">&times;</button></div>
+                <div class="modal-body">
+                    <div id="article-img-carousel" class="carousel slide" data-ride="carousel" data-interval="false">
+                        <div class="carousel-inner">
+                            <%_ article.headline_images.forEach((image, i) => { _%>
+                            <div class="carousel-item<%- i === 0 ? ' active' : '' %>">
+                                <img src='<%- image %>'>
+                            </div>
+                            <%_ }) _%>
+                        </div>
+
+                        <%_ if (article.headline_images.length > 1) { _%>
+                        <a class="carousel-control-prev" href="#article-img-carousel" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon fal fa-angle-left" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+
+                        <a class="carousel-control-next" href="#article-img-carousel" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon fal fa-angle-right" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                        <%_ } _%>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+    <%_ } _%>
 
     <article class="full content-container">
         <h1><%- article.headline %></h1>
@@ -94,7 +118,10 @@
             $(".img-reel-nav").stop()[overflowing ? "slideDown" : "slideUp"](200);
         });
 
-        $("img[data-toggle=modal]").click(function() { $("#image-modal .modal-body").html("<img src='"+ $(this).attr("src") +"'>") })
+        $(".img-reel img[data-toggle=modal]").click(function() {
+            var index = $(this).index();
+            $("#article-img-carousel").carousel(index);
+        });
 
         $("iframe").each(function(i, iframe) {
             var src = iframe.src;

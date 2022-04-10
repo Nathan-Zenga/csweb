@@ -96,12 +96,55 @@ nav a {
     z-index: 96;
 }
 
-.modal .modal-icons .close-view {
-    padding: 0 15px;
+.modal .modal-icons .close {
+    padding: 0 15px 15px;
     font-weight: 100;
     background-color: transparent;
     color: white;
     font-size: 2.5em;
+    margin: 0;
+}
+
+.modal .carousel {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.carousel .carousel-inner,
+.carousel .carousel-item {
+    height: 100%;
+}
+
+.carousel .carousel-control-prev,
+.carousel .carousel-control-next {
+    background-color: rgba(0, 0, 0, .3);
+    top: 50%;
+    bottom: auto;
+    width: 15%;
+    height: 80px;
+    min-width: 70px;
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+    opacity: 0;
+}
+
+.carousel:hover .carousel-control-prev,
+.carousel:hover .carousel-control-next {
+    opacity: .5;
+}
+
+.carousel:hover .carousel-control-prev:hover,
+.carousel:hover .carousel-control-next:hover {
+    opacity: 1;
+}
+
+.carousel .carousel-control-prev-icon,
+.carousel .carousel-control-next-icon {
+    background-image: none;
+    font-size: 3em;
+    width: auto;
+    height: auto;
 }
 
 .tab-content {
@@ -460,17 +503,16 @@ article.preview .article-content .text h1 {
     overflow: hidden;
 }
 
-article.preview .article-content img,
 article.preview .article-content .img {
     display: block;
     background-size: cover;
-    background-color: black;
     background-position: center;
     height: auto;
     padding-top: 100%;
     border-radius: 7px;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
+    transition: none;
 }
 
 article.preview .read-more-link {
@@ -541,8 +583,11 @@ article.preview .read-more-link {
 #news-article-page article .textbody-media > * {
     display: block;
     width: 600px;
-    height: 400px;
     margin: 0 auto;
+}
+
+#news-article-page article .textbody-media > *:not(audio) {
+    height: 400px;
 }
 
 #news-article-page article img {
@@ -563,14 +608,14 @@ article.preview .read-more-link {
     padding: 30px 0;
 }
 
-#news-article-page #image-modal img {
-    position: relative;
+#news-article-page #image-modal #article-img-carousel .carousel-item img {
+    position: absolute;
     top: 50%;
-    -webkit-transform: translateY(-50%);
-    transform: translateY(-50%);
+    left: 50%;
     max-width: 100%;
     max-height: 100%;
-    cursor: default;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
 }
 
 @media (max-width: 600px) {
