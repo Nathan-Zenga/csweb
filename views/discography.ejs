@@ -5,7 +5,7 @@
             <div class="project-thumb thumb content-container col-md-4 col-sm-6 float-left">
                 <div class="content">
                     <div class="img-wrapper">
-                        <div class="img invisible" style="background-image: url('<%= project.artwork %>');"></div>
+                        <div class="img hidden" style="background-image: url('<%= project.artwork %>');"></div>
                     </div>
                     <div class="text">
                         <h2 class="title" title="<%= project.title %>"><%= project.title %></h2>
@@ -27,7 +27,7 @@
             var url_pattern = /(?:(?:https?|ftp|file|data):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$])/gi;
             var image = new Image();
             image.src = img.src || $(img).css("background-image").match(url_pattern)[0];
-            image.onload = function() { $(img).removeClass("invisible") };
+            image.onload = function() { $(img).removeClass("hidden") };
         });
     </script>
 <%- include ('partials/footer') -%>

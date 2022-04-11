@@ -793,6 +793,11 @@ article.preview .read-more-link {
     word-wrap: break-word;
 }
 
+#discography-page .thumb .content {
+    background-image: url("/img/rough-texture-pattern.jpg");
+    background-size: cover;
+}
+
 #discography-page .thumb .text .link:not(:first-child) {
     margin-left: 10px;
 }
@@ -803,11 +808,12 @@ article.preview .read-more-link {
 }
 
 #discography-page .thumb .img {
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, .25);
     -webkit-transition: 2s filter;
     transition: 2s filter;
 }
 
-#discography-page .thumb .img.invisible {
+#discography-page .thumb .img.hidden {
     -webkit-filter: contrast(5) brightness(5) opacity(0);
     filter: contrast(5) brightness(5) opacity(0);
 }
