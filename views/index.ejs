@@ -17,7 +17,7 @@
         <img id="cs-logo-large" class="cs-logo main-img" src="/img/cs-logo.png" alt="CS logo">
         <div id="bg-video-player">
             <%_ media.forEach(m => { _%>
-            <video class="blur" src="<%- m.url %>" autoplay playsinline muted loop controlsList="nodownload"></video>
+            <video class="blur" src="<%- m.url %>" autoplay playsinline muted loop controlsList="nodownload" oncontextmenu="return false"></video>
             <%_ }) _%>
         </div>
     </section>
