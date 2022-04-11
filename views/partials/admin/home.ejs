@@ -16,8 +16,7 @@
                 </tr>
             </thead>
             <tbody>
-                <%_ var sizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
-                    sizes.forEach(size => { _%>
+                <%_ ["XS", "S", "M", "L", "XL", "XXL", "XXXL"].forEach(size => { _%>
                 <tr>
                     <th scope="row"><%= size %></th>
                     <td id="top-<%= size %>"><%= members.filter(m => m.size_top === size).length %></td>

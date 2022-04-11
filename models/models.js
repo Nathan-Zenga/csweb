@@ -43,8 +43,8 @@ module.exports.MailingList = model('MailingList', (() => {
         firstname: { type: String, set: v => v.charAt(0).toUpperCase() + v.slice(1) },
         lastname: { type: String, set: v => v.charAt(0).toUpperCase() + v.slice(1) },
         email: { type: String, index: true, unique: true },
-        size_top: String,
-        size_bottom: String,
+        size_top: { type: String, enum: ["XS", "S", "M", "L", "XL", "XXL", "XXXL"] },
+        size_bottom: { type: String, enum: ["XS", "S", "M", "L", "XL", "XXL", "XXXL"] },
         extra_info: String
     });
 
