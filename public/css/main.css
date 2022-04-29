@@ -866,6 +866,11 @@ article.preview .read-more-link {
     background-color: white;
 }
 
+#fx-select {
+    color: black;
+    max-width: 300px;
+}
+
 @media (min-width: 576px) {
     .product-thumb .name {
         text-overflow: ellipsis;

@@ -7,14 +7,14 @@ const { each } = require('async');
 const { isAuthed } = require('../config/config');
 const { Product } = require('../models/models');
 const MailTransporter = require('../config/MailTransporter');
-const curr_symbols = require('../config/currSymbols');
+const currencies = require('../config/currencies');
 const production = NODE_ENV === "production";
 const axiosRequestUri = `https://v6.exchangerate-api.com/v6/${EXCHANGERATE_API_KEY}/latest/GBP`;
 
 router.get("/", async (req, res) => {
     const products = await Product.find();
     const rates = req.session.rates = req.session.rates || (await axios.get(axiosRequestUri)).data.conversion_rates;
-    res.render('shop', { title: "Shop", pagename: "shop", products, curr_symbols, rates })
+    res.render('shop', { title: "Shop", pagename: "shop", products, currencies, rates })
 });
 
 router.get("/checkout", (req, res) => {
@@ -27,13 +27,16 @@ router.get("/cart", (req, res) => {
 });
 
 router.post("/fx", async (req, res) => {
+    const currency = currencies.find(c => c.code === req.body.currency_code?.toUpperCase());
+    if (!currency) return res.status(400).send("Unable to convert to this currency at this time");
+    const { symbol, name, code } = currency;
     const rates = req.session.rates = req.session.rates || (await axios.get(axiosRequestUri)).data.conversion_rates;
-    const rate = rates[req.body.currency];
-    const symbol = curr_symbols[req.body.currency];
-    const currency = req.session.currency = req.body.currency.toLowerCase();
+    const rate = rates[code];
+    const currency_code = req.session.currency_code = code.toLowerCase();
     req.session.fx_rate = rate;
-    req.session.currency_symbol = symbol || currency.toUpperCase();
-    res.send({ rate, symbol, currency });
+    req.session.currency_symbol = symbol || currency_code.toUpperCase();
+    req.session.currency_name = name;
+    res.send({ rate, symbol, currency_code });
 });
 
 router.post("/stock/add", isAuthed, async (req, res) => {
@@ -206,7 +209,7 @@ router.post("/checkout/payment/complete", async (req, res) => {
             `- Address:\n\t${line1},${line2 ? "\n\t"+line2+"," : ""}\n\t${city}, ${country},` + (state ? ` ${state},` : "") + `\n\t${postal_code}\n\n` +
             `- Date of purchase: ${Date(pi.created * 1000)}\n\n` +
             `- Total amount: £ ${pi.amount / 100}` +
-            (req.session.currency !== "gbp" ? ` (${req.session.currency_symbol || req.session.currency.toUpperCase()} ${req.session.converted_price(price_total).toFixed(2)})` : "") +
+            (req.session.currency_code !== "gbp" ? ` (${req.session.currency_symbol || req.session.currency_code.toUpperCase()} ${req.session.converted_price(price_total).toFixed(2)})` : "") +
             `\n\nAnd finally, a copy of their receipt:\n${pi.charges.data[0].receipt_url}`;
             transporter.setRecipient({ email: "info@thecs.co" }).sendMail({ subject, message }, err => {
                 if (err) { console.error(err); if (res.statusCode !== 500) res.status(500) }

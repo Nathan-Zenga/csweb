@@ -55,10 +55,9 @@ module.exports.saveMedia = async (body, doc, cb) => {
     const fields = ["headline_images", "textbody_media"].filter(f => body[f]);
     const savedMedia = { headline_images: [], textbody_media: [] };
     const saved_p_ids = [];
-    const warning = "Article document not valid";
-    if (!(doc instanceof Doc)) { if (!cb) throw TypeError(warning); return cb(TypeError(warning)) };
-    if (!fields.length) return cb ? cb() : null;
     try {
+        if (!(doc instanceof Doc)) throw TypeError("Article document not valid");
+        if (!fields.length) return cb ? cb() : null;
         await each(fields, (field, callback1) => {
             body[field] = Array.isArray(body[field]) ? body[field] : [body[field]];
             savedMedia[field].push(...body[field]);
