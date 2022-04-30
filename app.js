@@ -55,6 +55,7 @@ app.use(async (req, res, next) => {
     res.locals.currency_code = req.session.currency_code = req.session.currency_code || "gbp";
     res.locals.currency_symbol = req.session.currency_symbol = req.session.currency_symbol || "£";
     res.locals.converted_price = req.session.converted_price = price => parseFloat(price / 100) * req.session.fx_rate;
+    res.locals.platforms = ["Twitter", "Instagram", "Facebook", "Spotify", "SoundCloud", "YouTube", "Apple Music", "Tidal", "Bandcamp", "Deezer", "Google Play", "Linktree"];
     if (!req.session.paymentIntentID) return next();
     try {
         const pi = await Stripe.paymentIntents.retrieve(req.session.paymentIntentID);

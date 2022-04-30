@@ -30,7 +30,7 @@
             <div class="col-sm-4 float-left">
                 <select name="link_name" class="link-name">
                     <option value="">Choose link name</option>
-                    <%_ ["Twitter", "Instagram", "Facebook", "Spotify", "SoundCloud", "Apple Music", "Tidal", "Bandcamp", "Deezer", "Google Play", "Linktree"].forEach(social => { _%>
+                    <%_ platforms.forEach(social => { _%>
                     <option value="<%= social.toLowerCase().replace(/[ _]/g, '') %>"><%= social %></option>
                     <%_ }) _%>
                 </select>

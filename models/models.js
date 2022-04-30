@@ -1,4 +1,5 @@
 const { model, Schema } = require('mongoose');
+const platforms = ["Twitter", "Instagram", "Facebook", "Spotify", "SoundCloud", "YouTube", "Apple Music", "Tidal", "Bandcamp", "Deezer", "Google Play", "Linktree"].map(p => p.toLowerCase().replace(/[ _]/g, ''));
 Schema.Types.String.set('trim', true);
 
 module.exports.Article = model('Article', (() => {
@@ -27,14 +28,14 @@ module.exports.Project = model('Project', new Schema({
     artist: String,
     year: Number,
     artwork: String,
-    links: [{ name: String, url: String }],
+    links: [{ name: { type: String, enum: platforms }, url: String }],
     all_platforms: { type: Boolean, default: false }
 }));
 
 module.exports.Artist = model('Artist', new Schema({
     name: String,
     bio: String,
-    socials: [{ name: String, url: String }],
+    socials: [{ name: { type: String, enum: platforms }, url: String }],
     profile_image: String
 }));
 
@@ -66,7 +67,7 @@ module.exports.Homepage_content = model('Homepage_content', new Schema({
     banner_text: String,
     banner_media: [String],
     footnote_text: String,
-    socials: [{ name: String, url: String }]
+    socials: [{ name: { type: String, enum: platforms }, url: String }]
 }));
 
 module.exports.Homepage_image = model('Homepage_image', new Schema({
