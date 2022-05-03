@@ -39,7 +39,7 @@ router.post('/article/delete', isAuthed, async (req, res) => {
         const { deletedCount } = await Article.deleteMany({_id : { $in: ids }});
         if (!deletedCount) return res.status(404).send("Article(s) not found");
         await Promise.all(ids.map(id => cloud.api.delete_resources_by_prefix(`article/${id}`)));
-        const articles = await Article.find().sort({index: 1}).exec();
+        const articles = await Article.find().sort({ index: 1 }).exec();
         await Promise.all(articles.map((a, i) => { a.index = i+1; return a.save() }));
         res.send(`Article${ids.length > 1 ? "s" : ""} deleted successfully`)
     } catch (err) { res.status(err.http_code || 500).send(err.message) }

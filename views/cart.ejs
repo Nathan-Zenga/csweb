@@ -35,9 +35,11 @@
             </div>
             <br><br>
             <div style="text-align: center; font-weight: bold">
-                <%_ var price_total = !cart.length ? 0 : cart.map(itm => itm.price * itm.qty).reduce((t, p) => t + p) _%>
+                <%_ var price_total = cart.map(itm => itm.price * itm.qty).reduce((t, p) => t + p, 0); _%>
                 <p id="price-total">Total: <%- currency_symbol %> <span><%- converted_price(price_total).toFixed(2).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") %></span></p>
-                <%- !cart.length ? '' : '<p id="checkout-link"><a href="/shop/checkout"><button>PROCEED TO CHECKOUT</button></a></p>' %>
+                <%_ if (price_total) { _%>
+                <p id="checkout-link"><a href="/shop/checkout"><button>PROCEED TO CHECKOUT</button></a></p>
+                <%_ } _%>
             </div>
         </div>
     </div>
@@ -62,7 +64,7 @@
                 if (!r.quantity) $(form).closest(".cart-item").hide(function() { $(this).remove() });
                 if (r.cart_empty) $("#checkout-link").hide(function() { $(this).remove() });
                 if (r.cart_empty) $("#cart-icon").removeClass("visible");
-                $("#price-total span").text(r.total.toFixed(2).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
+                $("#price-total span").text(r.total);
             }).fail(function(err) {
                 alert(err.responseText);
             }).always(function() {

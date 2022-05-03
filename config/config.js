@@ -11,13 +11,13 @@ const { each, forEachOf } = require('async');
 module.exports.Collections = async cb => {
     const docs = {};
     docs.articles = await Article.find().sort({ index: 1 }).exec();
-    docs.artists = await Artist.find();
+    docs.artists = await Artist.find().sort({ name: 1 });
     docs.projects = await Project.find().sort({ year: -1 }).exec();
-    docs.locations = await Location.find();
+    docs.locations = await Location.find().sort({ country: 1, city: 1, name: 1 });
     docs.members = await MailingList.find().sort({ lastname: 1 }).exec();
     docs.homepage_contents = await Homepage_content.find();
     docs.homepage_images = await Homepage_image.find().sort({ index: 1 }).exec();
-    docs.products = await Product.find();
+    docs.products = await Product.find().sort({ name: 1 });
     if (!cb) return docs; cb(docs);
 };
 
@@ -33,8 +33,8 @@ module.exports.Collections = async cb => {
 module.exports.indexReorder = async (collection, args, cb) => {
     try {
         const { id, newIndex, sort } = args;
-        if (sort) sort = Object.assign({index: 1}, sort);
-        const docs = await collection.find().sort(sort || {index: 1}).exec();
+        if (sort) sort = Object.assign({ index: 1 }, sort);
+        const docs = await collection.find().sort(sort || { index: 1 }).exec();
         const index = docs.findIndex(e => e._id == id);
         const beforeSelectedDoc = docs.slice(0, index);
         const afterSelectedDoc = docs.slice(index+1, docs.length);

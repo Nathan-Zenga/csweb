@@ -5,17 +5,13 @@
             <h1>STOCKING UP<br>MERCH COMING SOON</h1>
         </div>
         <%_ } else { _%>
-        <div style="text-align: right; font-weight: 600">
-            <label for="fx-select" class="sr-only">Select Currency</label>
-            <select id="fx-select" name="currency">
-                <option value="<%= currency_code.toUpperCase() %>"><%- currency_name + (currency_symbol !== currency_code ? ` - ${currency_symbol}` : "") %></option>
-                <%_ currencies.sort((a,b) => a.name.localeCompare(b.name)).forEach(curr => {
-                    if (curr.code !== currency_code.toUpperCase() && rates[curr.code]) { _%>
-                <option value="<%= curr.code %>"><%= curr.name + (curr.symbol ? ` - ${curr.symbol}` : "") %></option>
-                <%_ }}) _%>
-            </select>
-            <i class="fas fa-chevron-down" id="dropdown-toggle"></i>
-        </div>
+        <select class="custom-select" id="fx-select" name="currency_code">
+            <option value="<%= currency_code.toUpperCase() %>"><%- currency_name + (currency_symbol && currency_symbol !== currency_code ? ` - ${currency_symbol}` : "") %></option>
+            <%_ currencies.sort((a,b) => a.name.localeCompare(b.name)).forEach(curr => {
+                if (curr.code !== currency_code.toUpperCase() && rates[curr.code]) { _%>
+            <option value="<%= curr.code %>"><%= curr.name + (curr.symbol ? ` - ${curr.symbol}` : "") %></option>
+            <%_ }}) _%>
+        </select>
 
         <div class="row">
             <%_ products.forEach(item => { var soldOut = item.stock_qty < 1; _%>
@@ -27,7 +23,7 @@
                     </div>
                     <div class="text">
                         <p class="price" data-gbp-price="<%= (item.price / 100).toFixed(2) %>">
-                            <span><%- (currency_symbol || currency_code).toUpperCase() %></span>
+                            <span><%- currency_symbol || currency_code %></span>
                             <span><%= converted_price(item.price).toFixed(2).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","); %></span>
                         </p>
                         <div class="description">
@@ -68,8 +64,6 @@
             })
         });
 
-        const prices = $(".product-thumb .price").map(function() { return parseFloat($(this).data("gbp-price")) });
-        Object.freeze(prices);
         $("#fx-select").change(function() {
             $.post("/shop/fx", { currency_code: this.value }, function(res) {
                 $(".product-thumb .price").fadeTo(0, .5);
@@ -77,7 +71,7 @@
                     setTimeout(function() {
                         $(".product-thumb .price").fadeTo(500, 1).each(function(i, e) {
                             $(e).find("span").eq(0).text(res.symbol || res.currency_code.toUpperCase());
-                            $(e).find("span").eq(1).text((prices[i] * res.rate).toFixed(2).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
+                            $(e).find("span").eq(1).text(res.converted_prices[i]);
                         });
                     }, 200);
                 });

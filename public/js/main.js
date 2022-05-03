@@ -1,18 +1,18 @@
 $(function() {
-    function submitBtnController(form) {
-        var $submitBtn = this.submitBtn = $(form).find("input[type=submit]").attr("disabled", true);
-        this.originalVal = this.submitBtn.val();
-        var progressVal = this.submitBtn.val("SUBMITTING").val();
+    window.submitBtnController = function(form, progressMsg) {
+        var $submitBtn = this.submitBtn = $(form).find("[type=submit]").attr("disabled", true);
+        var method = this.method = this.submitBtn.is(":button") ? "html" : "val";
+        this.originalVal = this.submitBtn[method]();
+        var progressVal = this.submitBtn[method](progressMsg || "SUBMITTING")[method]();
         this.interval = setInterval(function() {
-            var val = $submitBtn.val(), ellipsis = $submitBtn.val().includes("...");
-            $submitBtn.val(ellipsis ? progressVal : val + ".");
+            var val = $submitBtn[method](), ellipsis = $submitBtn[method]().includes("...");
+            $submitBtn[method](ellipsis ? progressVal : val + ".");
         }, 500);
     };
     submitBtnController.prototype.finish = function() {
         clearInterval(this.interval);
-        this.submitBtn.val(this.originalVal).attr("disabled", false);
+        this.submitBtn[this.method](this.originalVal).attr("disabled", false);
     };
-    window.submitBtnController = submitBtnController;
 
     var state, homepage = location.pathname === "/";
     $(window).on("load scroll", function() {

@@ -52,7 +52,7 @@ app.use(async (req, res, next) => {
     res.locals.cart = req.session.cart = req.session.cart || [];
     res.locals.fx_rate = req.session.fx_rate = req.session.fx_rate || 1;
     res.locals.currency_name = req.session.currency_name = req.session.currency_name || currencies.find(c => c.code === "GBP").name;
-    res.locals.currency_code = req.session.currency_code = req.session.currency_code || "gbp";
+    res.locals.currency_code = req.session.currency_code = req.session.currency_code || "GBP";
     res.locals.currency_symbol = req.session.currency_symbol = req.session.currency_symbol || "£";
     res.locals.converted_price = req.session.converted_price = price => parseFloat(price / 100) * req.session.fx_rate;
     res.locals.platforms = ["Twitter", "Instagram", "Facebook", "Spotify", "SoundCloud", "YouTube", "Apple Music", "Tidal", "Bandcamp", "Deezer", "Google Play", "Linktree"];
@@ -61,7 +61,7 @@ app.use(async (req, res, next) => {
         const pi = await Stripe.paymentIntents.retrieve(req.session.paymentIntentID);
         if (!pi || pi.status !== "succeeded") req.session.paymentIntentID = undefined; // id used in payment completion request if true
         if (!pi || pi.status === "succeeded") return next();
-        await Stripe.paymentIntents.cancel(pi.id, { cancellation_reason: "requested_by_customer" });
+        await Stripe.invoices.voidInvoice(pi.invoice);
         next();
     } catch (err) { console.error(err.message); next() }
 });

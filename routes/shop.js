@@ -10,6 +10,7 @@ const MailTransporter = require('../config/MailTransporter');
 const currencies = require('../config/currencies');
 const production = NODE_ENV === "production";
 const axiosRequestUri = `https://v6.exchangerate-api.com/v6/${EXCHANGERATE_API_KEY}/latest/GBP`;
+const number_separator_regx = /\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g;
 
 router.get("/", async (req, res) => {
     const products = await Product.find();
@@ -29,14 +30,13 @@ router.get("/cart", (req, res) => {
 router.post("/fx", async (req, res) => {
     const currency = currencies.find(c => c.code === req.body.currency_code?.toUpperCase());
     if (!currency) return res.status(400).send("Unable to convert to this currency at this time");
-    const { symbol, name, code } = currency;
     const rates = req.session.rates = req.session.rates || (await axios.get(axiosRequestUri)).data.conversion_rates;
-    const rate = rates[code];
-    const currency_code = req.session.currency_code = code.toLowerCase();
-    req.session.fx_rate = rate;
-    req.session.currency_symbol = symbol || currency_code.toUpperCase();
-    req.session.currency_name = name;
-    res.send({ rate, symbol, currency_code });
+    const rate = req.session.fx_rate = rates[currency.code];
+    const symbol = req.session.currency_symbol = currency.symbol || currency.code;
+    const currency_code = req.session.currency_code = currency.code;
+    const converted_prices = (await Product.find()).map(p => ((p.price * rate)/100).toFixed(2).replace(number_separator_regx, ","));
+    req.session.currency_name = currency.name;
+    res.send({ symbol, currency_code, converted_prices });
 });
 
 router.post("/stock/add", isAuthed, async (req, res) => {
@@ -117,8 +117,9 @@ router.post("/cart/remove", (req, res) => {
     const cartItemIndex = req.session.cart.findIndex(item => item.id === req.body.id);
     if (cartItemIndex === -1) return res.status(400).send("The selected item is not found in your cart");
     req.session.cart.splice(cartItemIndex, 1);
-    const total = req.session.cart.length ? req.session.cart.map(itm => itm.price * itm.qty).reduce((t, p) => t + p) : 0;
-    res.send({ total: req.session.converted_price(total), quantity: 0, cart_empty: !total });
+    var total = req.session.cart.map(itm => itm.price * itm.qty).reduce((t, p) => t + p, 0);
+    total = req.session.converted_price(total).toFixed(2).replace(number_separator_regx, ",");
+    res.send({ total, quantity: 0, cart_empty: !req.session.cart.length });
 });
 
 router.post("/cart/increment", (req, res) => {
@@ -130,8 +131,9 @@ router.post("/cart/increment", (req, res) => {
     const underMin = newQuantity < 1;
     const overMax = newQuantity > currentItem.stock_qty;
     currentItem.qty = underMin ? 1 : overMax ? currentItem.stock_qty : newQuantity;
-    const total = req.session.cart.map(itm => itm.price * itm.qty).reduce((t, p) => t + p);
-    res.send({ total: req.session.converted_price(total), quantity: currentItem.qty });
+    var total = req.session.cart.map(itm => itm.price * itm.qty).reduce((t, p) => t + p);
+    total = req.session.converted_price(total).toFixed(2).replace(number_separator_regx, ",");
+    res.send({ total, quantity: currentItem.qty });
 });
 
 router.post("/checkout/payment/create", async (req, res) => {
