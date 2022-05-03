@@ -36,11 +36,11 @@
     <label for="footnote_text">FOOTNOTE TEXT / QUOTE</label>
     <input type="text" name="footnote_text" id="footnote_text" value="<%= homepage_contents[0] ? homepage_contents[0].footnote_text : '' %>">
 
-    <label>CS SOCIALS <i class="fas fa-chevron-down"></i></label>
+    <label>CS SOCIALS</label>
     <div class="social-media-input-group">
         <div class="social-media-input input-item row">
             <div class="col-sm-4 float-left">
-                <select name="socials_name" class="socials-name">
+                <select class="custom-select socials-name" name="socials_name">
                     <option value="">Choose social</option>
                     <%_ ["Twitter", "Instagram", "Facebook", "Spotify", "YouTube", "SoundCloud", "Apple Music", "Tidal", "Bandcamp", "Deezer", "Google Play"].forEach(social => { _%>
                     <option value="<%= social.toLowerCase().replace(/ /g, '_') %>"><%= social %></option>

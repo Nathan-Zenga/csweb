@@ -24,11 +24,11 @@
     <%_ var thisYear = new Date().getFullYear(); _%>
     <input type="number" name="year" id="year" min="2000" max="<%= thisYear %>" value="<%= thisYear %>" required>
 
-    <label>LINKS (OPTIONAL) <i class="fas fa-chevron-down"></i></label>
+    <label>LINKS (OPTIONAL)</label>
     <div class="link-item-group">
         <div class="link-item input-item row">
             <div class="col-sm-4 float-left">
-                <select name="link_name" class="link-name">
+                <select class="custom-select link-name" name="link_name">
                     <option value="">Choose link name</option>
                     <%_ platforms.forEach(social => { _%>
                     <option value="<%= social.toLowerCase().replace(/[ _]/g, '') %>"><%= social %></option>

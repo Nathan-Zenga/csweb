@@ -20,11 +20,11 @@
         </div>
     </div>
 
-    <label>SOCIAL MEDIA LINKS <i class="fas fa-chevron-down"></i></label>
+    <label>SOCIAL MEDIA LINKS</label>
     <div class="social-media-input-group">
         <div class="social-media-input input-item row">
             <div class="col-sm-4 float-left">
-                <select name="social_media_name" class="social-media-name">
+                <select class="custom-select social-media-name" name="social_media_name">
                     <option value="">Choose social</option>
                     <%_ platforms.forEach(social => { _%>
                     <option value="<%= social.toLowerCase().replace(/[ _]/g, '') %>"><%= social %></option>

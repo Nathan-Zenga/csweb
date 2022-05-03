@@ -1,8 +1,8 @@
 <div class="row">
     <div class="col-md-3 float-left sidebar" id="edit-sidebar">
         <div class="mb-view-md section-dropdown-options">
-            <label>SELECT OPTION <i class="fas fa-chevron-down"></i></label>
-            <select>
+            <label>SELECT OPTION</label>
+            <select class="custom-select">
                 <option value="#edit-artist">ARTIST</option>
                 <option value="#edit-article">ARTICLE</option>
                 <option value="#reorder-article">REORDER ARTICLE</option>
@@ -29,8 +29,8 @@
 
             <div id="edit-artist" class="tab-pane fade show active">
                 <form method="post" action="/team/edit">
-                    <label>CHOOSE ARTIST <i class="fas fa-chevron-down"></i></label>
-                    <select name="artist_id" id="artist_id" required>
+                    <label>CHOOSE ARTIST</label>
+                    <select class="custom-select" name="artist_id" id="artist_id" required>
                         <option value="">-</option>
                         <%_ artists.forEach(artist => { _%>
                         <option value="<%= artist._id %>"><%= artist.name %></option>
@@ -60,7 +60,7 @@
                     <div class="social-media-input-group">
                         <div class="social-media-input input-item row">
                             <div class="col-sm-4 float-left">
-                                <select name="social_media_name" class="social-media-name edit">
+                                <select class="custom-select social-media-name edit" name="social_media_name">
                                     <option value="">Choose social</option>
                                     <%_ platforms.forEach(social => { _%>
                                     <option value="<%= social.toLowerCase().replace(/[ _]/g, '') %>"><%= social %></option>
@@ -82,8 +82,8 @@
 
             <div id="edit-article" class="tab-pane fade">
                 <form method="post" action="/news/article/edit">
-                    <label>CHOOSE ARTICLE <i class="fas fa-chevron-down"></i></label>
-                    <select name="article_id" id="article_id" required>
+                    <label>CHOOSE ARTICLE</label>
+                    <select class="custom-select" name="article_id" id="article_id" required>
                         <option value="">-</option>
                         <%_ articles.forEach(article => { _%>
                         <option value="<%= article._id %>"><%= article.headline %></option>
@@ -152,8 +152,8 @@
 
             <div id="edit-project" class="tab-pane fade">
                 <form action="/discography/project/edit">
-                    <label>CHOOSE PROJECT <i class="fas fa-chevron-down"></i></label>
-                    <select name="project_id" id="project_id" required>
+                    <label>CHOOSE PROJECT</label>
+                    <select class="custom-select" name="project_id" id="project_id" required>
                         <option value="">-</option>
                         <%_ projects.forEach(project => { _%>
                         <option value="<%= project._id %>"><%= project.title %></option>
@@ -184,7 +184,7 @@
                     <div class="link-item-group">
                         <div class="link-item input-item row">
                             <div class="col-sm-4 float-left">
-                                <select name="link_name" class="link-name">
+                                <select class="custom-select link-name" name="link_name">
                                     <option value="">Choose link name</option>
                                     <%_ platforms.forEach(social => { _%>
                                     <option value="<%= social.toLowerCase().replace(/[ _]/g, '') %>"><%= social %></option>
@@ -209,8 +209,8 @@
 
             <div id="edit-location" class="tab-pane fade">
                 <form method="post" action="/map/location/edit">
-                    <label>CHOOSE LOCATION <i class="fas fa-chevron-down"></i></label>
-                    <select name="location_id" id="location_id" required>
+                    <label>CHOOSE LOCATION</label>
+                    <select class="custom-select" name="location_id" id="location_id" required>
                         <option value="">-</option>
                         <%_ locations.forEach(location => { _%>
                         <option value="<%= location._id %>"><%= location.name +" - "+ location.city +", "+ location.country %></option>
@@ -238,8 +238,8 @@
 
             <div id="edit-member" class="tab-pane fade">
                 <form method="POST" action="/mailing-list/update">
-                    <label>CHOOSE MEMBER <i class="fas fa-chevron-down"></i></label>
-                    <select name="member_id" id="member_id">
+                    <label>CHOOSE MEMBER</label>
+                    <select class="custom-select" name="member_id" id="member_id">
                         <option value="">-</option>
                         <%_ members.forEach(member => { _%>
                         <option value="<%= member._id %>"><%= member.firstname + " " + member.lastname %></option>
@@ -261,7 +261,7 @@
                         <%_ var sizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"]; _%>
                         <div class="col-sm-6 float-left">
                             <label>SIZE (TOP)</label>
-                            <select name="size_top" id="size_top_edit" required>
+                            <select class="custom-select" name="size_top" id="size_top_edit" required>
                                 <option value="">Select size</option>
                                 <%_ sizes.forEach(size => { _%>
                                 <option value="<%= size %>"><%= size %></option>
@@ -270,7 +270,7 @@
                         </div>
                         <div class="col-sm-6 float-left">
                             <label>SIZE (BOTTOMS)</label>
-                            <select name="size_bottom" id="size_bottom_edit" required>
+                            <select class="custom-select" name="size_bottom" id="size_bottom_edit" required>
                                 <option value="">Select size</option>
                                 <%_ sizes.forEach(size => { _%>
                                 <option value="<%= size %>"><%= size %></option>
@@ -286,8 +286,8 @@
 
             <div id="edit-product" class="tab-pane fade">
                 <form method="post" action="/shop/stock/edit">
-                    <label>CHOOSE PRODUCT <i class="fas fa-chevron-down"></i></label>
-                    <select name="product_id" id="product_id">
+                    <label>CHOOSE PRODUCT</label>
+                    <select class="custom-select" name="product_id" id="product_id">
                         <option value="">-</option>
                         <%_ products.forEach(item => { _%>
                         <option value="<%= item._id %>"><%= item.name %></option>
