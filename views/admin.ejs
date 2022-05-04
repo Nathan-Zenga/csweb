@@ -72,7 +72,7 @@
                     media.src = result;
                 };
                 reader.readAsDataURL(file)
-            }, err => callback(err, urls));
+            }, function(err) { callback(err, urls) });
         };
         var showMessage = function(result) {
             var reload = confirm(result + "\n\nRefresh page?");
@@ -355,20 +355,20 @@
         });
 
         $(window).on("load", function() {
-            if (document.cookie) {
-                var cookies = document.cookie.split(/; ?/).map(function(cookie) {
-                    var keyvalue = cookie.split("=");
-                    return { [keyvalue[0]]: keyvalue[1] };
-                }).reduce(function(p, c) { return Object.assign(p, c) });
+            var cookies = !document.cookie ? null : document.cookie.split(/; ?/).map(function(cookie) {
+                var keyvalue = cookie.split("=");
+                return { [keyvalue[0]]: keyvalue[1] };
+            }).reduce(function(p, c) { return {...p, ...c} });
 
-                JSON.parse(cookies.active_tab_hrefs || "[]").forEach(function(href) {
-                    $(".nav.nav-pills a[href='"+ href +"']").click();
-                });
-            }
+            if (cookies) JSON.parse(cookies.active_tab_hrefs || "[]").every(function(href, i) {
+                if (/^val-/.test(href)) return setTimeout(function() { $(".section-dropdown-options select:visible").val(href.replace(/^val-/, "")).change() }, 200);
+                return $(".nav.nav-pills a[href='"+ href +"']").click();
+            });
 
-            $(".nav.nav-pills a").on("shown.bs.tab", function(e) {
+            $(".nav.nav-pills a").on("shown.bs.tab", function() {
                 var $a = $(".nav.nav-pills:visible a.active[data-toggle='pill']");
-                document.cookie = "active_tab_hrefs=" + JSON.stringify($a.map(function() { return $(this).attr("href") }).get()) + "; path="+ location.pathname +";";
+                $a = $(".section-dropdown-options select:visible").add($a);
+                document.cookie = "active_tab_hrefs=" + JSON.stringify($a.map(function() { return $(this).attr("href") || "val-"+$(this).val() }).get()) + "; path="+ location.pathname +";";
             });
         });
 
