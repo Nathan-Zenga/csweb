@@ -9,13 +9,11 @@ const { Product } = require('../models/models');
 const MailTransporter = require('../config/MailTransporter');
 const currencies = require('../config/currencies');
 const production = NODE_ENV === "production";
-const axiosRequestUri = `https://v6.exchangerate-api.com/v6/${EXCHANGERATE_API_KEY}/latest/GBP`;
 const number_separator_regx = /\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g;
 
 router.get("/", async (req, res) => {
     const products = await Product.find();
-    const rates = req.session.rates = req.session.rates || (await axios.get(axiosRequestUri)).data.conversion_rates;
-    res.render('shop', { title: "Shop", pagename: "shop", products, currencies, rates })
+    res.render('shop', { title: "Shop", pagename: "shop", products, currencies })
 });
 
 router.get("/checkout", (req, res) => {
@@ -29,12 +27,13 @@ router.get("/cart", (req, res) => {
 
 router.post("/fx", async (req, res) => {
     const currency = currencies.find(c => c.code === req.body.currency_code?.toUpperCase());
-    if (!currency) return res.status(400).send("Unable to convert to this currency at this time");
-    const rates = req.session.rates = req.session.rates || (await axios.get(axiosRequestUri)).data.conversion_rates;
-    const rate = req.session.fx_rate = rates[currency.code];
+    const url = `https://free.currconv.com/api/v7/convert?q=GBP_${currency?.code}&compact=ultra&apiKey=${EXCHANGERATE_API_KEY}`;
+    const rate = await axios.get(url).then(r => r.data[`GBP_${currency?.code}`]).catch(e => null);
+    if (!currency || !rate) return res.status(400).send("Unable to convert to this currency at this time\nPlease try again later");
     const symbol = req.session.currency_symbol = currency.symbol || currency.code;
     const currency_code = req.session.currency_code = currency.code;
     const converted_prices = (await Product.find()).map(p => ((p.price * rate)/100).toFixed(2).replace(number_separator_regx, ","));
+    req.session.fx_rate = rate;
     req.session.currency_name = currency.name;
     res.send({ symbol, currency_code, converted_prices });
 });
@@ -75,7 +74,7 @@ router.post('/stock/edit', isAuthed, async (req, res) => {
         await saved.save();
         for (const item of req.session.cart) if (item.id === saved.id) item.image = result.secure_url;
         res.send("Product details updated successfully");
-    } catch (err) { res.status(err.http_code || 500).send(err.message) }
+    } catch (err) { res.status(err.http_code || 400).send(err.message) }
 });
 
 router.post("/stock/remove", isAuthed, async (req, res) => {
@@ -169,8 +168,7 @@ router.post("/checkout/payment/create", async (req, res) => {
         })(req.session.cart);
 
         const invoice = await Stripe.invoices.create({ customer: customer.id, description: "CS Store Purchase Invoice" });
-        const invoice_final = await Stripe.invoices.finalizeInvoice(invoice.id);
-        const pi = await Stripe.paymentIntents.retrieve(invoice_final.payment_intent);
+        const { payment_intent: pi } = await Stripe.invoices.finalizeInvoice(invoice.id, { expand: ["payment_intent"] });
 
         req.session.paymentIntentID = pi.id;
         res.send({ clientSecret: pi.client_secret, pk: STRIPE_PK });
@@ -209,9 +207,9 @@ router.post("/checkout/payment/complete", async (req, res) => {
             const message = "You've received a new purchase from a new customer. Summary shown below\n\n" +
             `- Name: ${pi.customer.name}\n- Email: ${email}\n` +
             `- Address:\n\t${line1},${line2 ? "\n\t"+line2+"," : ""}\n\t${city}, ${country},` + (state ? ` ${state},` : "") + `\n\t${postal_code}\n\n` +
-            `- Date of purchase: ${Date(pi.created * 1000)}\n\n` +
-            `- Total amount: £ ${pi.amount / 100}` +
-            (req.session.currency_code !== "gbp" ? ` (${req.session.currency_symbol || req.session.currency_code.toUpperCase()} ${req.session.converted_price(price_total).toFixed(2)})` : "") +
+            `- Date of purchase: ${new Date().toDateString()}\n\n` +
+            `- Total amount: £ ${(pi.amount / 100).toFixed(2).replace(number_separator_regx, ",")}` +
+            (req.session.currency_code !== "GBP" ? ` (${req.session.currency_symbol} ${req.session.converted_price(price_total).toFixed(2).replace(number_separator_regx, ",")})` : "") +
             `\n\nAnd finally, a copy of their receipt:\n${pi.charges.data[0].receipt_url}`;
             transporter.setRecipient({ email: "info@thecs.co" }).sendMail({ subject, message }, err => {
                 if (err) { console.error(err); if (res.statusCode !== 500) res.status(500) }

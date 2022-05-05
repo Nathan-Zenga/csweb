@@ -5,13 +5,16 @@
             <h1>STOCKING UP<br>MERCH COMING SOON</h1>
         </div>
         <%_ } else { _%>
-        <select class="custom-select" id="fx-select" name="currency_code">
-            <option value="<%= currency_code.toUpperCase() %>"><%- currency_name + (currency_symbol && currency_symbol !== currency_code ? ` - ${currency_symbol}` : "") %></option>
-            <%_ currencies.sort((a,b) => a.name.localeCompare(b.name)).forEach(curr => {
-                if (curr.code !== currency_code.toUpperCase() && rates[curr.code]) { _%>
-            <option value="<%= curr.code %>"><%= curr.name + (curr.symbol ? ` - ${curr.symbol}` : "") %></option>
-            <%_ }}) _%>
-        </select>
+        <div id="fx-select-container">
+            <a id="fx-select-info" style="<%= currency_symbol === '£' ? 'display: none' : '' %>"><i class="fal fa-info-circle"></i></a>
+            <select class="custom-select" id="fx-select" name="currency_code">
+                <option value="<%= currency_code %>"><%- currency_name + (currency_symbol && currency_symbol !== currency_code ? ` - ${currency_symbol}` : "") %></option>
+                <%_ currencies.sort((a,b) => a.name.localeCompare(b.name)).forEach(curr => {
+                    if (curr.code !== currency_code) { _%>
+                <option value="<%= curr.code %>"><%= curr.name + (curr.symbol ? ` - ${curr.symbol}` : "") %></option>
+                <%_ }}) _%>
+            </select>
+        </div>
 
         <div class="row">
             <%_ products.forEach(item => { var soldOut = item.stock_qty < 1; _%>
@@ -67,10 +70,11 @@
         $("#fx-select").change(function() {
             $.post("/shop/fx", { currency_code: this.value }, function(res) {
                 $(".product-thumb .price").fadeTo(0, .5);
+                $("#fx-select-info").css("display", res.symbol === "£" ? "none" : "");
                 $("html, body").animate({ scrollTop: $(".product-thumb").length ? $(".product-thumb").eq(0).offset().top : undefined }, function() {
                     setTimeout(function() {
                         $(".product-thumb .price").fadeTo(500, 1).each(function(i, e) {
-                            $(e).find("span").eq(0).text(res.symbol || res.currency_code.toUpperCase());
+                            $(e).find("span").eq(0).text(res.symbol);
                             $(e).find("span").eq(1).text(res.converted_prices[i]);
                         });
                     }, 200);
@@ -91,6 +95,13 @@
                 var overflowing = span.width() > p.width();
                 $(elm).find(".expand-toggler").fadeTo(0, Number(overflowing));
             });
+        });
+
+        $("#fx-select-info").click(function() {
+            if ($(this).is(":hidden")) return;
+            alert("All converted prices are updated once per hour.\n\n"+
+            "So please be advised, your final payment charge may only slightly differ when you checkout, "+
+            "as currency exchange rates update more frequently in real-time.")
         });
     </script>
 <%- include ('partials/footer') -%>

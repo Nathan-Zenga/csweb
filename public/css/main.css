@@ -879,11 +879,22 @@ article.preview .read-more-link {
     background-color: white;
 }
 
+#fx-select-container {
+    text-align: right;
+}
+
+#fx-select-info {
+    display: inline-block;
+    margin-right: .75em;
+    font-size: 1.5em;
+    -webkit-transform: translateY(-3px);
+    transform: translateY(-3px);
+}
+
 #fx-select {
-    display: block;
     font-weight: 600;
     max-width: 300px;
-    margin: 0 0 1em auto;
+    margin-bottom: 1em;
 }
 
 @media (min-width: 576px) {
