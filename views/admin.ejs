@@ -355,12 +355,9 @@
         });
 
         $(window).on("load", function() {
-            var cookies = !document.cookie ? null : document.cookie.split(/; ?/).map(function(cookie) {
-                var keyvalue = cookie.split("=");
-                return { [keyvalue[0]]: keyvalue[1] };
-            }).reduce(function(p, c) { return {...p, ...c} });
+            var cookies = new URLSearchParams(document.cookie.replace(/;$/, "").replace(/; ?/g, "&"));
 
-            if (cookies) JSON.parse(cookies.active_tab_hrefs || "[]").every(function(href, i) {
+            JSON.parse(cookies.get("active_tab_hrefs") || "[]").every(function(href, i) {
                 if (/^val-/.test(href)) return setTimeout(function() { $(".section-dropdown-options select:visible").val(href.replace(/^val-/, "")).change() }, 200);
                 return $(".nav.nav-pills a[href='"+ href +"']").click();
             });
