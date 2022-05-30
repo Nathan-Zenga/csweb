@@ -11,7 +11,7 @@ router.get('/', async (req, res) => {
 router.get('/article/:title', async (req, res, next) => {
     const title = req.params.title.replace(/\-|\$/g, "\\W+");
     const a = await Article.findById(req.params.title).catch(e => null);
-    const article = a || await Article.findOne({ headline: RegExp(`^${title}(\\W+|_+)?$`, "i") });
+    const article = a || await Article.findOne({ headline: RegExp(`^(\\W+|_+)?${title}(\\W+|_+)?$`, "i") });
     if (!article) return next();
     const adjacent_articles = await Article.find({ $or: [{ index: article.index-1 }, { index: article.index+1 }] }).sort({ index: 1 });
     res.render('news-article', { title: article.headline_cropped() + " | News", pagename: "news-article", article, adjacent_articles })
@@ -19,8 +19,8 @@ router.get('/article/:title', async (req, res, next) => {
 
 router.post('/article/new', isAuthed, async (req, res) => {
     const { headline, textbody } = req.body;
-    const hl = headline.replace(/\W+/g, '-').replace(/\W+$/, '').replace(/\-|\$/g, "\\W+");
-    const existing = await Article.findOne({ headline: RegExp(`^${hl}(\\W+|_+)?$`, "i") });
+    const hl = headline.replace(/\W+/g, '-').replace(/^\W+|\W+$/, '').replace(/\-|\$/g, "\\W+");
+    const existing = await Article.findOne({ headline: RegExp(`^(\\W+|_+)?${hl}(\\W+|_+)?$`, "i") });
     if (existing) return res.status(400).send("This headline already exists for another article.");
     const article = new Article({ headline, textbody, index: 1 });
     const articles = await Article.find().sort({ index: 1, created_at: -1 }).exec();
@@ -47,8 +47,8 @@ router.post('/article/delete', isAuthed, async (req, res) => {
 
 router.post('/article/edit', isAuthed, async (req, res) => {
     const { article_id, headline, textbody, headline_image_thumb } = req.body;
-    const hl = headline.replace(/\W+/g, '-').replace(/\W+$/, '').replace(/\-|\$/g, "\\W+");
-    const existing = await Article.findOne({ headline: RegExp(`^${hl}(\\W+|_+)?$`, "i") });
+    const hl = headline.replace(/\W+/g, '-').replace(/^\W+|\W+$/, '').replace(/\-|\$/g, "\\W+");
+    const existing = await Article.findOne({ headline: RegExp(`^(\\W+|_+)?${hl}(\\W+|_+)?$`, "i") });
     if (existing && existing.id !== article_id) return res.status(400).send("This headline already exists for another article.");
     try {
         const article = await Article.findById(article_id);

@@ -13,7 +13,7 @@ module.exports.Article = model('Article', (() => {
     }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
 
     schema.virtual("link").get((val, vt, doc) => {
-        return `/news/article/${ doc.headline.split("").map(c => /\W/.test(c) && c != "$" ? "-" : c).join("").replace(/\-+/g, "-").replace(/\W+$/, '') }`.toLowerCase();
+        return `/news/article/${ doc.headline.split("").map(c => /\W/.test(c) && c != "$" ? "-" : c).join("").replace(/\-+/g, "-").replace(/^\W+|\W+$/, '') }`.toLowerCase();
     });
 
     schema.virtual("headline_cropped").get((val, vt, doc) => {
