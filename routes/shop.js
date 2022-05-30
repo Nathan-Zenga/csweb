@@ -91,8 +91,7 @@ router.post("/stock/remove", isAuthed, async (req, res) => {
         });
         res.send(`Product${ids.length > 1 ? "s" : ""} deleted from stock successfully`);
     } catch (err) {
-        const missing = err.message === "Product(s) not found";
-        res.status(missing ? 404 : 500).send(missing ? "Product(s) not found" : err.message);
+        res.status(err.message === "Product(s) not found" ? 404 : 500).send(err.message);
     }
 });
 

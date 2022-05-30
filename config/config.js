@@ -12,7 +12,7 @@ module.exports.Collections = async cb => {
     const docs = {};
     docs.articles = await Article.find().sort({ index: 1 }).exec();
     docs.artists = await Artist.find().sort({ name: 1 });
-    docs.projects = await Project.find().sort({ year: -1 }).exec();
+    docs.projects = await Project.find().sort({ year: -1, _id: -1 }).exec();
     docs.locations = await Location.find().sort({ country: 1, city: 1, name: 1 });
     docs.members = await MailingList.find().sort({ lastname: 1 }).exec();
     docs.homepage_contents = await Homepage_content.find();
