@@ -10,6 +10,7 @@ const MailTransporter = require('../config/MailTransporter');
 const currencies = require('../config/currencies');
 const production = NODE_ENV === "production";
 const number_separator_regx = /\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g;
+const countries = require("../config/country-list");
 
 router.get("/", async (req, res) => {
     const products = await Product.find();
@@ -18,7 +19,7 @@ router.get("/", async (req, res) => {
 
 router.get("/checkout", (req, res) => {
     if (!req.session.cart.length) return res.redirect(req.get("referrer"));
-    res.render('checkout', { title: "Checkout", pagename: "checkout" })
+    res.render('checkout', { title: "Checkout", pagename: "checkout", countries })
 });
 
 router.get("/cart", (req, res) => {
@@ -194,7 +195,7 @@ router.post("/checkout/payment/create", async (req, res) => {
         });
 
         req.session.checkout_session = session;
-        res.send({ id: session.id, pk: process.env.STRIPE_PK });
+        res.send({ id: session.id, pk: STRIPE_PK });
     } catch(err) { console.error(err.message); res.status(err.statusCode || 500).send(err.message) };
 });
 

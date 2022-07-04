@@ -29,7 +29,12 @@
 
                     <div class="col-sm-6 float-left">
                         <label for="country">COUNTRY</label>
-                        <input type="text" name="country" id="country" required>
+                        <select class="custom-select" id="country" name="country" required>
+                            <option value="">-</option>
+                            <%_ countries.forEach(c => { _%>
+                            <option value="<%- c.code %>"><%- c.name %></option>
+                            <%_ }) _%>
+                        </select>
                     </div>
 
                     <div class="col-sm-6 float-left">
