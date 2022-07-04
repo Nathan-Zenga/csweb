@@ -1,4 +1,4 @@
-const { Article, Project, Artist, Location, MailingList, Homepage_content, Homepage_image, Product } = require('../models/models');
+const { Article, Project, Artist, Location, MailingList, Homepage_content, Homepage_image, Product, Shipping_method } = require('../models/models');
 const { v2: cloud } = require('cloudinary');
 const { Model, Document: Doc } = require('mongoose');
 const { default: axios } = require('axios');
@@ -18,6 +18,7 @@ module.exports.Collections = async cb => {
     docs.homepage_contents = await Homepage_content.find();
     docs.homepage_images = await Homepage_image.find().sort({ index: 1 }).exec();
     docs.products = await Product.find().sort({ name: 1 });
+    docs.shipping_methods = await Shipping_method.find().sort({ fee: 1, name: 1 });
     if (!cb) return docs; cb(docs);
 };
 

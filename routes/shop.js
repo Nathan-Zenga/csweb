@@ -5,7 +5,7 @@ const { v2: cloud } = require('cloudinary');
 const { default: axios } = require('axios');
 const { each } = require('async');
 const { isAuthed } = require('../config/config');
-const { Product } = require('../models/models');
+const { Product, Shipping_method } = require('../models/models');
 const MailTransporter = require('../config/MailTransporter');
 const currencies = require('../config/currencies');
 const production = NODE_ENV === "production";
@@ -41,11 +41,10 @@ router.post("/fx", async (req, res) => {
 router.post("/stock/add", isAuthed, async (req, res) => {
     const { name, price, stock_qty, info, image_file, image_url } = req.body;
     try {
-        const product = await Product.create({ name, price, stock_qty, info });
-        if (!image_url && !image_file) return res.send("Product saved in stock");
+        const product = new Product({ name, price, stock_qty, info });
         const public_id = `shop/stock/${product.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
-        const result = await cloud.uploader.upload(image_url || image_file, { public_id });
-        product.image = result.secure_url;
+        const result = image_url || image_file ? await cloud.uploader.upload(image_url || image_file, { public_id }) : null;
+        if (result) product.image = result.secure_url;
         await product.save(); res.send("Product saved in stock");
     } catch (err) { res.status(err.http_code || 500).send(err.message) }
 });
@@ -135,53 +134,79 @@ router.post("/cart/increment", (req, res) => {
 });
 
 router.post("/checkout/payment/create", async (req, res) => {
-    const { firstname, lastname, email, address_l1, address_l2, city, country, state, postcode } = req.body;
-    const name = `${firstname} ${lastname}`;
-    const address = { line1: address_l1, line2: address_l2, city, country, state, postal_code: postcode };
-    if (!req.session.cart.length) return res.status(400).send("Unable to begin checkout - your basket is empty");
+    const { firstname, lastname, email, address_l1, address_l2, city, state, country, postcode } = req.body;
+    const { cart, location_origin } = Object.assign(req.session, res.locals);
+    const price_total = cart?.reduce((sum, p) => sum + (p.price * p.qty), 0);
+    if (isNaN(price_total)) return res.status(400).send("Unable to begin checkout - your basket is empty");
 
     try {
-        const customer = await Stripe.customers.create({ name, email, shipping: { name, address } });
+        const field_check = { firstname, lastname, email, "address line 1": address_l1, city, country, "post / zip code": postcode };
+        const missing_fields = Object.keys(field_check).filter(k => !field_check[k]);
+        const email_pattern = /^(?:[a-z0-9!#$%&'*+=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])$/i;
+        if (missing_fields.length) return res.status(400).send(`Missing fields: ${missing_fields.join(", ")}`);
+        if (!email_pattern.test(email)) return res.status(400).send("Invalid email format");
 
-        await (async function add_invoice_items(items) {
-            const item = items[0];
-            if (!item) return;
+        const customer = await Stripe.customers.create({
+            name: `${firstname} ${lastname}`,
+            email,
+            shipping: {
+                name: `${firstname} ${lastname}`,
+                address: { line1: address_l1, line2: address_l2, city, state, country, postal_code: postcode }
+            }
+        });
 
-            const product = await Stripe.products.create({
-                name: item.name,
-                images: item.image ? [item.image] : undefined
-            });
+        const domestic = /GB|IE/i.test(country);
+        const shipping_methods = await Shipping_method.find({ name: domestic ? /domestic|free|uk/i : /^((?!(domestic|free|uk)).)*$/i });
 
-            await Stripe.invoiceItems.create({
-                customer: customer.id,
+        const session = await Stripe.checkout.sessions.create({
+            payment_method_types: ["card"],
+            customer: customer.id,
+            payment_intent_data: { description: "CS Store Purchase" },
+            line_items: cart.map(item => ({
                 price_data: {
-                    product: product.id,
-                    unit_amount: item.price,
+                    product_data: { name: item.name, images: item.image ? [item.image.url] : undefined },
+                    unit_amount: parseInt(item.price),
                     currency: "gbp"
                 },
-                description: item.info || undefined,
+                description: item.items?.map(p => `${p.qty}x ${p.name}`).join(", ") || item.info || undefined,
                 quantity: item.qty
-            });
+            })),
+            shipping_options: shipping_methods.map(method => ({
+                shipping_rate_data: {
+                    type: "fixed_amount",
+                    fixed_amount: { amount: method.fee, currency: "gbp" },
+                    display_name: method.name,
+                    delivery_estimate: {
+                        minimum: {
+                            unit: method.delivery_estimate.minimum.unit.replace(/ /g, "_"),
+                            value: method.delivery_estimate.minimum.value
+                        },
+                        maximum: {
+                            unit: method.delivery_estimate.maximum.unit.replace(/ /g, "_"),
+                            value: method.delivery_estimate.maximum.value
+                        }
+                    }
+                }
+            })),
+            mode: "payment",
+            success_url: location_origin + "/shop/checkout/payment/complete",
+            cancel_url: location_origin + "/shop/checkout/payment/cancel"
+        });
 
-            await add_invoice_items(items.slice(1))
-        })(req.session.cart);
-
-        const invoice = await Stripe.invoices.create({ customer: customer.id, description: "CS Store Purchase Invoice" });
-        const { payment_intent: pi } = await Stripe.invoices.finalizeInvoice(invoice.id, { expand: ["payment_intent"] });
-
-        req.session.paymentIntentID = pi.id;
-        res.send({ clientSecret: pi.client_secret, pk: STRIPE_PK });
-    } catch (err) { res.status(err.statusCode || 500).send(err.message) }
+        req.session.checkout_session = session;
+        res.send({ id: session.id, pk: process.env.STRIPE_PK });
+    } catch(err) { console.error(err.message); res.status(err.statusCode || 500).send(err.message) };
 });
 
-router.post("/checkout/payment/complete", async (req, res) => {
-    if (!req.session.cart.length) return res.status(400).send("Unable to complete checkout - your basket is empty");
+router.get("/checkout/payment/complete", async (req, res) => {
+    if (!req.session.cart.length) return res.status(400).send("Unable to complete checkout - session expired");
     try {
-        const pi = await Stripe.paymentIntents.retrieve(req.session.paymentIntentID, { expand: ["customer"] });
+        const { customer, payment_intent: pi } = await Stripe.checkout.sessions.retrieve(req.session.checkout_session?.id, { expand: ["customer", "payment_intent"] });
+        if (pi.status !== "succeeded") return res.status(400).send(pi.status.replace(/_/g, " "));
+
         const products = await Product.find();
-        const price_total = req.session.cart.map(itm => itm.price * itm.qty).reduce((t, p) => t + p);
-        if (!pi) return res.status(404).send("Invalid payment session");
-        if (pi.status !== "succeeded") return res.status(500).send(pi.status.replace(/_/g, " "));
+        const price_total = req.session.cart.reduce((sum, p) => sum + (p.price * p.qty));
+
         if (production) await Promise.all(req.session.cart.map(item => {
             const product = products.find(p => p.id === item.id);
             if (!product) return null;
@@ -189,22 +214,22 @@ router.post("/checkout/payment/complete", async (req, res) => {
             if (product.stock_qty < 0) product.stock_qty = 0;
             return product.save();
         }));
-        req.session.cart = [];
-        req.session.paymentIntentID = undefined;
 
-        const { line1, line2, city, postal_code, state, country } = pi.customer.shipping.address;
+        req.session.cart = [];
+        req.session.checkout_session = undefined;
+
+        const { line1, line2, city, postal_code, state, country } = customer.shipping.address;
         const transporter = new MailTransporter();
-        const email = pi.receipt_email || pi.customer.email;
         const subject = "Purchase Nofication: Payment Successful";
-        const message = `Hi ${pi.customer.name},\n\n` +
-        `Your payment was successful. Please see below for your purchase receipt:\n\n` +
+        const message = `Hi ${customer.name},\n\n` +
+        "Your payment was successful. Please see below for your purchase receipt:\n\n" +
         `${pi.charges.data[0].receipt_url}\n\n` +
         "Thank you for shopping with us!\n\n- CS";
-        transporter.setRecipient({ email }).sendMail({ subject, message }, err => {
+        transporter.setRecipient({ email: session.customer.email }).sendMail({ subject, message }, err => {
             if (err) console.error(err), res.status(500);
             const subject = "Purchase Report: You Got Paid!";
             const message = "You've received a new purchase from a new customer. Summary shown below\n\n" +
-            `- Name: ${pi.customer.name}\n- Email: ${email}\n` +
+            `- Name: ${customer.name}\n- Email: ${session.customer.email}\n` +
             `- Address:\n\t${line1},${line2 ? "\n\t"+line2+"," : ""}\n\t${city}, ${country},` + (state ? ` ${state},` : "") + `\n\t${postal_code}\n\n` +
             `- Date of purchase: ${new Date().toDateString()}\n\n` +
             `- Total amount: £ ${(pi.amount / 100).toFixed(2).replace(number_separator_regx, ",")}` +
@@ -212,10 +237,14 @@ router.post("/checkout/payment/complete", async (req, res) => {
             `\n\nAnd finally, a copy of their receipt:\n${pi.charges.data[0].receipt_url}`;
             transporter.setRecipient({ email: "info@thecs.co" }).sendMail({ subject, message }, err => {
                 if (err) { console.error(err); if (res.statusCode !== 500) res.status(500) }
-                res.end();
+                res.render('checkout-success', { title: "Payment Successful", pagename: "checkout-success" })
             });
         });
     } catch(err) { res.status(err.statusCode || 500).send(err.message) }
+});
+
+router.get("/checkout/payment/cancel", (req, res) => {
+    res.render('checkout-cancel', { title: "Payment Cancelled", pagename: "checkout-cancel" });
 });
 
 module.exports = router;

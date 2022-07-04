@@ -106,3 +106,12 @@ module.exports.MailTest = model('MailTest', (() => {
     schema.virtual("newDay").get((val, vt, doc) => doc.last_sent_date.toDateString() != new Date().toDateString());
     return schema;
 })(), "mail_test");
+
+module.exports.Shipping_method = model('Shipping_method', new Schema({
+    name: { type: String, required: true },
+    delivery_estimate: {
+        minimum: { value: { type: Number, min: 1 }, unit: { type: String, enum: ["hour", "business day", "week", "month"] } },
+        maximum: { value: { type: Number, min: 1 }, unit: { type: String, enum: ["hour", "business day", "week", "month"] } }
+    },
+    fee: { type: Number, set: n => parseFloat(n) * 100, required: true }
+}));

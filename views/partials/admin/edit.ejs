@@ -10,6 +10,7 @@
                 <option value="#edit-location">LOCATION</option>
                 <option value="#edit-member">MEMBER</option>
                 <option value="#edit-product">SHOP PRODUCT</option>
+                <option value="#edit-shipping">SHIPPING</option>
                 <option value="#reorder-homepage-image">REORDER HOMEPAGE IMAGE</option>
             </select>
         </div>
@@ -21,6 +22,7 @@
             <a class="nav-link" data-toggle="pill" href="#edit-location">LOCATION</a>
             <a class="nav-link" data-toggle="pill" href="#edit-member">MEMBER</a>
             <a class="nav-link" data-toggle="pill" href="#edit-product">SHOP PRODUCT</a>
+            <a class="nav-link" data-toggle="pill" href="#edit-shipping">SHIPPING</a>
             <a class="nav-link" data-toggle="pill" href="#reorder-homepage-image">REORDER HOMEPAGE IMAGE</a>
         </div>
     </div>
@@ -325,6 +327,59 @@
                 </form>
             </div>
 
+            <div id="edit-shipping" class="tab-pane fade">
+                <form method="post" action="/shop/shipping/edit">
+                    <label>CHOOSE METHOD</label>
+                    <select class="custom-select" name="shipping_method_id" id="shipping_method_id">
+                        <option value="">-</option>
+                        <%_ shipping_methods.forEach(method => { _%>
+                        <option value="<%= method._id %>"><%= method.name %></option>
+                        <%_ }) _%>
+                    </select>
+
+                    <label>METHOD NAME</label>
+                    <input type="text" name="name" id="shipping_method_name_edit" required>
+
+                    <label>FEE (GBP £)</label>
+                    <input type="number" name="fee" id="shipping_fee_edit" min="0" step="0.01" required>
+
+                    <label>DELIVERY ESTIMATES</label>
+                    <fieldset class="delivery-estimates">
+                        <label>BETWEEN:</label>
+                        <div class="row">
+                            <div class="col">
+                                <input type="number" name="min_value" id="min_value_edit" min="1" value="5" required>
+                            </div>
+                            <div class="col">
+                                <select class="custom-select" name="min_unit" id="min_unit_edit" required>
+                                    <option value="hour">Hours</option>
+                                    <option value="business day">Business days</option>
+                                    <option value="week">Weeks</option>
+                                    <option value="month">Months</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <label>TO:</label>
+                        <div class="row">
+                            <div class="col">
+                                <input type="number" name="max_value" id="max_value_edit" min="1" value="7" required>
+                            </div>
+                            <div class="col">
+                                <select class="custom-select" name="max_unit" id="max_unit_edit" required>
+                                    <option value="hour">Hours</option>
+                                    <option value="business day">Business days</option>
+                                    <option value="week">Weeks</option>
+                                    <option value="month">Months</option>
+                                </select>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <input type="submit" value="SAVE">
+                </form>
+            </div>
+
             <div id="reorder-homepage-image" class="tab-pane fade">
                 <%_ if (homepage_images.length) { _%>
                 <form action="/homepage/image/reorder" method="post">
@@ -354,3 +409,7 @@
         </div>
     </div>
 </div>
+
+<script>
+    
+</script>

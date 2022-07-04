@@ -48,7 +48,7 @@ app.use(async (req, res, next) => {
     const contents = await Homepage_content.find();
     res.locals.user = req.user || null;
     res.locals.socials = contents[0]?.socials || [];
-    res.locals.location_origin = `https://${req.hostname}`;
+    res.locals.location_origin = production ? `https://${req.hostname}` : `http://localhost:${PORT}`;
     res.locals.cart = req.session.cart = req.session.cart || [];
     res.locals.fx_rate = req.session.fx_rate = req.session.fx_rate || 1;
     res.locals.currency_name = req.session.currency_name = req.session.currency_name || currencies.find(c => c.code === "GBP").name;
@@ -72,6 +72,7 @@ app.use('/news', require('./routes/news'));
 app.use('/team', require('./routes/artists'));
 app.use('/discography', require('./routes/discography'));
 app.use('/shop', require('./routes/shop'));
+app.use('/shop/shipping', require('./routes/shipping'));
 app.use('/mailing-list', require('./routes/mailing-list'));
 app.use('/map', require('./routes/map'));
 

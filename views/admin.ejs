@@ -8,6 +8,7 @@
             <a class="nav-link" data-toggle="pill" href="#locations">LOCATIONS</a>
             <a class="nav-link" data-toggle="pill" href="#mail">MAIL</a>
             <a class="nav-link" data-toggle="pill" href="#shop">SHOP</a>
+            <a class="nav-link" data-toggle="pill" href="#shipping">SHIPPING</a>
             <a class="nav-link" data-toggle="pill" href="#edit">EDIT</a>
             <a class="nav-link" data-toggle="pill" href="#remove">REMOVE</a>
         </div>
@@ -39,6 +40,10 @@
 
             <div id="shop" class="creation tab-pane fade">
             <%- include ('partials/admin/shop') -%>
+            </div>
+
+            <div id="shipping" class="creation tab-pane fade">
+            <%- include ('partials/admin/shipping') -%>
             </div>
 
             <div id="edit" class="tab-pane fade">
@@ -269,9 +274,16 @@
                 $form.find("#extra_info_edit").val(result.extra_info);
 
                 $form.find("#product_name_edit").val(result.name);
-                $form.find("#price_edit").val(parseFloat(result.price) / 100);
+                $form.find("#price_edit").val(!isNaN(result.price) ? parseFloat(result.price) / 100 : "");
                 $form.find("#stock_qty_edit").val(result.stock_qty);
                 $form.find("#product_info_edit").val(result.info);
+
+                $form.find("#shipping_method_name_edit").val(result.name);
+                $form.find("#shipping_fee_edit").val(!isNaN(result.fee) ? parseFloat(result.fee) / 100 : "");
+                $form.find("#min_value_edit").val(result.delivery_estimate ? result.delivery_estimate.minimum.value : "");
+                $form.find("#min_unit_edit").val(result.delivery_estimate ? result.delivery_estimate.minimum.unit : "");
+                $form.find("#max_value_edit").val(result.delivery_estimate ? result.delivery_estimate.maximum.value : "");
+                $form.find("#max_unit_edit").val(result.delivery_estimate ? result.delivery_estimate.maximum.unit : "");
             });
 
             $("#mail form #recipient_email").change(function() {

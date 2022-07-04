@@ -10,6 +10,7 @@
                 <option value="#remove-location">LOCATION</option>
                 <option value="#remove-member">MEMBER</option>
                 <option value="#remove-product">SHOP PRODUCT</option>
+                <option value="#remove-shipping">SHIPPING</option>
                 <option value="#remove-homepage-image">HOMEPAGE IMAGE</option>
             </select>
         </div>
@@ -21,6 +22,7 @@
             <a class="nav-link" data-toggle="pill" href="#remove-location">LOCATION</a>
             <a class="nav-link" data-toggle="pill" href="#remove-member">MEMBER</a>
             <a class="nav-link" data-toggle="pill" href="#remove-product">SHOP PRODUCT</a>
+            <a class="nav-link" data-toggle="pill" href="#remove-shipping">SHIPPING</a>
             <a class="nav-link" data-toggle="pill" href="#remove-homepage-image">HOMEPAGE IMAGE</a>
         </div>
     </div>
@@ -224,6 +226,34 @@
                 </form>
                 <%_ } else { _%>
                 <p style="text-align: center; margin-top: 2em"><b>NO SHOP PRODUCTS TO REMOVE</b></p>
+                <%_ } _%>
+            </div>
+
+            <div id="remove-shipping" class="tab-pane fade">
+                <%_ if (shipping_methods.length) { _%>
+                <form action="/shop/stock/remove" method="post">
+                    <label>DELETE SHIPPING METHODS(S)</label>
+                    <div class="input-group filter-search-container">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text"><i class="fas fa-search"></i></label>
+                        </div>
+                        <input type="search" class="form-control filter-search-input" placeholder="Search to filter">
+                    </div>
+                    <%_ shipping_methods.forEach((method, i) => { _%>
+                    <div class="input-group list-item">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="checkbox" id="<%= method._id %>" name="method<%= i %>" value="<%= method._id %>">
+                            </div>
+                        </div>
+                        <label class="form-control list-item-label" for="<%= method._id %>"><%- method.name %></label>
+                    </div>
+                    <%_ }) _%>
+                    <br>
+                    <input type="submit" value="DELETE SHIPPING METHODS">
+                </form>
+                <%_ } else { _%>
+                <p style="text-align: center; margin-top: 2em"><b>NO SHIPPING METHODS TO REMOVE</b></p>
                 <%_ } _%>
             </div>
 

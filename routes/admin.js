@@ -65,8 +65,8 @@ router.post("/activate/:token", async (req, res) => {
 });
 
 router.post("/search", isAuthed, async (req, res) => {
-    const { articles, artists, projects, locations, members, products } = await Collections();
-    res.send([...articles, ...artists, ...projects, ...locations, ...members, ...products]);
+    const { articles, artists, projects, locations, members, products, shipping_methods } = await Collections();
+    res.send([...articles, ...artists, ...projects, ...locations, ...members, ...products, ...shipping_methods]);
 });
 
 module.exports = router;
