@@ -10,7 +10,9 @@ router.get('/', async (req, res) => {
     res.render('index', { title: null, pagename: "home", content, media })
 });
 
-router.get('/events', (req, res, next) => { res.status(404); next() });
+router.get('/events', (req, res) => {
+    res.status(400).render('error', { title: "Error 404", pagename: "error", html: "<h1>PAGE IN CONSTRUCTION</h1>" });
+});
 
 router.post('/homepage/content', isAuthed, async (req, res) => {
     const { banner_text, footnote_text, socials_name, socials_url } = req.body;

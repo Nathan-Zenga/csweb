@@ -788,6 +788,10 @@ article.preview .read-more-link {
     background-position: center;
 }
 
+.thumb:hover .img {
+    background-size: contain;
+}
+
 .thumb .text {
     padding-left: 20px;
     padding-right: 20px;
@@ -1030,7 +1034,7 @@ body:not(#cart-page) #cart-icon.visible, #admin-page #mail-alert-box.visible {
         padding-top: 0;
         text-align: left;
     }
-    
+
     .cart-item .item-qty-control {
         margin-left: 0;
     }

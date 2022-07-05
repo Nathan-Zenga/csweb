@@ -56,13 +56,9 @@ app.use(async (req, res, next) => {
     res.locals.currency_symbol = req.session.currency_symbol = req.session.currency_symbol || "£";
     res.locals.converted_price = req.session.converted_price = price => parseFloat(price / 100) * req.session.fx_rate;
     res.locals.platforms = ["Twitter", "Instagram", "Facebook", "Spotify", "SoundCloud", "YouTube", "Apple Music", "Tidal", "Bandcamp", "Deezer", "Google Play", "Linktree"];
-    if (!req.session.paymentIntentID) return next();
     try {
-        const pi = await Stripe.paymentIntents.retrieve(req.session.paymentIntentID);
-        if (!pi || pi.status !== "succeeded") req.session.paymentIntentID = undefined; // id used in payment completion request if true
-        if (!pi || pi.status === "succeeded") return next();
-        await Stripe.invoices.voidInvoice(pi.invoice);
-        next();
+        req.session.checkout_session && await Stripe.checkout.sessions.expire(req.session.checkout_session.id);
+        req.session.checkout_session = undefined; next();
     } catch (err) { console.error(err.message); next() }
 });
 
@@ -77,8 +73,7 @@ app.use('/mailing-list', require('./routes/mailing-list'));
 app.use('/map', require('./routes/map'));
 
 app.get("*", (req, res) => {
-    const html = `<h1>PAGE ${res.statusCode === 404 ? "IN CONSTRUCTION" : "NOT FOUND"}</h1>`;
-    res.status(404).render('error', { title: "Error 404", pagename: "error", html });
+    res.status(404).render('error', { title: "Error 404", pagename: "error", html: "<h1>PAGE NOT FOUND</h1>" });
 });
 
 app.post("*", (req, res) => res.status(400).send("Sorry, your request currently cannot be processed"));

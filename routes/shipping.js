@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { isAuthed } = require('../config/config');
 const { Shipping_method } = require('../models/models');
-const delivery_est_units = ["hour", "business day", "week", "month"].join(",");
+const delivery_est_units = ["hour", "business day", "week", "month"];
 
 router.post("/add", async (req, res) => {
     const { name, fee, min_value, min_unit, max_value, max_unit } = req.body;
@@ -29,7 +29,7 @@ router.post('/edit', isAuthed, async (req, res) => {
         const min = delivery_est_units.indexOf(min_unit);
         const max = delivery_est_units.indexOf(max_unit);
         if (min > max) return res.status(400).send(`Minimum delivery estimate cannot be larger than the maximum`);
-    
+
         if (name) shipping.name = name;
         if (fee) shipping.fee = fee;
         if (min_value) shipping.delivery_estimate.minimum.value = min_value;

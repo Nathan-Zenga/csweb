@@ -137,8 +137,8 @@ router.post("/cart/increment", (req, res) => {
 router.post("/checkout/payment/create", async (req, res) => {
     const { firstname, lastname, email, address_l1, address_l2, city, state, country, postcode } = req.body;
     const { cart, location_origin } = Object.assign(req.session, res.locals);
-    const price_total = cart?.reduce((sum, p) => sum + (p.price * p.qty), 0);
-    if (isNaN(price_total)) return res.status(400).send("Unable to begin checkout - your basket is empty");
+    const price_total = cart.reduce((sum, p) => sum + (p.price * p.qty), 0);
+    if (!price_total) return res.status(400).send("Unable to begin checkout - your basket is empty");
 
     try {
         const field_check = { firstname, lastname, email, "address line 1": address_l1, city, country, "post / zip code": postcode };
@@ -165,11 +165,11 @@ router.post("/checkout/payment/create", async (req, res) => {
             payment_intent_data: { description: "CS Store Purchase" },
             line_items: cart.map(item => ({
                 price_data: {
-                    product_data: { name: item.name, images: item.image ? [item.image.url] : undefined },
+                    product_data: { name: item.name, images: item.image ? [item.image] : undefined },
                     unit_amount: parseInt(item.price),
                     currency: "gbp"
                 },
-                description: item.items?.map(p => `${p.qty}x ${p.name}`).join(", ") || item.info || undefined,
+                description: item.info || undefined,
                 quantity: item.qty
             })),
             shipping_options: shipping_methods.map(method => ({
@@ -226,11 +226,11 @@ router.get("/checkout/payment/complete", async (req, res) => {
         "Your payment was successful. Please see below for your purchase receipt:\n\n" +
         `${pi.charges.data[0].receipt_url}\n\n` +
         "Thank you for shopping with us!\n\n- CS";
-        transporter.setRecipient({ email: session.customer.email }).sendMail({ subject, message }, err => {
+        transporter.setRecipient({ email: customer.email }).sendMail({ subject, message }, err => {
             if (err) console.error(err), res.status(500);
             const subject = "Purchase Report: You Got Paid!";
             const message = "You've received a new purchase from a new customer. Summary shown below\n\n" +
-            `- Name: ${customer.name}\n- Email: ${session.customer.email}\n` +
+            `- Name: ${customer.name}\n- Email: ${customer.email}\n` +
             `- Address:\n\t${line1},${line2 ? "\n\t"+line2+"," : ""}\n\t${city}, ${country},` + (state ? ` ${state},` : "") + `\n\t${postal_code}\n\n` +
             `- Date of purchase: ${new Date().toDateString()}\n\n` +
             `- Total amount: £ ${(pi.amount / 100).toFixed(2).replace(number_separator_regx, ",")}` +
@@ -241,7 +241,7 @@ router.get("/checkout/payment/complete", async (req, res) => {
                 res.render('checkout-success', { title: "Payment Successful", pagename: "checkout-success" })
             });
         });
-    } catch(err) { res.status(err.statusCode || 500).send(err.message) }
+    } catch(err) { res.status(err.statusCode || 400).send(err.message) }
 });
 
 router.get("/checkout/payment/cancel", (req, res) => {
