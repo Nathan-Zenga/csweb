@@ -1,5 +1,4 @@
 <%- include ('partials/header') -%>
-    <%- include ('partials/stripe-checkout-css') -%>
     <div class="content-container" id="payment-form-container">
         <div class="content container">
             <form id="payment-details-form" action="/shop/checkout/payment/create">
@@ -58,8 +57,7 @@
             e.preventDefault();
             var btnControl = new submitBtnController(this, "REDIRECTING");
             $.post(this.action, $(this).serializeArray(), function(data) {
-                var stripe = Stripe(data.pk);
-                return stripe.redirectToCheckout({ sessionId: data.id });
+                return Stripe(data.pk).redirectToCheckout({ sessionId: data.id });
             }).then(function(result) {
                 if (result.error) { btnControl.finish(); alert(result.error.message); }
             }).fail(function(err, status, codeMessage) {

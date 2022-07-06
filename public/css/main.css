@@ -1100,3 +1100,7 @@ body:not(#cart-page) #cart-icon.visible, #admin-page #mail-alert-box.visible {
         padding-bottom: 20px;
     }
 }
+
+#payment-details-form {
+    padding: 40px 0;
+}
