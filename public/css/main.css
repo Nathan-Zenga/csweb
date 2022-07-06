@@ -788,10 +788,6 @@ article.preview .read-more-link {
     background-position: center;
 }
 
-.thumb:hover .img {
-    background-size: contain;
-}
-
 .thumb .text {
     padding-left: 20px;
     padding-right: 20px;
@@ -861,11 +857,23 @@ article.preview .read-more-link {
 }
 
 .product-thumb .img-wrapper {
+    position: relative;
+    border-radius: 7px;
     padding: 0;
+    overflow: hidden;
 }
 
-.product-thumb .img {
+.product-thumb .img img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    max-width: 100%;
+    max-height: 100%;
     border-radius: 7px;
+    -webkit-transition: .5s max-width, .5s max-height, .5s border-radius;
+    transition: .5s max-width, .5s max-height, .5s border-radius;
 }
 
 .product-thumb .name {

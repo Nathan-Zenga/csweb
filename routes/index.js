@@ -11,7 +11,7 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/events', (req, res) => {
-    res.status(400).render('error', { html: "<h1>PAGE IN CONSTRUCTION</h1>" });
+    res.status(400).render('error', { title: "(C)oming (S)oon", html: "<h1>PAGE IN CONSTRUCTION</h1>" });
 });
 
 router.post('/homepage/content', isAuthed, async (req, res) => {
