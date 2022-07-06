@@ -1,4 +1,4 @@
-<%- include ('partials/header') -%>
+<%- include ('partials/header', { title: "Artists", pagename: "artists" }) -%>
 <%_ artists.forEach((artist, i) => {
     var isEven = i % 2 == 0; _%>
     <div class="artist-bio content-container">

@@ -4,7 +4,7 @@ const { isAuthed } = require('../config/config');
 const apiKey = process.env.GEOCODER_API_KEY;
 const geocoder = require('node-geocoder')({ provider: 'google', httpAdapter: 'https', apiKey });
 
-router.get('/', (req, res) => res.render('map', { title: "Map", pagename: "map" }));
+router.get('/', (req, res) => res.render('map'));
 
 router.post('/init', async (req, res) => {
     const locations = await Location.find();

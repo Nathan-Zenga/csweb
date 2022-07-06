@@ -1,4 +1,4 @@
-<%- include ('partials/header') -%>
+<%- include ('partials/header', { title: "Admin Register", pagename: "admin" }) -%>
     <div class="content-container" style="padding: 2em 0;">
         <form method="post" action="/admin/activate/<%- token %>">
             <label>NEW PASSWORD</label>

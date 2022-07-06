@@ -5,7 +5,7 @@ const { isAuthed, saveMedia, indexReorder } = require('../config/config');
 
 router.get('/', async (req, res) => {
     const articles = await Article.find().sort({ index: 1 }).exec();
-    res.render('news', { title: "News", pagename: "news", articles })
+    res.render('news', { articles })
 });
 
 router.get('/article/:title', async (req, res, next) => {
@@ -14,7 +14,7 @@ router.get('/article/:title', async (req, res, next) => {
     const article = a || await Article.findOne({ headline: RegExp(`^(\\W+|_+)?${title}(\\W+|_+)?$`, "i") });
     if (!article) return next();
     const adjacent_articles = await Article.find({ $or: [{ index: article.index-1 }, { index: article.index+1 }] }).sort({ index: 1 });
-    res.render('news-article', { title: article.headline_cropped() + " | News", pagename: "news-article", article, adjacent_articles })
+    res.render('news-article', { title: article.headline_cropped() + " | News", article, adjacent_articles })
 });
 
 router.post('/article/new', isAuthed, async (req, res) => {

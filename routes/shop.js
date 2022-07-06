@@ -14,17 +14,15 @@ const countries = require("../config/country-list");
 
 router.get("/", async (req, res) => {
     const products = await Product.find();
-    res.render('shop', { title: "Shop", pagename: "shop", products, currencies })
+    res.render('shop', { products, currencies })
 });
 
 router.get("/checkout", (req, res) => {
     if (!req.session.cart.length) return res.redirect(req.get("referrer"));
-    res.render('checkout', { title: "Checkout", pagename: "checkout", countries })
+    res.render('checkout', { countries })
 });
 
-router.get("/cart", (req, res) => {
-    res.render('cart', { title: "Cart", pagename: "cart", cart: req.session.cart })
-});
+router.get("/cart", (req, res) => res.render('cart'));
 
 router.post("/fx", async (req, res) => {
     const currency = currencies.find(c => c.code === req.body.currency_code?.toUpperCase());
@@ -238,14 +236,12 @@ router.get("/checkout/payment/complete", async (req, res) => {
             `\n\nAnd finally, a copy of their receipt:\n${pi.charges.data[0].receipt_url}`;
             transporter.setRecipient({ email: "info@thecs.co" }).sendMail({ subject, message }, err => {
                 if (err) { console.error(err); if (res.statusCode !== 500) res.status(500) }
-                res.render('checkout-success', { title: "Payment Successful", pagename: "checkout-success" })
+                res.render('checkout-success')
             });
         });
     } catch(err) { res.status(err.statusCode || 400).send(err.message) }
 });
 
-router.get("/checkout/payment/cancel", (req, res) => {
-    res.render('checkout-cancel', { title: "Payment Cancelled", pagename: "checkout-cancel" });
-});
+router.get("/checkout/payment/cancel", (req, res) => res.render('checkout-cancel'));
 
 module.exports = router;

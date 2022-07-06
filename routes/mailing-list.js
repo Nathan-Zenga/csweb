@@ -5,7 +5,7 @@ const { default: axios } = require('axios');
 const { RECAPTCHA_SITE_KEY: recaptcha_site_key, RECAPTCHA_SECRET_KEY } = process.env;
 
 router.get('/sign-up', (req, res) => {
-    res.render('mailing-list', { title: "Sign Up", pagename: "sign-up", recaptcha_site_key })
+    res.render('mailing-list', { recaptcha_site_key })
 });
 
 router.get('/member/delete', async (req, res) => {

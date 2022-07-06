@@ -73,7 +73,7 @@ app.use('/mailing-list', require('./routes/mailing-list'));
 app.use('/map', require('./routes/map'));
 
 app.get("*", (req, res) => {
-    res.status(404).render('error', { title: "Error 404", pagename: "error", html: "<h1>PAGE NOT FOUND</h1>" });
+    res.status(404).render('error', { title: "Error 404", html: "<h1>PAGE NOT FOUND</h1>" });
 });
 
 app.post("*", (req, res) => res.status(400).send("Sorry, your request currently cannot be processed"));

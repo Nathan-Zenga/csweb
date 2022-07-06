@@ -6,18 +6,14 @@ const { Admin } = require('../models/models');
 const email = "info@thecs.co";
 const passport = require('../config/passport');
 
-router.get('/', isAuthed, (req, res) => {
-    Collections(db => res.render('admin', { title: "Admin", pagename: "admin", ...db }))
-});
+router.get('/', isAuthed, (req, res) => Collections(db => res.render('admin', { ...db })));
 
-router.get('/login', (req, res) => {
-    res.render('admin-login', { title: "Admin Login", pagename: "admin" })
-});
+router.get('/login', (req, res) => res.render('admin-login'));
 
 router.get('/activate/:token', async (req, res, next) => {
     const found = await Admin.findOne({ password: req.params.token, tokenExpiryDate: { $gte: Date.now() } });
     if (!found) return next();
-    res.render('admin-activate', { title: "Admin Register", pagename: "admin", token: found.password })
+    res.render('admin-activate', { token: found.password })
 });
 
 router.get('/logout', (req, res) => { req.logout(); res.redirect("/") });

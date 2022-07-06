@@ -7,11 +7,11 @@ const { Homepage_content, Homepage_image } = require('../models/models');
 router.get('/', async (req, res) => {
     const content = await Homepage_content.findOne();
     const media = await Homepage_image.find({ p_id: { $regex: /^homepage\/videos/ } }).sort({ index: 1 }).exec();
-    res.render('index', { title: null, pagename: "home", content, media })
+    res.render('index', { content, media })
 });
 
 router.get('/events', (req, res) => {
-    res.status(400).render('error', { title: "Error 404", pagename: "error", html: "<h1>PAGE IN CONSTRUCTION</h1>" });
+    res.status(400).render('error', { html: "<h1>PAGE IN CONSTRUCTION</h1>" });
 });
 
 router.post('/homepage/content', isAuthed, async (req, res) => {

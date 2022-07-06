@@ -5,7 +5,7 @@ const { isAuthed } = require('../config/config');
 
 router.get('/', async (req, res) => {
     const artists = await Artist.find();
-    res.render('artists', { title: "Artists", pagename: "artists", artists })
+    res.render('artists', { artists })
 });
 
 router.post('/new', isAuthed, async (req, res) => {

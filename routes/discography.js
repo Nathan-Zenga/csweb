@@ -5,7 +5,7 @@ const { isAuthed } = require('../config/config');
 
 router.get('/', async (req, res) => {
     const projects = await Project.find().sort({ year: -1, _id: -1 }).exec();
-    res.render('discography', { title: "Discography", pagename: "discography", projects })
+    res.render('discography', { projects })
 });
 
 router.post('/project/new', isAuthed, async (req, res) => {
