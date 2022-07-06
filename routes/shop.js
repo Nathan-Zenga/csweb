@@ -201,7 +201,7 @@ router.get("/checkout/payment/complete", async (req, res) => {
     if (!req.session.cart.length) return res.status(400).render('error', { html: "Unable to complete checkout - session expired" });
     try {
         const { customer, payment_intent: pi } = await Stripe.checkout.sessions.retrieve(req.session.checkout_session?.id, { expand: ["customer", "payment_intent"] });
-        if (pi.status !== "succeeded") return res.status(400).render('error', { html: `<p>${pi.status.replace(/_/g, " ")}</p>` });
+        if (pi.status !== "succeeded") return res.status(400).render('error', { html: `Payment status:<h2>${pi.status.replace(/_/g, " ").replace(/^./, m => m.toUpperCase())}</h2>` });
 
         const products = await Product.find();
         const price_total = req.session.cart.reduce((sum, p) => sum + (p.price * p.qty));

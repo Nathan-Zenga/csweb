@@ -2,9 +2,14 @@
     <head>
         <style>
             #mail-body {
-                font-family: 'Courier New', Arial, monospace, sans-serif;
+                font-family: Verdana, "Trebuchet MS", Arial, sans-serif;
                 font-size: 13px;
+                line-height: 1.5;
                 margin: 0;
+            }
+            #mail-body .social-icon {
+                -webkit-filter: invert(100%);
+                filter: invert(100%);
             }
             #logo {
                 text-align: center;
@@ -14,19 +19,15 @@
                 max-height: 70px;
             }
             .section {
-                padding-top: 30px;
-                padding-bottom: 30px;
+                padding-top: 50px;
+                padding-bottom: 50px;
             }
             .header, .footer {
-                background-color: grey;
+                background-color: rgb(110, 110, 110);
                 color: white;
             }
             .footer a + a {
                 margin-left: 10px;
-            }
-            #mail-body .social-icon {
-                -webkit-filter: invert(100%);
-                filter: invert(100%);
             }
         </style>
     </head>
@@ -39,7 +40,8 @@
             <%-
                 (function() {
                     var url_pattern = /(?:(?:https?|ftp|file|data):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$])/gi;
-                    return message.replace(/\r?\n/g, "<br>").replace(url_pattern, match => {
+                    message = message.replace(/\r?\n/g, "<br>").replace(/\t/g, "&nbsp;".repeat(5));
+                    return message.replace(url_pattern, match => {
                         var href = /^www/.test(match) || !/^(https?|ftp|file|data)/.test(match) ? "http://" + match : match;
                         return "<a style='color: inherit!important' target='_blank' href='"+ href +"'>" + match + "</a>"
                     });
@@ -47,13 +49,15 @@
             %>
         </div>
         <div class="footer section" style="text-align: center">
+            <%_ if (socials.length) { _%>
             <div class="row">
                 <%_ socials.forEach((link, i) => { _%>
                 <a style="color: inherit!important" target="_blank" href="<%= link.url %>"><img class="social-icon" style="height: 1.5em; max-height: 1.5em" src="cid:social_icon_<%= i %>" alt="<%= link.name %> link"></a>
                 <%_ }) _%>
             </div>
             <br>
-            <p style="font-size: .8em;">&copy; CS Records 2016 - <%= new Date().getFullYear() %></p>
+            <%_ } _%>
+            <p style="font-size: .8em; font-weight: bold">&copy; CS Records 2016 - <%= new Date().getFullYear() %></p>
             <%_ if (recipient.id) { _%>
             <p style="<%- centered_block_style %> font-size: .8em;">You are receiving this email because you have subscribed to us, CS Records, to receive updates and promotional material.</p>
             <p style="font-size: .8em;"><a style="color: inherit!important" href="<%- location_origin %>/mailing-list/member/delete?id=<%= recipient.id %>&src=email_unsub_link<%= recipient.id %>">Unsubscribe</a></p>

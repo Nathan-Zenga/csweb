@@ -110,7 +110,7 @@
             $(".product-thumb").mouseenter(function() {
                 var $img = $(this).find("img");
                 var prop = $img.width() > $img.height() ? "max-width" : "max-height";
-                $img.css(prop, "100%", "border-radius", "");
+                $img.css(prop, "", "border-radius", "");
             }).mouseleave(function() {
                 var $img = $(this).find("img");
                 var prop = $img.width() > $img.height() ? "max-width" : "max-height";
