@@ -113,7 +113,7 @@ router.post("/cart/remove", (req, res) => {
     const cartItemIndex = req.session.cart.findIndex(item => item.id === req.body.id);
     if (cartItemIndex === -1) return res.status(400).send("The selected item is not found in your cart");
     req.session.cart.splice(cartItemIndex, 1);
-    var total = req.session.cart.map(itm => itm.price * itm.qty).reduce((t, p) => t + p, 0);
+    var total = req.session.cart.reduce((sum, p) => sum + (p.price * p.qty), 0);
     total = req.session.converted_price(total).toFixed(2).replace(number_separator_regx, ",");
     res.send({ total, quantity: 0, cart_empty: !req.session.cart.length });
 });
@@ -127,7 +127,7 @@ router.post("/cart/increment", (req, res) => {
     const underMin = newQuantity < 1;
     const overMax = newQuantity > currentItem.stock_qty;
     currentItem.qty = underMin ? 1 : overMax ? currentItem.stock_qty : newQuantity;
-    var total = req.session.cart.map(itm => itm.price * itm.qty).reduce((t, p) => t + p);
+    var total = req.session.cart.reduce((sum, p) => sum + (p.price * p.qty), 0);
     total = req.session.converted_price(total).toFixed(2).replace(number_separator_regx, ",");
     res.send({ total, quantity: currentItem.qty });
 });
@@ -135,8 +135,7 @@ router.post("/cart/increment", (req, res) => {
 router.post("/checkout/payment/create", async (req, res) => {
     const { firstname, lastname, email, address_l1, address_l2, city, state, country, postcode } = req.body;
     const { cart, location_origin } = Object.assign(req.session, res.locals);
-    const price_total = cart.reduce((sum, p) => sum + (p.price * p.qty), 0);
-    if (!price_total) return res.status(400).send("Unable to begin checkout - your basket is empty");
+    if (!cart.length) return res.status(400).send("Unable to begin checkout - your basket is empty");
 
     try {
         const field_check = { firstname, lastname, email, "address line 1": address_l1, city, country, "post / zip code": postcode };
@@ -204,7 +203,7 @@ router.get("/checkout/payment/complete", async (req, res) => {
         if (pi.status !== "succeeded") return res.status(400).render('error', { html: `Payment status:<h2>${pi.status.replace(/_/g, " ").replace(/^./, m => m.toUpperCase())}</h2>` });
 
         const products = await Product.find();
-        const price_total = req.session.cart.reduce((sum, p) => sum + (p.price * p.qty));
+        const price_total = req.session.cart.reduce((sum, p) => sum + (p.price * p.qty), 0);
 
         if (production) await Promise.all(req.session.cart.map(item => {
             const product = products.find(p => p.id === item.id);

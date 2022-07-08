@@ -70,7 +70,7 @@
         });
 
         $("#fx-select").change(function() {
-            $.post("/shop/fx", { currency_code: this.value }, function(res) {
+            $.post("/shop/fx", { [this.name]: this.value }, function(res) {
                 $(".product-thumb .price").fadeTo(0, .5);
                 $("#fx-select-info").css("display", res.symbol === "£" ? "none" : "");
                 $("html, body").animate({ scrollTop: $(".product-thumb").length ? $(".product-thumb").eq(0).offset().top : undefined }, function() {
@@ -100,22 +100,25 @@
         });
 
         $("#fx-select-info").click(function() {
-            if ($(this).is(":hidden")) return;
-            alert("All converted prices are updated once per hour.\n\n"+
+            $(this).is(":visible") && alert("All converted prices are updated once per hour.\n\n"+
             "So please be advised, your final payment charge may only slightly differ when you checkout, "+
             "as currency exchange rates update more frequently in real-time.")
         });
 
         $(window).on("load", function() {
-            $(".product-thumb").mouseenter(function() {
-                var $img = $(this).find("img");
-                var prop = $img.width() > $img.height() ? "max-width" : "max-height";
-                $img.css(prop, "", "border-radius", "");
-            }).mouseleave(function() {
-                var $img = $(this).find("img");
-                var prop = $img.width() > $img.height() ? "max-width" : "max-height";
-                $img.css(prop, "150%", "border-radius", "0px");
-            }).each(function() { $(this).mouseleave() });
+            $(".product-thumb").each(function() {
+                var $wrapper = $(this).find(".img-wrapper");
+                var $img = $wrapper.find("img");
+                var portrait = $img.width() > $img.height();
+                var prop = portrait ? "max-width" : "max-height";
+                var side = portrait ? "height" : "width";
+                var newMaxLength = ($wrapper[side]() / $img[side]()) * 100;
+                $(this).mouseenter(function() {
+                    $img.css({ [prop]: "", "border-radius": "" });
+                }).mouseleave(function() {
+                    $img.css({ [prop]: newMaxLength + "%", "border-radius": 0 });
+                }).mouseleave();
+            });
         });
     </script>
 <%- include ('partials/footer') -%>

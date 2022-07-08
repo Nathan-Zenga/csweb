@@ -35,7 +35,7 @@
             </div>
             <br><br>
             <div style="text-align: center; font-weight: bold">
-                <%_ var price_total = cart.map(itm => itm.price * itm.qty).reduce((t, p) => t + p, 0); _%>
+                <%_ var price_total = cart.reduce((sum, p) => sum + (p.price * p.qty), 0); _%>
                 <p id="price-total">Total: <%- currency_symbol %> <span><%- converted_price(price_total).toFixed(2).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") %></span></p>
                 <%_ if (price_total) { _%>
                 <p id="checkout-link"><a href="/shop/checkout"><button>PROCEED TO CHECKOUT</button></a></p>
