@@ -8,12 +8,22 @@
                         <div class="col-md-3 float-left item-img" style="background-image:url('<%- item.image %>')"></div>
                         <div class="col-md-6 float-left item-info">
                             <p class="item-name" style="font-weight: bold"><%- item.name %></p>
-                            <p class="item-price" style="font-weight: bold"><%- currency_symbol %> <span><%- converted_price(item.price).toFixed(2).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") %></span></p>
+                            <p class="item-price" style="font-weight: bold"><%- currency_symbol %> <span><%- converted_price(item.price).toFixed(2).replace(number_separator_regx, ",") %></span></p>
                             <p><%= item.info.replace(/\r?\n/g, "<br>") %></p>
+                            <form action="/shop/cart/change-size">
+                                <input type="hidden" name="id" value="<%- item.id %>">
+                                <input type="hidden" name="prev_size" value="<%- item.size %>">
+                                <select class="custom-select size" name="size" style="max-width: 150px">
+                                    <%_ sizes.forEach(size => { _%>
+                                    <option value="<%= size %>"<%= item.size === size ? " selected" : "" %>><%= size %></option>
+                                    <%_ }) _%>
+                                </select>
+                            </form>
                         </div>
                         <div class="col-md-3 float-left">
                             <form class="item-qty-control" action="/shop/cart/increment">
                                 <input type="hidden" name="id" value="<%- item.id %>">
+                                <input type="hidden" name="size" value="<%- item.size %>">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <button type="button" class="btn btn-secondary qty-control-btn" value="-1">-</button>
@@ -26,6 +36,7 @@
                             </form>
                             <form class="remove-item" action="/shop/cart/remove">
                                 <input type="hidden" name="id" value="<%- item.id %>">
+                                <input type="hidden" name="size" value="<%- item.size %>">
                                 <button type="submit" class="btn remove-item-btn">REMOVE</button>
                             </form>
                         </div>
@@ -36,7 +47,7 @@
             <br><br>
             <div style="text-align: center; font-weight: bold">
                 <%_ var price_total = cart.reduce((sum, p) => sum + (p.price * p.qty), 0); _%>
-                <p id="price-total">Total: <%- currency_symbol %> <span><%- converted_price(price_total).toFixed(2).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") %></span></p>
+                <p id="price-total">Total: <%- currency_symbol %> <span><%- converted_price(price_total).toFixed(2).replace(number_separator_regx, ",") %></span></p>
                 <%_ if (price_total) { _%>
                 <p id="checkout-link"><a href="/shop/checkout"><button>PROCEED TO CHECKOUT</button></a></p>
                 <%_ } _%>
@@ -69,6 +80,16 @@
                 alert(err.responseText);
             }).always(function() {
                 buttons.attr("disabled", false);
+            })
+        });
+
+        $("select[name=size]").change(function() {
+            var form = $(this).closest("form").get(0);
+            $.post(form.action, $(form).serializeArray(), function(r) {
+                $(form).find("input[name=prev_size]").val(r.size);
+                alert(r.message);
+            }).fail(function(err) {
+                alert(err.responseText);
             })
         });
     </script>

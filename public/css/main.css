@@ -887,6 +887,15 @@ article.preview .read-more-link {
     font-weight: 700;
 }
 
+.product-thumb .content > .cart-options {
+    padding-top: 0;
+}
+
+.product-thumb .size {
+    margin: 0 auto 1.5em;
+    max-width: 150px;
+}
+
 .product-thumb input[type=submit] {
     background-color: white;
 }

@@ -56,10 +56,10 @@ app.use(async (req, res, next) => {
     res.locals.currency_symbol = req.session.currency_symbol = req.session.currency_symbol || "£";
     res.locals.converted_price = req.session.converted_price = price => parseFloat(price / 100) * req.session.fx_rate;
     res.locals.platforms = ["Twitter", "Instagram", "Facebook", "Spotify", "SoundCloud", "YouTube", "Apple Music", "Tidal", "Bandcamp", "Deezer", "Google Play", "Linktree"];
-    try {
-        req.session.checkout_session && await Stripe.checkout.sessions.expire(req.session.checkout_session.id);
-        req.session.checkout_session = undefined; next();
-    } catch (err) { console.error(err.message); next() }
+    res.locals.sizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
+    res.locals.number_separator_regx = /\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g;
+    req.session.checkout_session_id && await Stripe.checkout.sessions.expire(req.session.checkout_session_id).catch(e => null);
+    req.session.checkout_session_id = undefined; next();
 });
 
 app.use('/', require('./routes/index'));

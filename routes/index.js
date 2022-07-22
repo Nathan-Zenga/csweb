@@ -67,7 +67,7 @@ router.post('/cs/links/delete', isAuthed, async (req, res) => {
     const names = Object.values(req.body);
     const content = await Homepage_content.findOne();
     if (!content || !names.length) return res.status(400).send("Nothing selected");
-    content.socials = content.socials.filter(x => !names.includes(x.name));
+    content.socials.splice(content.socials.indexOf(x.name), 1);
     content.save(err => res.status(err ? 500 : 200).send(err ? err.message : `Link${names.length > 1 ? "s" : ""} removed successfully`));
 });
 

@@ -9,7 +9,7 @@ router.get('/', (req, res) => res.render('map'));
 router.post('/init', async (req, res) => {
     const locations = await Location.find();
     const defaultPts = { lat: 51.5073219, lng: -0.1276474 };
-    if (!locations.length) return res.send({ locations: [defaultPts], mid_point: defaultPts});
+    if (!locations.length) return res.send({ locations: [defaultPts], mid_point: defaultPts });
     const lat = locations.reduce((sum, x) => sum + x.latitude, 0) / locations.length;
     const lng = locations.reduce((sum, x) => sum + x.longitude, 0) / locations.length;
     res.send({ locations, mid_point: { lat, lng } });

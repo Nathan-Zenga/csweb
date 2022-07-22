@@ -60,7 +60,9 @@ router.post('/stock/edit', isAuthed, async (req, res) => {
         if (info) product.info = info;
         if (stock_qty) product.stock_qty = stock_qty;
         if (stock_qty) req.session.cart = req.session.cart.map(item => {
-            if (item.id === product.id) item.stock_qty = stock_qty;
+            if (item.id !== product.id) return item;
+            item.stock_qty = stock_qty;
+            item.qty = Math.min(item.qty, stock_qty);
             return item;
         });
 
@@ -97,20 +99,19 @@ router.post("/cart/add", async (req, res) => {
     const product = await Product.findById(req.body.id).catch(e => null);
     if (!product || product.stock_qty < 1) return res.status(404).send("Item currently not in stock");
     const { id, name, price, image, info, stock_qty } = product;
-    const currentItem = req.session.cart.find(item => item.id === id);
+    const currentItems = req.session.cart.filter(item => item.id === id);
+    const currentItem = currentItems.find(item => item.size === req.body.size);
 
-    if (currentItem) {
-        currentItem.qty += 1;
-        if (currentItem.qty > stock_qty) currentItem.qty = stock_qty;
-    } else {
-        req.session.cart.unshift({ id, name, price, image, info, stock_qty, qty: 1 });
-    }
+    if (currentItem) currentItem.qty = Math.min(currentItem.qty + 1, stock_qty);
+    const totalCount = currentItems.reduce((sum, x) => sum + x.qty, 0);
+    if (currentItem && totalCount > stock_qty) currentItem.qty -= 1;
+    if (!currentItem && totalCount < stock_qty) req.session.cart.unshift({ id, name, price, image, info, stock_qty, qty: 1, size: req.body.size });
 
     res.send(`${req.session.cart.length}`);
 });
 
 router.post("/cart/remove", (req, res) => {
-    const cartItemIndex = req.session.cart.findIndex(item => item.id === req.body.id);
+    const cartItemIndex = req.session.cart.findIndex(item => item.id === req.body.id && item.size === req.body.size);
     if (cartItemIndex === -1) return res.status(400).send("The selected item is not found in your cart");
     req.session.cart.splice(cartItemIndex, 1);
     var total = req.session.cart.reduce((sum, p) => sum + (p.price * p.qty), 0);
@@ -119,17 +120,27 @@ router.post("/cart/remove", (req, res) => {
 });
 
 router.post("/cart/increment", (req, res) => {
-    const { id, quantity } = req.body;
-    const currentItem = req.session.cart.find(item => item.id === id);
+    const { id, quantity, size } = req.body;
+    if (isNaN(Number(quantity)) || Number(quantity) < 1) return res.status(400).send("Invalid value for quantity");
+    const currentItems = req.session.cart.filter(item => item.id === id);
+    const currentItem = currentItems.find(item => item.size === size);
     if (!currentItem) return res.status(400).send("The selected item is not found in your cart");
-    if (isNaN(quantity)) return res.status(400).send("Invalid value for quantity");
-    const newQuantity = parseInt(quantity) || 1;
-    const underMin = newQuantity < 1;
-    const overMax = newQuantity > currentItem.stock_qty;
-    currentItem.qty = underMin ? 1 : overMax ? currentItem.stock_qty : newQuantity;
+    const newQuantity = Math.max(1, Number(quantity));
+    currentItem.qty = Math.min(newQuantity, currentItem.stock_qty);
+    const totalCount = currentItems.reduce((sum, x) => sum + x.qty, 0);
+    if (totalCount > currentItem.stock_qty) currentItem.qty -= totalCount - currentItem.stock_qty;
     var total = req.session.cart.reduce((sum, p) => sum + (p.price * p.qty), 0);
     total = req.session.converted_price(total).toFixed(2).replace(number_separator_regx, ",");
     res.send({ total, quantity: currentItem.qty });
+});
+
+router.post("/cart/change-size", (req, res) => {
+    const { id, size, prev_size } = req.body;
+    if (!res.locals.sizes.includes(size)) return res.status(400).send("Invalid size selected");
+    const i = req.session.cart.findIndex(item => item.id === id && item.size === prev_size);
+    if (i === -1) return res.status(400).send("The selected item is not found in your cart");
+    req.session.cart[i].size = size;
+    res.send({ message: `Size changed for ${req.session.cart[i].name}`, size });
 });
 
 router.post("/checkout/payment/create", async (req, res) => {
@@ -191,7 +202,7 @@ router.post("/checkout/payment/create", async (req, res) => {
             cancel_url: location_origin + "/shop/checkout/payment/cancel"
         });
 
-        req.session.checkout_session = session;
+        req.session.checkout_session_id = session.id;
         res.send({ id: session.id, pk: STRIPE_PK });
     } catch(err) { console.error(err.message); res.status(err.statusCode || 500).send(err.message) };
 });
@@ -199,7 +210,7 @@ router.post("/checkout/payment/create", async (req, res) => {
 router.get("/checkout/payment/complete", async (req, res) => {
     if (!req.session.cart.length) return res.status(400).render('error', { html: "Unable to complete checkout - session expired" });
     try {
-        const { customer, payment_intent: pi } = await Stripe.checkout.sessions.retrieve(req.session.checkout_session?.id, { expand: ["customer", "payment_intent"] });
+        const { customer, payment_intent: pi } = await Stripe.checkout.sessions.retrieve(req.session.checkout_session_id, { expand: ["customer", "payment_intent"] });
         if (pi.status !== "succeeded") return res.status(400).render('error', { html: `Payment status:<h2>${pi.status.replace(/_/g, " ").replace(/^./, m => m.toUpperCase())}</h2>` });
 
         const products = await Product.find();
@@ -214,7 +225,7 @@ router.get("/checkout/payment/complete", async (req, res) => {
         }));
 
         req.session.cart = [];
-        req.session.checkout_session = undefined;
+        req.session.checkout_session_id = undefined;
 
         const { line1, line2, city, postal_code, state, country } = customer.shipping.address;
         const transporter = new MailTransporter();

@@ -8,11 +8,9 @@
         <div id="fx-select-container">
             <a id="fx-select-info" style="<%= currency_symbol === '£' ? 'display: none' : '' %>"><i class="fal fa-info-circle"></i></a>
             <select class="custom-select" id="fx-select" name="currency_code">
-                <option value="<%= currency_code %>"><%- currency_name + (currency_symbol && currency_symbol !== currency_code ? ` - ${currency_symbol}` : "") %></option>
-                <%_ currencies.sort((a,b) => a.name.localeCompare(b.name)).forEach(curr => {
-                    if (curr.code !== currency_code) { _%>
-                <option value="<%= curr.code %>"><%= curr.name + (curr.symbol ? ` - ${curr.symbol}` : "") %></option>
-                <%_ }}) _%>
+                <%_ currencies.sort((a,b) => a.name.localeCompare(b.name)).forEach(curr => { _%>
+                <option value="<%= curr.code %>"<%- curr.code === currency_code ? " selected" : "" %>><%= curr.name + (curr.symbol ? ` - ${curr.symbol}` : "") %></option>
+                <%_ }) _%>
             </select>
         </div>
 
@@ -29,7 +27,7 @@
                     <div class="text">
                         <p class="price" data-gbp-price="<%= (item.price / 100).toFixed(2) %>">
                             <span><%- currency_symbol || currency_code %></span>
-                            <span><%= converted_price(item.price).toFixed(2).replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","); %></span>
+                            <span><%= converted_price(item.price).toFixed(2).replace(number_separator_regx, ","); %></span>
                         </p>
                         <div class="description">
                             <p><span><%= item.info %></span></p>
@@ -41,6 +39,12 @@
                     </div>
                     <div class="cart-options">
                         <form class="add-to-cart" action="/shop/cart/add">
+                            <select class="custom-select size" name="size" required>
+                                <option value="">Select size</option>
+                                <%_ sizes.forEach(size => { _%>
+                                <option value="<%= size %>"><%= size %></option>
+                                <%_ }) _%>
+                            </select>
                             <input type="hidden" name="id" value="<%= item._id %>">
                             <input type="submit" style="<%= soldOut ? 'opacity:.5' : '' %>" data-value="<%= !soldOut ? 'ADD TO CART' : 'SOLD OUT' %>" value="<%= !soldOut ? 'ADD TO CART' : 'SOLD OUT' %>"<%= soldOut ? 'disabled' : '' %>>
                         </form>

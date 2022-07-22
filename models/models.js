@@ -1,5 +1,6 @@
 const { model, Schema } = require('mongoose');
 const platforms = ["Twitter", "Instagram", "Facebook", "Spotify", "SoundCloud", "YouTube", "Apple Music", "Tidal", "Bandcamp", "Deezer", "Google Play", "Linktree"].map(p => p.toLowerCase().replace(/[ _]/g, ''));
+const sizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
 Schema.Types.String.set('trim', true);
 
 module.exports.Article = model('Article', (() => {
@@ -44,8 +45,8 @@ module.exports.MailingList = model('MailingList', (() => {
         firstname: { type: String, set: v => v.charAt(0).toUpperCase() + v.slice(1) },
         lastname: { type: String, set: v => v.charAt(0).toUpperCase() + v.slice(1) },
         email: { type: String, index: true, unique: true },
-        size_top: { type: String, enum: ["XS", "S", "M", "L", "XL", "XXL", "XXXL"] },
-        size_bottom: { type: String, enum: ["XS", "S", "M", "L", "XL", "XXL", "XXXL"] },
+        size_top: { type: String, enum: sizes },
+        size_bottom: { type: String, enum: sizes },
         extra_info: String
     });
 
