@@ -58,6 +58,7 @@ app.use(async (req, res, next) => {
     res.locals.platforms = ["Twitter", "Instagram", "Facebook", "Spotify", "SoundCloud", "YouTube", "Apple Music", "Tidal", "Bandcamp", "Deezer", "Google Play", "Linktree"];
     res.locals.sizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
     res.locals.number_separator_regx = /\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g;
+    res.locals.product_categories = ["clothing", "other"];
     req.session.checkout_session_id && await Stripe.checkout.sessions.expire(req.session.checkout_session_id).catch(e => null);
     req.session.checkout_session_id = undefined; next();
 });

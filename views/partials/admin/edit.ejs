@@ -307,6 +307,20 @@
                     <label>PRODUCT INFO <span>(OPTIONAL)</span></label>
                     <input type="text" name="info" id="product_info_edit"></input>
 
+                    <label>CATEGORY</label>
+                    <div class="row">
+                        <%_ product_categories.forEach(category => { _%>
+                        <div class="col-md-4 col-sm-6 input-group list-item">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text">
+                                    <input type="radio" name="category" id="product_category_<%= category %>_edit" value="<%= category %>" required>
+                                </div>
+                            </div>
+                            <label class="form-control list-item-label" for="product_category_<%= category %>_edit"><%= category.replace(/^./, m => m.toUpperCase()) %></label>
+                        </div>
+                        <%_ }) _%>
+                    </div>
+
                     <label>PRODUCT IMAGE</label>
                     <div class="file-upload-container">
                         <div class="input-group">
@@ -352,7 +366,7 @@
                             <div class="col">
                                 <select class="custom-select" name="min_unit" id="min_unit_edit" required>
                                     <option value="hour">Hours</option>
-                                    <option value="business day">Business days</option>
+                                    <option value="business day" selected>Business days</option>
                                     <option value="week">Weeks</option>
                                     <option value="month">Months</option>
                                 </select>
@@ -367,7 +381,7 @@
                             <div class="col">
                                 <select class="custom-select" name="max_unit" id="max_unit_edit" required>
                                     <option value="hour">Hours</option>
-                                    <option value="business day">Business days</option>
+                                    <option value="business day" selected>Business days</option>
                                     <option value="week">Weeks</option>
                                     <option value="month">Months</option>
                                 </select>

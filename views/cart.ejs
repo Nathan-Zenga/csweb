@@ -10,6 +10,7 @@
                             <p class="item-name" style="font-weight: bold"><%- item.name %></p>
                             <p class="item-price" style="font-weight: bold"><%- currency_symbol %> <span><%- converted_price(item.price).toFixed(2).replace(number_separator_regx, ",") %></span></p>
                             <p><%= item.info.replace(/\r?\n/g, "<br>") %></p>
+                            <%_ if (item.size) { _%>
                             <form action="/shop/cart/change-size">
                                 <input type="hidden" name="id" value="<%- item.id %>">
                                 <input type="hidden" name="prev_size" value="<%- item.size %>">
@@ -19,11 +20,14 @@
                                     <%_ }) _%>
                                 </select>
                             </form>
+                            <%_ } _%>
                         </div>
                         <div class="col-md-3 float-left">
                             <form class="item-qty-control" action="/shop/cart/increment">
                                 <input type="hidden" name="id" value="<%- item.id %>">
+                                <%_ if (item.size) { _%>
                                 <input type="hidden" name="size" value="<%- item.size %>">
+                                <%_ } _%>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <button type="button" class="btn btn-secondary qty-control-btn" value="-1">-</button>

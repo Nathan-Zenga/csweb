@@ -39,7 +39,7 @@
                     </div>
                     <div class="cart-options">
                         <form class="add-to-cart" action="/shop/cart/add">
-                            <select class="custom-select size" name="size" required>
+                            <select class="custom-select size" name="size" <%- item.size_required ? "required": "disabled" %>>
                                 <option value="">Select size</option>
                                 <%_ sizes.forEach(size => { _%>
                                 <option value="<%= size %>"><%= size %></option>

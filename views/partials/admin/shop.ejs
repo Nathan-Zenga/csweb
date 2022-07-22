@@ -11,6 +11,20 @@
     <label>PRODUCT INFO <span>(OPTIONAL)</span></label>
     <input type="text" name="info" id="product_info"></input>
 
+    <label>CATEGORY</label>
+    <div class="row">
+        <%_ product_categories.forEach(category => { _%>
+        <div class="col-md-4 col-sm-6 input-group list-item">
+            <div class="input-group-prepend">
+                <div class="input-group-text">
+                    <input type="radio" name="category" id="product_category_<%= category %>" value="<%= category %>" required>
+                </div>
+            </div>
+            <label class="form-control list-item-label" for="product_category_<%= category %>"><%= category.replace(/^./, m => m.toUpperCase()) %></label>
+        </div>
+        <%_ }) _%>
+    </div>
+
     <label>PRODUCT IMAGE</label>
     <div class="file-upload-container">
         <div class="input-group">

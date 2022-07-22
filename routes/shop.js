@@ -38,9 +38,9 @@ router.post("/fx", async (req, res) => {
 });
 
 router.post("/stock/add", isAuthed, async (req, res) => {
-    const { name, price, stock_qty, info, image_file, image_url } = req.body;
+    const { name, price, stock_qty, info, category, image_file, image_url } = req.body;
     try {
-        const product = new Product({ name, price, stock_qty, info });
+        const product = new Product({ name, price, stock_qty, info, category });
         const public_id = `shop/stock/${product.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
         const result = image_url || image_file ? await cloud.uploader.upload(image_url || image_file, { public_id }) : null;
         if (result) product.image = result.secure_url;
@@ -49,7 +49,7 @@ router.post("/stock/add", isAuthed, async (req, res) => {
 });
 
 router.post('/stock/edit', isAuthed, async (req, res) => {
-    const { product_id, name, price, stock_qty, info, image_file, image_url } = req.body;
+    const { product_id, name, price, stock_qty, info, category, image_file, image_url } = req.body;
     try {
         const product = await Product.findById(product_id);
         if (!product) return res.status(404).send("Product not found");
@@ -58,6 +58,7 @@ router.post('/stock/edit', isAuthed, async (req, res) => {
         if (name) product.name = name;
         if (price) product.price = price;
         if (info) product.info = info;
+        if (category) product.category = category;
         if (stock_qty) product.stock_qty = stock_qty;
         if (stock_qty) req.session.cart = req.session.cart.map(item => {
             if (item.id !== product.id) return item;
@@ -121,11 +122,11 @@ router.post("/cart/remove", (req, res) => {
 
 router.post("/cart/increment", (req, res) => {
     const { id, quantity, size } = req.body;
-    if (isNaN(Number(quantity)) || Number(quantity) < 1) return res.status(400).send("Invalid value for quantity");
+    if (isNaN(parseInt(quantity)) || parseInt(quantity) < 1) return res.status(400).send("Invalid value for quantity");
     const currentItems = req.session.cart.filter(item => item.id === id);
     const currentItem = currentItems.find(item => item.size === size);
     if (!currentItem) return res.status(400).send("The selected item is not found in your cart");
-    const newQuantity = Math.max(1, Number(quantity));
+    const newQuantity = Math.max(1, parseInt(quantity));
     currentItem.qty = Math.min(newQuantity, currentItem.stock_qty);
     const totalCount = currentItems.reduce((sum, x) => sum + x.qty, 0);
     if (totalCount > currentItem.stock_qty) currentItem.qty -= totalCount - currentItem.stock_qty;
@@ -173,7 +174,7 @@ router.post("/checkout/payment/create", async (req, res) => {
             payment_intent_data: { description: "CS Store Purchase" },
             line_items: cart.map(item => ({
                 price_data: {
-                    product_data: { name: item.name, images: item.image ? [item.image] : undefined },
+                    product_data: { name: item.name + (item.size ? ` - size ${item.size}` : ""), images: item.image ? [item.image] : undefined },
                     unit_amount: parseInt(item.price),
                     currency: "gbp"
                 },

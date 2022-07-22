@@ -77,13 +77,19 @@ module.exports.Homepage_image = model('Homepage_image', new Schema({
     index: Number
 }));
 
-module.exports.Product = model('Product', new Schema({
-    name: { type: String, unique: true, required: true },
-    price: { type: Number, set: n => parseFloat(n) * 100 },
-    image: String,
-    info: String,
-    stock_qty: { type: Number, min: [0, "No negative values allowed for stock quantity"] }
-}));
+module.exports.Product = model('Product', (() => {
+    const schema = new Schema({
+        name: { type: String, unique: true, required: true },
+        price: { type: Number, set: n => parseFloat(n) * 100 },
+        image: String,
+        info: String,
+        stock_qty: { type: Number, min: [0, "No negative values allowed for stock quantity"] },
+        category: { type: String, enum: ["clothing", "other"] }
+    });
+
+    schema.virtual("size_required").get((val, vt, doc) => doc.category === "clothing");
+    return schema;
+})());
 
 module.exports.Admin = model('Admin', (() => {
     const schema = new Schema({
