@@ -26,7 +26,7 @@ router.post('/new', isAuthed, async (req, res) => {
 });
 
 router.post('/edit', isAuthed, async (req, res) => {
-    const { artist_id, artist_name, artist_bio, profile_image, social_media_name, social_media_url } = req.body;
+    const { artist_id, name, bio, profile_image, social_media_name, social_media_url } = req.body;
     try {
         const artist = await Artist.findById(artist_id);
         if (!artist) return res.status(404).send("Artist not found");
@@ -34,8 +34,8 @@ router.post('/edit', isAuthed, async (req, res) => {
         const social_media_urls = (Array.isArray(social_media_url) ? social_media_url : [social_media_url]).filter(e => e);
         if (social_media_names.length !== social_media_urls.length) return res.status(400).send("Number of specified social media names + urls don't match");
 
-        if (artist_name) artist.name = artist_name;
-        if (artist_bio) artist.bio = artist_bio;
+        if (name) artist.name = name;
+        if (bio) artist.bio = bio;
         artist.socials = social_media_names.map((name, i) => ({ name, url: social_media_urls[i] }));
 
         if (profile_image) await cloud.api.delete_resources_by_prefix(`artists/${artist.id}`);

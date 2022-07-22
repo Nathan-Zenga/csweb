@@ -39,9 +39,9 @@
                     </div>
                     <div class="cart-options">
                         <form class="add-to-cart" action="/shop/cart/add">
-                            <select class="custom-select size" name="size" <%- item.size_required ? "required": "disabled" %>>
-                                <option value="">Select size</option>
-                                <%_ sizes.forEach(size => { _%>
+                            <select class="custom-select size" name="size" <%- item.size_required ? "required" : "disabled" %>>
+                                <option value=""><%- item.size_required ? "Select size" : "N/A" %></option>
+                                <%_ item.size_required && sizes.forEach(size => { _%>
                                 <option value="<%= size %>"><%= size %></option>
                                 <%_ }) _%>
                             </select>
