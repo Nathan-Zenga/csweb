@@ -48,7 +48,7 @@ app.use(async (req, res, next) => {
     const contents = await Homepage_content.find();
     res.locals.user = req.user || null;
     res.locals.socials = contents[0]?.socials || [];
-    res.locals.location_origin = production ? `https://${req.hostname}` : `http://localhost:${PORT}`;
+    res.locals.location_origin = `http${production ? "s" : ""}://${req.headers.host}`;
     res.locals.cart = req.session.cart = req.session.cart || [];
     res.locals.fx_rate = req.session.fx_rate = req.session.fx_rate || 1;
     res.locals.currency_name = req.session.currency_name = req.session.currency_name || currencies.find(c => c.code === "GBP").name;
@@ -59,6 +59,7 @@ app.use(async (req, res, next) => {
     res.locals.sizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
     res.locals.number_separator_regx = /\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g;
     res.locals.product_categories = ["clothing", "other"];
+    if (req.originalUrl === "/shop/checkout/payment/complete") return next();
     req.session.checkout_session_id && await Stripe.checkout.sessions.expire(req.session.checkout_session_id).catch(e => null);
     req.session.checkout_session_id = undefined; next();
 });
