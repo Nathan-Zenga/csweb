@@ -82,10 +82,11 @@ const server = app.listen(PORT, async () => {
 
     if (production) try {
         const test = await MailTest.findOne() || new MailTest();
-        const { email, subject, message, newDay } = test;
-        newDay && await new MailTransporter({ email }).sendMail({ subject, message });
-        newDay && (test.last_sent_date = Date.now());
-        newDay && await test.save();
+        const { email, subject, message, due } = test;
+        if (!due) return;
+        await new MailTransporter({ email }).sendMail({ subject, message });
+        test.last_sent_date = Date.now();
+        await test.save();
     } catch (err) { console.error(err.message) }
 });
 

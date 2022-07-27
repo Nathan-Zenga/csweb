@@ -110,7 +110,8 @@ module.exports.MailTest = model('MailTest', (() => {
         message: { type: String, default: "This is a test email" }
     });
 
-    schema.virtual("newDay").get((val, vt, doc) => doc.last_sent_date.toDateString() != new Date().toDateString());
+    const twoWeeks = 1000 * 60 * 60 * 24 * 14;
+    schema.virtual("due").get((val, vt, doc) => new Date().getTime() >= doc.last_sent_date.getTime() + twoWeeks);
     return schema;
 })(), "mail_test");
 
