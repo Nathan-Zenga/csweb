@@ -14,7 +14,7 @@ module.exports.Collections = async cb => {
     docs.artists = await Artist.find().sort({ name: 1 });
     docs.projects = await Project.find().sort({ year: -1, _id: -1 }).exec();
     docs.locations = await Location.find().sort({ country: 1, city: 1, name: 1 });
-    docs.members = await MailingList.find().sort({ lastname: 1 }).exec();
+    docs.members = await MailingList.find().sort({ firstname: 1 }).exec();
     docs.homepage_contents = await Homepage_content.find();
     docs.homepage_images = await Homepage_image.find().sort({ index: 1 }).exec();
     docs.products = await Product.find().sort({ name: 1 });

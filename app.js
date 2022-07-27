@@ -45,10 +45,9 @@ app.use(passport.session());
 
 // Global variables
 app.use(async (req, res, next) => {
-    const contents = await Homepage_content.find();
     res.locals.user = req.user || null;
-    res.locals.socials = contents[0]?.socials || [];
-    res.locals.location_origin = `http${production ? "s" : ""}://${req.headers.host}`;
+    res.locals.socials = (await Homepage_content.find())[0]?.socials || [];
+    res.locals.location_origin = `http${req.hostname != "localhost" ? "s" : ""}://${req.headers.host}`;
     res.locals.cart = req.session.cart = req.session.cart || [];
     res.locals.fx_rate = req.session.fx_rate = req.session.fx_rate || 1;
     res.locals.currency_name = req.session.currency_name = req.session.currency_name || currencies.find(c => c.code === "GBP").name;
@@ -78,10 +77,7 @@ app.get("*", (req, res) => res.status(404).render('error', { title: "Error 404",
 
 app.post("*", (req, res) => res.status(400).send("Sorry, your request currently cannot be processed"));
 
-const server = createServer(app);
-socketio(server);
-
-server.listen(PORT, async () => {
+const server = app.listen(PORT, async () => {
     console.log(`Server started${!production ? " on port " + PORT : ""}`);
 
     if (production) try {
@@ -92,3 +88,5 @@ server.listen(PORT, async () => {
         newDay && await test.save();
     } catch (err) { console.error(err.message) }
 });
+
+socketio(server);

@@ -362,9 +362,10 @@
 
         $(".filter-search-input").on("input", function(e) {
             var $items = $(e.target).closest("form").find(".list-item");
-            var regex = new RegExp(`\\b${e.target.value.replace(/\W/g, function(m) { return `\\${m}` })}(\\S+)?`, "gi");
-            var filter = function() { return regex.test($(this).find("label").text()) };
-            !e.target.value ? $items.show() : $items.hide().filter(filter).show();
+            !e.target.value ? $items.show() : $items.hide().filter(function() {
+                var regex = new RegExp("\\b" + e.target.value.replace(/\W/g, function(m) { return "\\" + m }), "gi");
+                return regex.test($(this).find("label").text())
+            }).show();
         });
 
         $(window).on("load", function() {

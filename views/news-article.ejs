@@ -128,5 +128,7 @@
             var observer = new MutationObserver(function() { if (iframe.src != src) iframe.src = src });
             observer.observe(iframe, { attributes: true, childList: true, subtree: true });
         });
+
+        $(window).on("keydown", function(e) { (e.keyCode || e.code) === 27 && $("#image-modal").modal("hide") });
     </script>
 <%- include ('partials/footer') -%>

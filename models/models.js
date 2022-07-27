@@ -42,11 +42,11 @@ module.exports.Artist = model('Artist', new Schema({
 
 module.exports.MailingList = model('MailingList', (() => {
     const schema = new Schema({
-        firstname: { type: String, set: v => v.charAt(0).toUpperCase() + v.slice(1) },
-        lastname: { type: String, set: v => v.charAt(0).toUpperCase() + v.slice(1) },
-        email: { type: String, index: true, unique: true },
-        size_top: { type: String, enum: sizes },
-        size_bottom: { type: String, enum: sizes },
+        firstname: { type: String, set: v => v.replace(/^./, m => m.toUpperCase()).trim(), required: true },
+        lastname: { type: String, set: v => v.replace(/^./, m => m.toUpperCase()).trim(), required: true },
+        email: { type: String, index: true, unique: true, required: true },
+        size_top: { type: String, enum: sizes, required: true },
+        size_bottom: { type: String, enum: sizes, required: true },
         extra_info: String
     });
 
