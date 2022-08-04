@@ -19,17 +19,16 @@ router.get('/article/:title', async (req, res, next) => {
 
 router.post('/article/new', isAuthed, async (req, res) => {
     const { headline, textbody } = req.body;
-    const hl = headline.replace(/\W+/g, '-').replace(/^\W+|\W+$/, '').replace(/\-|\$/g, "\\W+");
-    const existing = await Article.findOne({ headline: RegExp(`^(\\W+|_+)?${hl}(\\W+|_+)?$`, "i") });
-    if (existing) return res.status(400).send("This headline already exists for another article.");
     const article = new Article({ headline, textbody, index: 1 });
+    const found = await Article.findOne({ headline: RegExp(`^${headline.replace(/\W/g, m => "\\"+m)}$`, "i") });
+    if (found?.link === article.link) return res.status(400).send("This headline cannot be used as it conflicts with another article.");
     const articles = await Article.find().sort({ index: 1, created_at: -1 }).exec();
-    saveMedia(req.body, article, async (err, results) => {
-        if (err) return res.status(err.http_code || 500).send(err.message);
-        if (results) for (const k in results) article[k] = results[k];
+    try {
+        const results = await saveMedia(req.body, article);
+        if (results) for (let k in results) article[k] = results[k];
         await Promise.all(articles.map(a => { a.index += 1; return a.save() }));
-        article.save(err => res.status(err ? 500 : 200).send(err ? err.message : "Done"));
-    });
+        await article.save(); res.send("New article now posted");
+    } catch (err) { return res.status(err.http_code || 500).send(err.message) }
 });
 
 router.post('/article/delete', isAuthed, async (req, res) => {
@@ -47,26 +46,25 @@ router.post('/article/delete', isAuthed, async (req, res) => {
 
 router.post('/article/edit', isAuthed, async (req, res) => {
     const { article_id, headline, textbody, headline_image_thumb } = req.body;
-    const hl = headline.replace(/\W+/g, '-').replace(/^\W+|\W+$/, '').replace(/\-|\$/g, "\\W+");
-    const existing = await Article.findOne({ headline: RegExp(`^(\\W+|_+)?${hl}(\\W+|_+)?$`, "i") });
-    if (existing && existing.id !== article_id) return res.status(400).send("This headline already exists for another article.");
     try {
         const article = await Article.findById(article_id);
-        const media_fields = ["headline_images", "textbody_media"].filter(f => req.body[f]);
         if (!article) return res.status(404).send("Article not found");
         if (headline) article.headline = headline;
+        const found = await Article.findOne({ headline: RegExp(`^${headline.replace(/\W/g, m => "\\"+m)}$`, "i"), $not: { _id: article_id } });
+        if (found?.link === article.link) return res.status(400).send("This headline cannot be used as it conflicts with another article.");
         if (textbody) article.textbody = textbody;
         if (headline_image_thumb) article.headline_image_thumb = headline_image_thumb;
-        if (!media_fields.length) { await article.save(); return res.send("Article updated successfully") }
 
+        const media_fields = ["headline_images", "textbody_media"].filter(f => req.body[f]);
+        if (!media_fields.length) { await article.save(); return res.send("Article updated successfully") }
         const results = await saveMedia(req.body, article);
-        const urls_to_delete1 = results && results.headline_images.length ? article.headline_images.slice(results.headline_images.length) : [];
-        const urls_to_delete2 = results && results.textbody_media.length ? article.textbody_media.slice(results.textbody_media.length) : [];
+        const urls_to_delete1 = results?.headline_images.length ? article.headline_images.slice(results.headline_images.length) : [];
+        const urls_to_delete2 = results?.textbody_media.length ? article.textbody_media.slice(results.textbody_media.length) : [];
         await Promise.all([...urls_to_delete1, ...urls_to_delete2].map(url => {
             const prefix = url.slice(url.indexOf("/article/"));
             return url.startsWith("https://res.cloudinary.com") ? cloud.api.delete_resources_by_prefix(prefix) : null;
         }));
-        if (results) for (const k in results) article[k] = results[k].length ? results[k] : article[k];
+        if (results) for (let k in results) article[k] = results[k].length ? results[k] : article[k];
         await article.save(); res.send("Article updated successfully")
     } catch (err) { res.status(err.http_code || 500).send(err.message) }
 });

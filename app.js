@@ -14,7 +14,6 @@ const MailTransporter = require('./config/MailTransporter');
 const currencies = require('./config/currencies');
 const production = NODE_ENV === "production";
 const socketio = require('./config/socket.io');
-const { createServer } = require('http');
 
 mongoose.connect(CSDB).then(() => { console.log("Connected to DB") });
 

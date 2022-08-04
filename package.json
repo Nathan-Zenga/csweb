@@ -1,6 +1,6 @@
 {
   "name": "csweb",
-  "version": "2.0.0",
+  "version": "2.4.2",
   "description": "merch store website",
   "main": "app.js",
   "scripts": {
