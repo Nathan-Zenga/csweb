@@ -1018,6 +1018,27 @@ body:not(#cart-page, #admin-page) #cart-icon.visible {
     height: 200px;
 }
 
+.cart-item .size:not(.glow):focus {
+    border-color: rgb(206, 212, 218);
+    box-shadow: none;
+    transition: none;
+}
+
+.cart-item .size.glow {
+    -webkit-animation: glow1 1s 1 ease-out backwards;
+    animation: cart-item-size-glow 1s 1 ease backwards;
+}
+
+@-webkit-keyframes cart-item-size-glow {
+    from { box-shadow: 0 0 10px rgb(50, 255, 50); }
+    to { box-shadow: 0 0 0 transparent; }
+}
+
+@keyframes cart-item-size-glow {
+    from { box-shadow: 0 0 10px rgb(50, 255, 50); }
+    to { box-shadow: 0 0 0 transparent; }
+}
+
 @media (max-width: 767px) {
     .cart-item > * {
         margin-bottom: 1.5em;

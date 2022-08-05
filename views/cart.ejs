@@ -87,11 +87,12 @@
             })
         });
 
-        $("select[name=size]").change(function() {
+        $("select.size").change(function(e) {
+            var $cartItem = $(this).closest(".cart-item");
             var form = $(this).closest("form").get(0);
             $.post(form.action, $(form).serializeArray(), function(r) {
-                $(form).find("input[name=prev_size]").val(r.size);
-                alert(r.message);
+                $cartItem.find("input[name*=size]").val(r.size);
+                $(e.target).addClass("glow").on("animationend", function() { $(this).removeClass("glow").off("animationend") });
                 r.refresh && location.reload();
             }).fail(function(err) {
                 alert(err.responseText);
