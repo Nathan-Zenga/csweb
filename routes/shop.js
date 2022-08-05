@@ -140,8 +140,12 @@ router.post("/cart/change-size", (req, res) => {
     if (!res.locals.sizes.includes(size)) return res.status(400).send("Invalid size selected");
     const i = req.session.cart.findIndex(item => item.id === id && item.size === prev_size);
     if (i === -1) return res.status(400).send("The selected item is not found in your cart");
-    req.session.cart[i].size = size;
-    res.send({ message: `Size changed for ${req.session.cart[i].name}`, size });
+    const found = req.session.cart.findIndex(item => item.id === id && item.size === size);
+    req.session.cart[i].size = found === -1 ? size : req.session.cart[i].size;
+    if (found === -1) return res.send({ message: "Size changed", size });
+    req.session.cart[found].qty = Math.min(req.session.cart[found].qty + req.session.cart[i].qty, req.session.cart[found].stock_qty);
+    req.session.cart.splice(i, 1);
+    res.send({ message: "Size changed", size, refresh: true });
 });
 
 router.post("/checkout/payment/create", async (req, res) => {

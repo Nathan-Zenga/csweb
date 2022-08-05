@@ -92,6 +92,7 @@
             $.post(form.action, $(form).serializeArray(), function(r) {
                 $(form).find("input[name=prev_size]").val(r.size);
                 alert(r.message);
+                r.refresh && location.reload();
             }).fail(function(err) {
                 alert(err.responseText);
             })
