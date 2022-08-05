@@ -40,7 +40,9 @@
                             </form>
                             <form class="remove-item" action="/shop/cart/remove">
                                 <input type="hidden" name="id" value="<%- item.id %>">
+                                <%_ if (item.size) { _%>
                                 <input type="hidden" name="size" value="<%- item.size %>">
+                                <%_ } _%>
                                 <button type="submit" class="btn remove-item-btn">REMOVE</button>
                             </form>
                         </div>

@@ -111,7 +111,7 @@ module.exports.MailTest = model('MailTest', (() => {
     });
 
     const twoWeeks = 1000 * 60 * 60 * 24 * 14;
-    schema.virtual("due").get((val, vt, doc) => new Date().getTime() >= doc.last_sent_date.getTime() + twoWeeks);
+    schema.virtual("due").get((val, vt, doc) => Date.now() >= doc.last_sent_date.getTime() + twoWeeks);
     return schema;
 })(), "mail_test");
 
