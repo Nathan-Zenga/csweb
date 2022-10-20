@@ -16,7 +16,7 @@ router.get('/activate/:token', async (req, res, next) => {
     res.render('admin-activate', { token: found.password })
 });
 
-router.get('/logout', (req, res) => { req.logout(); res.redirect("/") });
+router.get('/logout', (req, res) => { req.logout(() => res.redirect("/")) });
 
 router.post('/login', (req, res) => {
     req.body.username = email; Object.freeze(req.body);
