@@ -4,7 +4,8 @@
   "description": "merch store website",
   "main": "app.js",
   "scripts": {
-    "heroku-postbuild": "node ./config/homepage-media-build",
+    "start": "node app",
+    "build": "node ./config/homepage-media-build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
