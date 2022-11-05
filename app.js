@@ -3,11 +3,13 @@ const app = express();
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const path = require('path'); // core module
+const fs = require('fs');
+const https = require('https');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MemoryStore = require('memorystore')(session);
 const passport = require('passport');
-const { STRIPE_SK, CSDB, NODE_ENV, PORT = 4001 } = process.env;
+const { STRIPE_SK, CSDB, NODE_ENV, PORT = 4001, PORT_SECURE = 80 } = process.env;
 const Stripe = new (require('stripe').Stripe)(STRIPE_SK);
 const { Homepage_content, MailTest } = require('./models/models');
 const MailTransporter = require('./config/MailTransporter');
@@ -76,7 +78,11 @@ app.get("*", (req, res) => res.status(404).render('error', { title: "Error 404",
 
 app.post("*", (req, res) => res.status(400).send("Sorry, your request currently cannot be processed"));
 
-const server = app.listen(PORT, async () => {
+const key = fs.readFileSync(path.join(__dirname, 'cert', 'key.pem'));
+const cert = fs.readFileSync(path.join(__dirname, 'cert', 'cert.pem'));
+const httpsServer = https.createServer({ key, cert }, app);
+
+httpsServer.listen(PORT_SECURE, async () => {
     console.log(`Server started${!production ? " on port " + PORT : ""}`);
 
     if (production) try {
@@ -89,4 +95,4 @@ const server = app.listen(PORT, async () => {
     } catch (err) { console.error(err.message) }
 });
 
-socketio(server);
+socketio(httpsServer);
