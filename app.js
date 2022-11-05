@@ -44,6 +44,7 @@ app.use(passport.session());
 
 // Global variables
 app.use(async (req, res, next) => {
+    console.log("method: %s, path: %s, host: %s, user-agent: %s", req.method, req.originalUrl, req.headers.host, req.headers['sec-ch-ua'] || req.headers['user-agent']);
     res.locals.user = req.user || null;
     res.locals.socials = (await Homepage_content.find())[0]?.socials || [];
     res.locals.location_origin = `http${req.hostname != "localhost" ? "s" : ""}://${req.headers.host}`;
@@ -59,7 +60,8 @@ app.use(async (req, res, next) => {
     res.locals.product_categories = ["clothing", "other"];
     if (req.originalUrl === "/shop/checkout/payment/complete") return next();
     req.session.checkout_session_id && await Stripe.checkout.sessions.expire(req.session.checkout_session_id).catch(e => null);
-    req.session.checkout_session_id = undefined; next();
+    req.session.checkout_session_id = undefined;
+    next();
 });
 
 app.use('/', require('./routes/index'));
