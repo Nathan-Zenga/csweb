@@ -44,7 +44,7 @@ app.use(passport.session());
 
 // Global variables
 app.use(async (req, res, next) => {
-    console.log("method: %s, path: %s, host: %s, user-agent: %s", req.method, req.originalUrl, req.headers.host, req.headers['sec-ch-ua'] || req.headers['user-agent']);
+    res.on("finish", () => console.log("method: %s, path: %s, host: %s, status: %s (%s)", req.method, req.originalUrl, req.headers.host, res.statusCode, res.statusMessage));
     res.locals.user = req.user || null;
     res.locals.socials = (await Homepage_content.find())[0]?.socials || [];
     res.locals.location_origin = `http${req.hostname != "localhost" ? "s" : ""}://${req.headers.host}`;
@@ -78,16 +78,18 @@ app.get("*", (req, res) => res.status(404).render('error', { title: "Error 404",
 
 app.post("*", (req, res) => res.status(400).send("Sorry, your request currently cannot be processed"));
 
-const server = app.listen(PORT, async () => {
+const server = app.listen(PORT, () => {
     console.log(`Server started${!production ? " on port " + PORT : ""}`);
 
     if (production) try {
-        const test = await MailTest.findOne() || new MailTest();
-        const { email, subject, message, due } = test;
-        if (!due) return;
-        await new MailTransporter({ email }).sendMail({ subject, message });
-        test.last_sent_date = Date.now();
-        await test.save();
+        setInterval(async () => {
+            const test = await MailTest.findOne() || new MailTest();
+            const { email, subject, message, due } = test;
+            if (!due) return;
+            await new MailTransporter({ email }).sendMail({ subject, message });
+            test.last_sent_date = Date.now();
+            await test.save();
+        }, 1000 * 60 * 10);
     } catch (err) { console.error(err.message) }
 });
 
