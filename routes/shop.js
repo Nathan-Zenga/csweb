@@ -26,8 +26,8 @@ router.get("/cart", (req, res) => res.render('cart'));
 
 router.post("/fx", async (req, res) => {
     const currency = currencies.find(c => c.code === req.body.currency_code?.toUpperCase());
-    const url = `https://free.currconv.com/api/v7/convert?q=GBP_${currency?.code}&compact=ultra&apiKey=${EXCHANGERATE_API_KEY}`;
-    const rate = await axios.get(url).then(r => r.data[`GBP_${currency?.code}`]).catch(e => null);
+    const url = `https://openexchangerates.org/api/latest.json?app_id=${EXCHANGERATE_API_KEY}&base=USD`;
+    const rate = await axios.get(url).then(r => (1 / r.data.rates.GBP) * r.data.rates[currency?.code]).catch(e => null);
     if (!currency || !rate) return res.status(400).send("Unable to convert to this currency at this time\nPlease try again later");
     const symbol = req.session.currency_symbol = currency.symbol || currency.code;
     const currency_code = req.session.currency_code = currency.code;
