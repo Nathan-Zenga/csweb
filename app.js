@@ -14,6 +14,7 @@ const MailTransporter = require('./modules/MailTransporter');
 const currencies = require('./modules/currencies');
 const production = NODE_ENV === "production";
 const socketio = require('./modules/socket.io');
+const visitor = require('./modules/visitor-info');
 
 mongoose.connect(CSDB).then(() => { console.log("Connected to DB") });
 
@@ -44,7 +45,7 @@ app.use(passport.session());
 
 // Global variables
 app.use(async (req, res, next) => {
-    res.on("finish", () => console.log("method: %s, path: %s, host: %s, status: %s (%s)", req.method, req.originalUrl, req.headers.host, res.statusCode, res.statusMessage));
+    res.on("finish", () => console.log(visitor(req, res)));
     res.locals.user = req.user || null;
     res.locals.socials = (await Homepage_content.find())[0]?.socials || [];
     res.locals.location_origin = `http${req.hostname != "localhost" ? "s" : ""}://${req.headers.host}`;
