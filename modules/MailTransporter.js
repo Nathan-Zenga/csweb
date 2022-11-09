@@ -67,7 +67,7 @@ class MailTransporter {
 
             const template = path.join(__dirname, '../views/templates/mail.ejs');
             const socials = (await Homepage_content.find())[0]?.socials || [];
-            const location_origin = production ? "https://www.thecs.co" : "http://localhost:4001";
+            const location_origin = MailTransporter.location_origin;
             const html = await renderFile(template, { message, recipient: this.#recipient, socials, location_origin });
 
             const transport_opts = await this.#getTransportOpts();
@@ -94,5 +94,7 @@ class MailTransporter {
         return this
     };
 };
+
+MailTransporter.location_origin = "";
 
 module.exports = MailTransporter;
