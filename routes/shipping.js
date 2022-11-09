@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { isAuthed } = require('../config/config');
+const { isAuthed } = require('../modules/config');
 const { Shipping_method } = require('../models/models');
 const delivery_est_units = ["hour", "business day", "week", "month"];
 

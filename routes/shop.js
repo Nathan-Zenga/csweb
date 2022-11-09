@@ -4,13 +4,13 @@ const Stripe = new (require('stripe').Stripe)(STRIPE_SK);
 const { v2: cloud } = require('cloudinary');
 const { default: axios } = require('axios');
 const { each } = require('async');
-const { isAuthed } = require('../config/config');
+const { isAuthed } = require('../modules/config');
 const { Product, Shipping_method } = require('../models/models');
-const MailTransporter = require('../config/MailTransporter');
-const currencies = require('../config/currencies');
+const MailTransporter = require('../modules/MailTransporter');
+const currencies = require('../modules/currencies');
 const production = NODE_ENV === "production";
 const number_separator_regx = /\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g;
-const countries = require("../config/country-list");
+const countries = require("../modules/country-list");
 
 router.get("/", async (req, res) => {
     const products = await Product.find();
@@ -160,14 +160,9 @@ router.post("/checkout/payment/create", async (req, res) => {
         if (missing_fields.length) return res.status(400).send(`Missing fields: ${missing_fields.join(", ")}`);
         if (!email_pattern.test(email)) return res.status(400).send("Invalid email format");
 
-        const customer = await Stripe.customers.create({
-            name: `${firstname} ${lastname}`,
-            email,
-            shipping: {
-                name: `${firstname} ${lastname}`,
-                address: { line1: address_l1, line2: address_l2, city, state, country, postal_code: postcode }
-            }
-        });
+        const name = `${firstname} ${lastname}`;
+        const shipping = { name, address: { line1: address_l1, line2: address_l2, city, state, country, postal_code: postcode } };
+        const customer = await Stripe.customers.create({ name, email, shipping });
 
         const domestic = /GB|IE/i.test(country);
         const shipping_methods = await Shipping_method.find({ name: domestic ? /domestic|free|uk/i : /^((?!(domestic|free|uk)).)*$/i });

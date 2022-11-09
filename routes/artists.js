@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { v2: cloud } = require('cloudinary');
 const { Artist } = require('../models/models');
-const { isAuthed } = require('../config/config');
+const { isAuthed } = require('../modules/config');
 
 router.get('/', async (req, res) => {
     const artists = await Artist.find();

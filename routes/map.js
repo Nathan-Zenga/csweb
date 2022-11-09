@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { Location } = require('../models/models');
-const { isAuthed } = require('../config/config');
+const { isAuthed } = require('../modules/config');
 const apiKey = process.env.GEOCODER_API_KEY;
 const geocoder = require('node-geocoder')({ provider: 'google', httpAdapter: 'https', apiKey });
 

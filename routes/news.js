@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { v2: cloud } = require('cloudinary');
 const { Article } = require('../models/models');
-const { isAuthed, saveMedia, indexReorder } = require('../config/config');
+const { isAuthed, saveMedia, indexReorder } = require('../modules/config');
 
 router.get('/', async (req, res) => {
     const articles = await Article.find().sort({ index: 1 }).exec();

@@ -10,10 +10,10 @@ const passport = require('passport');
 const { STRIPE_SK, CSDB, NODE_ENV, PORT = 4001 } = process.env;
 const Stripe = new (require('stripe').Stripe)(STRIPE_SK);
 const { Homepage_content, MailTest } = require('./models/models');
-const MailTransporter = require('./config/MailTransporter');
-const currencies = require('./config/currencies');
+const MailTransporter = require('./modules/MailTransporter');
+const currencies = require('./modules/currencies');
 const production = NODE_ENV === "production";
-const socketio = require('./config/socket.io');
+const socketio = require('./modules/socket.io');
 
 mongoose.connect(CSDB).then(() => { console.log("Connected to DB") });
 

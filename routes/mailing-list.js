@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { MailingList } = require('../models/models');
-const { isAuthed } = require('../config/config');
+const { isAuthed } = require('../modules/config');
 const { default: axios } = require('axios');
 const { RECAPTCHA_SITE_KEY: recaptcha_site_key, RECAPTCHA_SECRET_KEY } = process.env;
 

@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { v2: cloud } = require('cloudinary');
 const { each } = require('async');
-const { isAuthed, indexReorder } = require('../config/config');
+const { isAuthed, indexReorder } = require('../modules/config');
 const { Homepage_content, Homepage_image } = require('../models/models');
 
 router.get('/', async (req, res) => {
