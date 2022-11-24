@@ -1097,8 +1097,10 @@ body:not(#cart-page, #admin-page) #cart-icon.visible {
     z-index: 50;
 }
 
-#admin-page #mail-alert-box.visible.hidden {
+#admin-page #mail-alert-box.visible {
     padding-left: 30px;
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
 }
 
 #admin-page #mail-alert-box .message p:last-child {

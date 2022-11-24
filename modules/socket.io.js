@@ -45,8 +45,8 @@ module.exports = server => {
             })(members);
         });
 
-        const timeout = setInterval(() => {
-            if (!status.running) return clearInterval(timeout);
+        const interval = setInterval(() => {
+            if (!status.running) return clearInterval(interval);
             status.message && socket.emit("sent mail background update", status);
         }, 1000);
     })

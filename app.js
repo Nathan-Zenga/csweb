@@ -30,12 +30,13 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Express session
+app.set('trust proxy', 1);
 app.use(session({
     secret: 'secret',
     name: 'sesh' + Math.round(Math.random() * 10000),
     saveUninitialized: true,
     resave: true,
-    cookie: { secure: false },
+    cookie: { secure: 'auto' },
     store: new MemoryStore({ checkPeriod: 1000 * 60 * 60 * 12 })
 }));
 
@@ -48,7 +49,7 @@ app.use(async (req, res, next) => {
     res.on("finish", () => console.log(visitor(req, res)));
     res.locals.user = req.user || null;
     res.locals.socials = (await Homepage_content.find())[0]?.socials || [];
-    res.locals.location_origin = MailTransporter.location_origin = `http${req.hostname != "localhost" ? "s" : ""}://${req.headers.host}`;
+    res.locals.location_origin = MailTransporter.location_origin = `${req.protocol}://${req.headers.host}`;
     res.locals.cart = req.session.cart = req.session.cart || [];
     res.locals.fx_rate = req.session.fx_rate = req.session.fx_rate || 1;
     res.locals.currency_name = req.session.currency_name = req.session.currency_name || currencies.find(c => c.code === "GBP").name;
