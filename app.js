@@ -46,8 +46,8 @@ app.use(passport.session());
 
 // Global variables
 app.use(async (req, res, next) => {
-    res.on("finish", () => console.log(visitor(req, res)));
-    res.locals.user = req.user || null;
+    req.hostname != "localhost" && res.on("finish", () => console.log(visitor(req, res)));
+    res.locals.user = req.user;
     res.locals.socials = (await Homepage_content.find())[0]?.socials || [];
     res.locals.location_origin = MailTransporter.location_origin = `${req.protocol}://${req.headers.host}`;
     res.locals.cart = req.session.cart = req.session.cart || [];

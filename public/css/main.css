@@ -191,22 +191,47 @@ form {
 
 #admin-page form .input-group input,
 #admin-page form .input-group label {
-    font-size: 1em;
+    font-size: 14px;
+    margin-bottom: 0;
 }
 
-#admin-page .input-group {
+#admin-page form .input-group {
     margin-bottom: 1em;
 }
 
-#admin-page .input-group .list-item-label {
+#admin-page form .input-group .list-item-label {
     font-weight: 600;
     background-color: rgb(220, 220, 220);
     height: auto;
 }
 
-#admin-page .input-group input[type=radio],
-#admin-page #remove.tab-pane input[type=checkbox] {
+#admin-page form .input-group input[type=radio],
+#admin-page #remove.tab-pane form input[type=checkbox] {
     margin-bottom: 0;
+}
+
+#admin-page form .input-item-group .input-item {
+    margin-bottom: 1.5em;
+}
+
+#admin-page form .input-item-group .opt-btn-group {
+    margin: 0 0 0 auto;
+    max-width: 50%;
+}
+
+#admin-page form .delivery-estimates {
+    margin-bottom: 1em;
+}
+
+#admin-page form .all_platforms_opt {
+    margin: 0 auto 1em 0;
+    max-width: 60%;
+}
+
+#admin-page .section-dropdown-options {
+    font-weight: 600;
+    max-width: 250px;
+    margin: 0 auto;
 }
 
 .file-upload-container {
@@ -257,6 +282,10 @@ select {
     border: 1px lightgrey solid;
 }
 
+.form-control {
+    font-size: inherit;
+}
+
 .custom-select {
     font-size: 1em;
     color: black;
@@ -270,7 +299,11 @@ textarea {
     max-width: 100%;
 }
 
-input[type=text], input[type=password], input[type=number], input[type=url], input[type=email] {
+input[type=text]:not(.form-control),
+input[type=password]:not(.form-control),
+input[type=number]:not(.form-control),
+input[type=url]:not(.form-control),
+input[type=email]:not(.form-control) {
     border-bottom: 1px solid black;
 }
 
@@ -316,7 +349,7 @@ button + button {
     margin-left: 10px;
 }
 
-.input-group button {
+.input-group input, .input-group button {
     margin-bottom: 0;
 }
 
@@ -988,11 +1021,12 @@ article.preview .read-more-link {
 }
 
 #cart-icon {
-    box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.2);
+    transition: .5s box-shadow;
     z-index: 500;
 }
 
 body:not(#cart-page, #admin-page) #cart-icon.visible {
+    box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.2);
     -webkit-transform: translateX(0);
     transform: translateX(0);
 }
@@ -1129,12 +1163,6 @@ body:not(#cart-page, #admin-page) #cart-icon.visible {
 
 #admin-page #mail-alert-box.visible.hidden .message {
     display: none;
-}
-
-#admin-page .section-dropdown-options {
-    font-weight: 600;
-    max-width: 250px;
-    margin: 0 auto;
 }
 
 @media (max-width: 575px) {

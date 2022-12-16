@@ -25,29 +25,33 @@
     <input type="number" name="year" id="year" min="2000" max="<%= thisYear %>" value="<%= thisYear %>" required>
 
     <label>LINKS (OPTIONAL)</label>
-    <div class="link-item-group">
-        <div class="link-item input-item row">
-            <div class="col-sm-4 float-left">
-                <select class="custom-select link-name" name="link_name">
+    <div class="link-item-group input-item-group">
+        <div class="link-item input-item">
+            <div class="input-group">
+                <select class="form-control custom-select link-name" name="link_name">
                     <option value="">Choose link name</option>
                     <%_ platforms.forEach(social => { _%>
                     <option value="<%= social.toLowerCase().replace(/[ _]/g, '') %>"><%= social %></option>
                     <%_ }) _%>
                 </select>
+                <input type="url" name="link_url" class="form-control link-url" placeholder="Enter URL">
             </div>
-            <div class="col-sm-8 float-left">
-                <input type="url" name="link_url" class="link-url" placeholder="Enter URL">
-            </div>
-            <div class="col-sm-12 float-left" style="text-align: right; margin-top: -1em;">
-                <button class="add">Add</button>
-                <button class="remove">Remove</button>
+            <div class="input-group opt-btn-group">
+                <button type="button" class="form-control add">Add</button>
+                <button type="button" class="form-control remove">Remove</button>
             </div>
         </div>
     </div>
 
     <label><span>Check the box in case entering every link is unnecessary</span></label>
-    <input type="checkbox" name="all_platforms" id="all_platforms">
-    <label for="all_platforms" style="display: inline-block"><b>ALL PLATFORMS?</b></label>
+    <div class="input-group all_platforms_opt">
+        <div class="input-group-prepend">
+            <div class="input-group-text">
+                <input type="checkbox" name="all_platforms" id="all_platforms">
+            </div>
+        </div>
+        <label class="form-control" for="all_platforms"><b>ALL PLATFORMS?</b></label>
+    </div>
 
     <input type="submit" value="SAVE">
 </form>

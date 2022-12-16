@@ -37,22 +37,20 @@
     <input type="text" name="footnote_text" id="footnote_text" value="<%= homepage_contents[0] ? homepage_contents[0].footnote_text : '' %>">
 
     <label>CS SOCIALS</label>
-    <div class="social-media-input-group">
-        <div class="social-media-input input-item row">
-            <div class="col-sm-4 float-left">
-                <select class="custom-select socials-name" name="socials_name">
+    <div class="social-media-input-group input-item-group">
+        <div class="social-media-input input-item">
+            <div class="input-group">
+                <select class="form-control custom-select socials-name edit" name="socials_name">
                     <option value="">Choose social</option>
-                    <%_ ["Twitter", "Instagram", "Facebook", "Spotify", "YouTube", "SoundCloud", "Apple Music", "Tidal", "Bandcamp", "Deezer", "Google Play"].forEach(social => { _%>
-                    <option value="<%= social.toLowerCase().replace(/ /g, '_') %>"><%= social %></option>
+                    <%_ platforms.forEach(social => { _%>
+                    <option value="<%= social.toLowerCase().replace(/[ _]/g, '') %>"><%= social %></option>
                     <%_ }) _%>
                 </select>
+                <input type="url" name="socials_url" class="form-control socials-url edit" placeholder="Enter URL">
             </div>
-            <div class="col-sm-8 float-left">
-                <input type="url" name="socials_url" class="socials-url" placeholder="Enter URL">
-            </div>
-            <div class="col-sm-12 float-left" style="text-align: right; margin-top: -1em;">
-                <button class="add">Add</button>
-                <button class="remove">Remove</button>
+            <div class="input-group opt-btn-group">
+                <button type="button" class="form-control add">Add</button>
+                <button type="button" class="form-control remove">Remove</button>
             </div>
         </div>
     </div>

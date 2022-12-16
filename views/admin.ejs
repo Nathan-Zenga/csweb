@@ -198,12 +198,12 @@
             e.preventDefault();
             var $form = $(this).closest("form");
             var $item = $(this).closest(".input-item");
-            switch (this.className) {
-                case "add":
+            switch (true) {
+                case this.className.includes("add"):
                     $item.clone(true).find(":input").not("button").val("").end().end().insertAfter($item);
                     break;
-                case "remove":
-                    if ($form.find(".input-item").length > 1) $item.remove();
+                case this.className.includes("remove"):
+                    $form.find(".input-item").length > 1 && $item.remove();
                     break;
             }
         });

@@ -59,22 +59,20 @@
                         </div>
                     </div>
                     <label>SOCIAL MEDIA LINKS</label>
-                    <div class="social-media-input-group">
-                        <div class="social-media-input input-item row">
-                            <div class="col-sm-4 float-left">
-                                <select class="custom-select social-media-name edit" name="social_media_name">
+                    <div class="social-media-input-group input-item-group">
+                        <div class="social-media-input input-item">
+                            <div class="input-group">
+                                <select class="form-control custom-select social-media-name edit" name="social_media_name">
                                     <option value="">Choose social</option>
                                     <%_ platforms.forEach(social => { _%>
                                     <option value="<%= social.toLowerCase().replace(/[ _]/g, '') %>"><%= social %></option>
                                     <%_ }) _%>
                                 </select>
+                                <input type="url" name="social_media_url" class="form-control social-media-url edit" placeholder="Enter URL">
                             </div>
-                            <div class="col-sm-8 float-left">
-                                <input type="url" name="social_media_url" class="social-media-url edit" placeholder="Enter URL">
-                            </div>
-                            <div class="col-sm-12 float-left" style="text-align: right; margin-top: -1em;">
-                                <button class="add">Add</button>
-                                <button class="remove">Remove</button>
+                            <div class="input-group opt-btn-group">
+                                <button type="button" class="form-control add">Add</button>
+                                <button type="button" class="form-control remove">Remove</button>
                             </div>
                         </div>
                     </div>
@@ -183,28 +181,32 @@
                     <%_ var thisYear = new Date().getFullYear(); _%>
                     <input type="number" name="year" id="year_edit" min="2000" max="<%= thisYear %>" value="<%= thisYear %>">
                     <label>LINKS (OPTIONAL)</label>
-                    <div class="link-item-group">
-                        <div class="link-item input-item row">
-                            <div class="col-sm-4 float-left">
-                                <select class="custom-select link-name" name="link_name">
+                    <div class="link-item-group input-item-group">
+                        <div class="link-item input-item">
+                            <div class="input-group">
+                                <select class="form-control custom-select link-name" name="link_name">
                                     <option value="">Choose link name</option>
                                     <%_ platforms.forEach(social => { _%>
                                     <option value="<%= social.toLowerCase().replace(/[ _]/g, '') %>"><%= social %></option>
                                     <%_ }) _%>
                                 </select>
+                                <input type="url" name="link_url" class="form-control link-url" placeholder="Enter URL">
                             </div>
-                            <div class="col-sm-8 float-left">
-                                <input type="url" name="link_url" class="link-url" placeholder="Enter URL">
-                            </div>
-                            <div class="col-sm-12 float-left" style="text-align: right; margin-top: -1em;">
-                                <button class="add">Add</button>
-                                <button class="remove">Remove</button>
+                            <div class="input-group opt-btn-group">
+                                <button type="button" class="form-control add">Add</button>
+                                <button type="button" class="form-control remove">Remove</button>
                             </div>
                         </div>
                     </div>
                     <label><span>Check the box in case entering every link is unnecessary</span></label>
-                    <input type="checkbox" name="all_platforms" id="all_platforms_change">
-                    <label for="all_platforms_change" style="display: inline-block"><b>ALL PLATFORMS?</b></label>
+                    <div class="input-group all_platforms_opt">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <input type="checkbox" name="all_platforms" id="all_platforms_change">
+                            </div>
+                        </div>
+                        <label class="form-control" for="all_platforms_change"><b>ALL PLATFORMS?</b></label>
+                    </div>
                     <input type="submit" value="UPDATE PROJECT">
                 </form>
             </div>
@@ -358,33 +360,37 @@
 
                     <label>DELIVERY ESTIMATES</label>
                     <fieldset class="delivery-estimates">
-                        <label>BETWEEN:</label>
                         <div class="row">
-                            <div class="col">
-                                <input type="number" name="min_value" id="min_value_edit" min="1" value="5" required>
+                            <div class="col-3">
+                                <label>BETWEEN:</label>
                             </div>
                             <div class="col">
-                                <select class="custom-select" name="min_unit" id="min_unit_edit" required>
-                                    <option value="hour">Hours</option>
-                                    <option value="business day" selected>Business days</option>
-                                    <option value="week">Weeks</option>
-                                    <option value="month">Months</option>
-                                </select>
+                                <div class="input-group">
+                                    <input class="form-control" type="number" name="min_value" id="min_value_edit" min="1" value="5" required>
+                                    <select class="form-control custom-select" name="min_unit" id="min_unit_edit" required>
+                                        <option value="hour">Hours</option>
+                                        <option value="business day" selected>Business days</option>
+                                        <option value="week">Weeks</option>
+                                        <option value="month">Months</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
-                        <label>TO:</label>
                         <div class="row">
-                            <div class="col">
-                                <input type="number" name="max_value" id="max_value_edit" min="1" value="7" required>
+                            <div class="col-3">
+                                <label>TO:</label>
                             </div>
                             <div class="col">
-                                <select class="custom-select" name="max_unit" id="max_unit_edit" required>
-                                    <option value="hour">Hours</option>
-                                    <option value="business day" selected>Business days</option>
-                                    <option value="week">Weeks</option>
-                                    <option value="month">Months</option>
-                                </select>
+                                <div class="input-group">
+                                    <input class="form-control" type="number" name="max_value" id="max_value_edit" min="1" value="7" required>
+                                    <select class="form-control custom-select" name="max_unit" id="max_unit_edit" required>
+                                        <option value="hour">Hours</option>
+                                        <option value="business day" selected>Business days</option>
+                                        <option value="week">Weeks</option>
+                                        <option value="month">Months</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </fieldset>
@@ -408,9 +414,13 @@
                     <%_ }}) _%>
                     </div>
                     <br>
-                    <div class="row">
-                        <div class="col-sm-4 float-left"><label>POSITION NUMBER</label></div>
-                        <div class="col-sm-8 float-left"><input type="number" name="index" min="1" max="<%= homepage_images.length %>" required></div>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">
+                                <label>POSITION NO.</label>
+                            </div>
+                        </div>
+                        <input class="form-control" type="number" name="index" min="1" max="<%= homepage_images.length %>" required>
                     </div>
                     <input type="submit" value="RE-ORDER IMAGE">
                 </form>

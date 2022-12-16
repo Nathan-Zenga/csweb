@@ -21,22 +21,20 @@
     </div>
 
     <label>SOCIAL MEDIA LINKS</label>
-    <div class="social-media-input-group">
-        <div class="social-media-input input-item row">
-            <div class="col-sm-4 float-left">
-                <select class="custom-select social-media-name" name="social_media_name">
+    <div class="social-media-input-group input-item-group">
+        <div class="social-media-input input-item">
+            <div class="input-group">
+                <select class="form-control custom-select social-media-name" name="social_media_name">
                     <option value="">Choose social</option>
                     <%_ platforms.forEach(social => { _%>
                     <option value="<%= social.toLowerCase().replace(/[ _]/g, '') %>"><%= social %></option>
                     <%_ }) _%>
                 </select>
+                <input type="url" name="social_media_url" class="form-control social-media-url" placeholder="Enter URL">
             </div>
-            <div class="col-sm-8 float-left">
-                <input type="url" name="social_media_url" class="social-media-url" placeholder="Enter URL">
-            </div>
-            <div class="col-sm-12 float-left" style="text-align: right; margin-top: -1em;">
-                <button class="add">Add</button>
-                <button class="remove">Remove</button>
+            <div class="input-group opt-btn-group">
+                <button type="button" class="form-control add">Add</button>
+                <button type="button" class="form-control remove">Remove</button>
             </div>
         </div>
     </div>

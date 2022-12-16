@@ -7,33 +7,37 @@
 
     <label>DELIVERY ESTIMATES</label>
     <fieldset class="delivery-estimates">
-        <label>BETWEEN:</label>
         <div class="row">
-            <div class="col">
-                <input type="number" name="min_value" id="min-value" min="1" value="5" required>
+            <div class="col-3">
+                <label>BETWEEN:</label>
             </div>
             <div class="col">
-                <select class="custom-select" name="min_unit" id="min-unit" required>
-                    <option value="hour">Hours</option>
-                    <option value="business day" selected>Business days</option>
-                    <option value="week">Weeks</option>
-                    <option value="month">Months</option>
-                </select>
+                <div class="input-group">
+                    <input class="form-control" type="number" name="min_value" id="min_value" min="1" value="5" required>
+                    <select class="form-control custom-select" name="min_unit" id="min_unit" required>
+                        <option value="hour">Hours</option>
+                        <option value="business day" selected>Business days</option>
+                        <option value="week">Weeks</option>
+                        <option value="month">Months</option>
+                    </select>
+                </div>
             </div>
         </div>
 
-        <label>TO:</label>
         <div class="row">
-            <div class="col">
-                <input type="number" name="max_value" id="max-value" min="1" value="7" required>
+            <div class="col-3">
+                <label>TO:</label>
             </div>
             <div class="col">
-                <select class="custom-select" name="max_unit" id="max-unit" required>
-                    <option value="hour">Hours</option>
-                    <option value="business day" selected>Business days</option>
-                    <option value="week">Weeks</option>
-                    <option value="month">Months</option>
-                </select>
+                <div class="input-group">
+                    <input class="form-control" type="number" name="max_value" id="max_value" min="1" value="7" required>
+                    <select class="form-control custom-select" name="max_unit" id="max_unit" required>
+                        <option value="hour">Hours</option>
+                        <option value="business day" selected>Business days</option>
+                        <option value="week">Weeks</option>
+                        <option value="month">Months</option>
+                    </select>
+                </div>
             </div>
         </div>
     </fieldset>
