@@ -1,6 +1,6 @@
 {
   "name": "csweb",
-  "version": "2.4.2",
+  "version": "2.4.4",
   "description": "merch store website",
   "main": "app.js",
   "scripts": {
@@ -11,12 +11,12 @@
     "async": "^3.2.3",
     "axios": "^0.26.1",
     "bcrypt": "^5.0.1",
-    "body-parser": "^1.19.2",
+    "body-parser": "^1.20.1",
     "cloudinary": "^1.28.1",
     "cookie-parser": "^1.4.6",
     "ejs": "^3.1.7",
-    "express": "^4.17.3",
-    "express-session": "^1.17.2",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
     "googleapis": "^97.0.0",
     "memorystore": "^1.6.7",
     "mongoose": "^6.2.6",
