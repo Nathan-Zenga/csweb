@@ -704,7 +704,7 @@ article.preview .read-more-link {
     margin-bottom: .5em;
 }
 
-.artist-bio .text p {
+.artist-bio .text p:last-child {
     margin: 0;
 }
 
@@ -738,20 +738,24 @@ article.preview .read-more-link {
         background-color: transparent;
     }
 
-    .artist-bio:nth-child(odd) {
-        background-image: linear-gradient(to left, white 55%, black 55%, black 100%);
+    .artist-bio.no-clip-path:nth-child(odd) {
+        background-image: linear-gradient(to left, white 55%, black 55%);
     }
 
-    .artist-bio:nth-child(even) {
-        background-image: linear-gradient(to right, white 55%, black 55%, black 100%);
+    .artist-bio.no-clip-path:nth-child(even) {
+        background-image: linear-gradient(to right, white 55%, black 55%);
     }
 
     .artist-bio .img {
         margin: 0;
     }
 
-    .artist-bio .img-wrapper::before,
-    .artist-bio .img-wrapper::after {
+    .artist-bio:not(.no-clip-path) .img-wrapper .img {
+        clip-path: polygon(10% 0, 100% 0, 90% 100.1%, 0 100.1%);
+    }
+
+    .artist-bio.no-clip-path .img-wrapper::before,
+    .artist-bio.no-clip-path .img-wrapper::after {
         position: absolute;
         content: " ";
         top: 0;
@@ -762,20 +766,38 @@ article.preview .read-more-link {
         transform: skew(-7deg);
     }
 
-    .artist-bio .img-wrapper::before {
+    .artist-bio.no-clip-path .img-wrapper::before {
         left: -95px;
     }
 
-    .artist-bio .img-wrapper::after {
+    .artist-bio.no-clip-path .img-wrapper::after {
         right: -95px;
     }
 
-    .artist-bio:nth-child(odd) .img-wrapper::before {
+    .artist-bio.no-clip-path:nth-child(odd) .img-wrapper::before {
         background-color: black;
     }
 
-    .artist-bio:nth-child(even) .img-wrapper::after {
+    .artist-bio.no-clip-path:nth-child(even) .img-wrapper::after {
         background-color: black;
+    }
+
+    .artist-bio:not(.no-clip-path) .img-wrapper::before {
+        position: absolute;
+        display: block;
+        content: " ";
+        top: 0;
+        width: 300vw;
+        height: 100%;
+        background-color: white;
+    }
+
+    .artist-bio:not(.no-clip-path):nth-child(even) .img-wrapper::before {
+        right: 10%;
+    }
+
+    .artist-bio:not(.no-clip-path):nth-child(odd) .img-wrapper::before {
+        left: 90%;
     }
 
     .artist-bio .text {
@@ -795,6 +817,10 @@ article.preview .read-more-link {
         max-height: 400px;
         overflow: auto;
     }
+
+    .artist-bio .text p {
+        margin: 0;
+    }    
 }
 
 .thumb {

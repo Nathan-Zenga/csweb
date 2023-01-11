@@ -21,5 +21,8 @@
         </div>
     </div>
     <%_ }) _%>
-    <script> $(".artist-bio .text .social-icon").one("error", function() { $(this).parent().hide() }); </script>
+    <script>
+        $(".artist-bio .text .social-icon").one("error", function() { $(this).parent().hide() });
+        !("clip-path" in document.body.style) && $(".artist-bio").addClass("no-clip-path");
+    </script>
 <%- include ('partials/footer') -%>
