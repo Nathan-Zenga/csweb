@@ -19,11 +19,11 @@ header *[class*="-container"] {
     font-weight: 600;
 }
 
-nav {
+#nav {
     display: none;
 }
 
-nav a {
+#nav a {
     display: block;
     margin-bottom: 1.5em;
     text-transform: uppercase;
@@ -51,16 +51,16 @@ nav a {
         padding: 0;
     }
 
-    nav {
+    #nav {
         display: block;
     }
 
-    nav a {
+    #nav a {
         display: initial;
         margin-bottom: 0;
     }
 
-    nav a + a {
+    #nav a + a {
         margin-left: 1.5em;
     }
 }
@@ -751,7 +751,7 @@ article.preview .read-more-link {
     }
 
     .artist-bio:not(.no-clip-path) .img-wrapper .img {
-        clip-path: polygon(10% 0, 100% 0, 90% 100.1%, 0 100.1%);
+        clip-path: polygon(10% 0, 100% 0, 90.1% 100.1%, 0.1% 100.1%);
     }
 
     .artist-bio.no-clip-path .img-wrapper::before,
@@ -800,11 +800,6 @@ article.preview .read-more-link {
         left: 90%;
     }
 
-    .artist-bio .text {
-        max-height: 400px;
-        overflow: auto;
-    }
-
     .artist-bio:nth-child(odd) .text {
         padding-right: 0;
     }
@@ -820,7 +815,7 @@ article.preview .read-more-link {
 
     .artist-bio .text p {
         margin: 0;
-    }    
+    }
 }
 
 .thumb {
@@ -972,7 +967,7 @@ article.preview .read-more-link {
 #fx-select {
     font-weight: 600;
     max-width: 300px;
-    margin-bottom: 1em;
+    margin-bottom: 5em;
 }
 
 @media (min-width: 576px) {

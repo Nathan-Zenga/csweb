@@ -72,23 +72,23 @@ a:hover {
     border: none;
 }
 
-.cs .hamburger {
+#cs .hamburger {
     padding-top: 0;
     padding-bottom: 0;
 }
 
-.cs .hamburger:hover,
-.cs .hamburger.is-active:hover {
+#cs .hamburger:hover,
+#cs .hamburger.is-active:hover {
     opacity: 1;
 }
 
-.cs .hamburger-box {
+#cs .hamburger-box {
     width: 24px;
 }
 
-.cs .hamburger-inner:before,
-.cs .hamburger-inner:after,
-.cs .hamburger-inner {
+#cs .hamburger-inner:before,
+#cs .hamburger-inner:after,
+#cs .hamburger-inner {
     background-color: white!important;
     width: 100%;
     height: 2px;

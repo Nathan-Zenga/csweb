@@ -36,7 +36,7 @@ module.exports = server => {
                 }
 
                 const success = () => { socket.emit(event, { message: `Email sent to ${member.fullname} (${status.count+=1}/${members.length})` }) };
-                const error = err => { socket.emit(event, { message: `${err.message}\nNot sent for ${member.fullname}` }) };
+                const error = err => { socket.emit(event, { message: `${err.message}\n\nNot sent for ${member.fullname}` }) };
                 await transporter.setRecipient(member).sendMail({ subject, message }).then(success).catch(error);
                 status.message = `${status.count}/${members.length} emails sent so far...`;
 

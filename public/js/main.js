@@ -25,8 +25,7 @@ $(function() {
     });
 
     $("#nav-toggle").click(function() {
-        $(this).toggleClass("nav-open");
-        var navOpen = $(this).hasClass("nav-open");
-        $("nav").stop().slideToggle(function() { if(!navOpen) $(this).css("display", "") });
+        var navOpen = $(this).toggleClass("nav-open").hasClass("nav-open");
+        $("#nav").stop().slideToggle(function() { !navOpen && $(this).css("display", "") });
     });
 });

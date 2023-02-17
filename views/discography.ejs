@@ -10,7 +10,7 @@
                     <div class="text">
                         <h2 class="title" title="<%= project.title %>"><%= project.title %></h2>
                         <p><%= project.artist + " | " + project.year %></p>
-                        <p> Available on<%= project.all_platforms && !project.links.length ? " all platforms" : "" %></p>
+                        <p>Available on<%= project.all_platforms && !project.links.length ? " all platforms" : "" %></p>
                         <p>
                         <%_ if (!project.all_platforms) project.links.forEach(link => { _%>
                             <a class="link" target="_blank" href="<%= link.url %>"><img class="socials-icon" src="https://cdn.jsdelivr.net/npm/simple-icons@5.21.1/icons/<%- link.name %>.svg"></a>
