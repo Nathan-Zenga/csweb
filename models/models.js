@@ -1,6 +1,5 @@
 const { model, Schema } = require('mongoose');
-const platforms = ["Twitter", "Instagram", "Facebook", "Spotify", "SoundCloud", "YouTube", "Apple Music", "Tidal", "Bandcamp", "Deezer", "Google Play", "Linktree"].map(p => p.toLowerCase().replace(/[ _]/g, ''));
-const sizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
+const { platforms, sizes } = require('../config/constants');
 Schema.Types.String.set('trim', true);
 
 module.exports.Article = model('Article', (() => {

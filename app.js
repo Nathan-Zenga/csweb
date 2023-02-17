@@ -15,6 +15,7 @@ const currencies = require('./modules/currencies');
 const production = NODE_ENV === "production";
 const socketio = require('./modules/socket.io');
 const visitor = require('./modules/visitor-info');
+const { platforms, sizes } = require('./config/constants');
 
 mongoose.connect(CSDB).then(() => { console.log("Connected to DB") });
 
@@ -56,8 +57,8 @@ app.use(async (req, res, next) => {
     res.locals.currency_code = req.session.currency_code = req.session.currency_code || "GBP";
     res.locals.currency_symbol = req.session.currency_symbol = req.session.currency_symbol || "£";
     res.locals.converted_price = req.session.converted_price = price => parseFloat(price / 100) * req.session.fx_rate;
-    res.locals.platforms = ["Twitter", "Instagram", "Facebook", "Spotify", "SoundCloud", "YouTube", "Apple Music", "Tidal", "Bandcamp", "Deezer", "Google Play", "Linktree"];
-    res.locals.sizes = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
+    res.locals.platforms = platforms;
+    res.locals.sizes = sizes;
     res.locals.number_separator_regx = /\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g;
     res.locals.product_categories = ["clothing", "other"];
     if (req.originalUrl === "/shop/checkout/payment/complete") return next();
