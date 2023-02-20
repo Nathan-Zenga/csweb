@@ -1,5 +1,5 @@
 const { model, Schema } = require('mongoose');
-const { platforms, sizes, delivery_est_units } = require('../config/constants');
+const { platforms, sizes, delivery_est_units, product_categories } = require('../config/constants');
 Schema.Types.String.set('trim', true);
 
 module.exports.Article = model('Article', (() => {
@@ -83,7 +83,7 @@ module.exports.Product = model('Product', (() => {
         image: String,
         info: String,
         stock_qty: { type: Number, min: [0, "No negative values allowed for stock quantity"] },
-        category: { type: String, enum: ["clothing", "other"] }
+        category: { type: String, enum: product_categories }
     });
 
     schema.virtual("size_required").get((val, vt, doc) => doc.category === "clothing");
