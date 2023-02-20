@@ -368,10 +368,11 @@
                                 <div class="input-group">
                                     <input class="form-control" type="number" name="min_value" id="min_value_edit" min="1" value="5" required>
                                     <select class="form-control custom-select" name="min_unit" id="min_unit_edit" required>
-                                        <option value="hour">Hours</option>
-                                        <option value="business day" selected>Business days</option>
-                                        <option value="week">Weeks</option>
-                                        <option value="month">Months</option>
+                                        <%_ delivery_est_units.forEach(unit => { _%>
+                                        <option value="<%= unit %>"<%- unit == "business day" ? " selected" : "" %>>
+                                            <%= unit.replace(/^./, m => m.toUpperCase()) %>s
+                                        </option>
+                                        <%_ }) _%>
                                     </select>
                                 </div>
                             </div>
@@ -385,10 +386,11 @@
                                 <div class="input-group">
                                     <input class="form-control" type="number" name="max_value" id="max_value_edit" min="1" value="7" required>
                                     <select class="form-control custom-select" name="max_unit" id="max_unit_edit" required>
-                                        <option value="hour">Hours</option>
-                                        <option value="business day" selected>Business days</option>
-                                        <option value="week">Weeks</option>
-                                        <option value="month">Months</option>
+                                        <%_ delivery_est_units.forEach(unit => { _%>
+                                        <option value="<%= unit %>"<%- unit == "business day" ? " selected" : "" %>>
+                                            <%= unit.replace(/^./, m => m.toUpperCase()) %>s
+                                        </option>
+                                        <%_ }) _%>
                                     </select>
                                 </div>
                             </div>

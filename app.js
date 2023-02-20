@@ -15,7 +15,7 @@ const currencies = require('./modules/currencies');
 const production = NODE_ENV === "production";
 const socketio = require('./modules/socket.io');
 const visitor = require('./modules/visitor-info');
-const { platforms, sizes } = require('./config/constants');
+const { platforms, sizes, delivery_est_units } = require('./config/constants');
 
 mongoose.connect(CSDB).then(() => { console.log("Connected to DB") });
 
@@ -59,6 +59,7 @@ app.use(async (req, res, next) => {
     res.locals.converted_price = req.session.converted_price = price => parseFloat(price / 100) * req.session.fx_rate;
     res.locals.platforms = platforms;
     res.locals.sizes = sizes;
+    res.locals.delivery_est_units = delivery_est_units;
     res.locals.number_separator_regx = /\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g;
     res.locals.product_categories = ["clothing", "other"];
     if (req.originalUrl === "/shop/checkout/payment/complete") return next();

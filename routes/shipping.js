@@ -1,17 +1,12 @@
 const router = require('express').Router();
 const { isAuthed } = require('../modules/config');
 const { Shipping_method } = require('../models/models');
-const delivery_est_units = ["hour", "business day", "week", "month"];
 
 router.post("/add", async (req, res) => {
     const { name, fee, min_value, min_unit, max_value, max_unit } = req.body;
-
-    const min = delivery_est_units.indexOf(min_unit);
-    const max = delivery_est_units.indexOf(max_unit);
-    if (min > max) return res.status(400).send(`Minimum delivery estimate cannot be larger than the maximum`);
+    const shipping = new Shipping_method({ name, fee });
 
     try {
-        const shipping = new Shipping_method({ name, fee });
         shipping.delivery_estimate.minimum.value = min_value;
         shipping.delivery_estimate.maximum.value = max_value;
         shipping.delivery_estimate.minimum.unit = min_unit;
@@ -25,10 +20,6 @@ router.post('/edit', isAuthed, async (req, res) => {
     try {
         const shipping = await Shipping_method.findById(shipping_method_id);
         if (!shipping) return res.status(404).send("Shipping method not found");
-
-        const min = delivery_est_units.indexOf(min_unit);
-        const max = delivery_est_units.indexOf(max_unit);
-        if (min > max) return res.status(400).send(`Minimum delivery estimate cannot be larger than the maximum`);
 
         if (name) shipping.name = name;
         if (fee) shipping.fee = fee;
