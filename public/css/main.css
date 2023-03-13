@@ -189,14 +189,18 @@ form {
     overflow: auto;
 }
 
+#admin-page form .input-group {
+    margin-bottom: 2em;
+}
+
+#admin-page #remove.tab-pane form .input-group {
+    margin-bottom: 1em;
+}
+
 #admin-page form .input-group input,
 #admin-page form .input-group label {
     font-size: 14px;
     margin-bottom: 0;
-}
-
-#admin-page form .input-group {
-    margin-bottom: 1em;
 }
 
 #admin-page form .input-group .list-item-label {
@@ -205,17 +209,12 @@ form {
     height: auto;
 }
 
-#admin-page form .input-group input[type=radio],
-#admin-page #remove.tab-pane form input[type=checkbox] {
-    margin-bottom: 0;
-}
-
 #admin-page form .input-item-group .input-item {
     margin-bottom: 1.5em;
 }
 
 #admin-page form .input-item-group .opt-btn-group {
-    margin: 0 0 0 auto;
+    margin: -15px 0 0 auto;
     max-width: 50%;
 }
 
@@ -232,6 +231,11 @@ form {
     font-weight: 600;
     max-width: 250px;
     margin: 0 auto;
+}
+
+#admin-page fieldset.stock-qty-per-size .row label,
+#admin-page fieldset.delivery-estimates .row label {
+    margin-top: 7px;
 }
 
 .file-upload-container {

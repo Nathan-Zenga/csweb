@@ -283,7 +283,7 @@
                     </div>
                     <label>EXTRA INFO (OPTIONAL)</label>
                     <textarea name="extra_info" id="extra_info_edit"></textarea>
-                    <input type="submit" value="UPDATE MAILING LIST">
+                    <input type="submit" value="UPDATE DETAILS">
                 </form>
             </div>
 
@@ -303,16 +303,10 @@
                     <label>PRICE (GBP £)</label>
                     <input type="number" name="price" id="price_edit" min="0.01" step="0.01" required>
 
-                    <label>TOTAL IN STOCK</label>
-                    <input type="number" name="stock_qty" id="stock_qty_edit" min="1" value="1" required>
-
-                    <label>PRODUCT INFO <span>(OPTIONAL)</span></label>
-                    <input type="text" name="info" id="product_info_edit"></input>
-
                     <label>CATEGORY</label>
                     <div class="row">
                         <%_ product_categories.forEach(category => { _%>
-                        <div class="col-md-4 col-sm-6 input-group list-item">
+                        <div class="col-md-4 col input-group list-item">
                             <div class="input-group-prepend">
                                 <div class="input-group-text">
                                     <input type="radio" name="category" id="product_category_<%= category %>_edit" value="<%= category %>" required>
@@ -322,6 +316,30 @@
                         </div>
                         <%_ }) _%>
                     </div>
+
+                    <fieldset class="stock-qty">
+                        <label>TOTAL IN STOCK</label>
+                        <input type="number" name="stock_qty" id="stock_qty_edit" min="1" value="1" required>
+                    </fieldset>
+
+                    <fieldset class="stock-qty-per-size" disabled hidden>
+                        <label>TOTAL IN STOCK PER SIZE</label>
+                        <%_ sizes.forEach(size => { _%>
+                        <div class="row no-gutters">
+                            <div class="col-2">
+                                <label><%= size %></label>
+                            </div>
+                            <div class="col">
+                                <div class="input-group">
+                                    <input class="form-control" id="size_<%= size %>_edit" type="number" name="<%= size %>" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                        <%_ }) _%>
+                    </fieldset>
+
+                    <label>PRODUCT INFO <span>(OPTIONAL)</span></label>
+                    <input type="text" name="info" id="product_info_edit"></input>
 
                     <label>PRODUCT IMAGE</label>
                     <div class="file-upload-container">

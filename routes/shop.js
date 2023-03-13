@@ -9,7 +9,6 @@ const { Product, Shipping_method } = require('../models/models');
 const MailTransporter = require('../modules/MailTransporter');
 const currencies = require('../modules/currencies');
 const production = NODE_ENV === "production";
-const number_separator_regx = /\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g;
 const countries = require("../modules/country-list");
 
 router.get("/", async (req, res) => {
@@ -31,7 +30,7 @@ router.post("/fx", async (req, res) => {
     if (!currency || !rate) return res.status(400).send("Unable to convert to this currency at this time\nPlease try again later");
     const symbol = req.session.currency_symbol = currency.symbol || currency.code;
     const currency_code = req.session.currency_code = currency.code;
-    const converted_prices = (await Product.find()).map(p => ((p.price * rate)/100).toFixed(2).replace(number_separator_regx, ","));
+    const converted_prices = (await Product.find()).map(p => ((p.price * rate) / 100).toFixed(2).replace(res.locals.number_separator_regx, ","));
     req.session.fx_rate = rate;
     req.session.currency_name = currency.name;
     res.send({ symbol, currency_code, converted_prices });
@@ -41,6 +40,8 @@ router.post("/stock/add", isAuthed, async (req, res) => {
     const { name, price, stock_qty, info, category, image_file, image_url } = req.body;
     try {
         const product = new Product({ name, price, stock_qty, info, category });
+        product.size_required && res.locals.sizes.forEach(s => { product.stock_qty_per_size[s] = req.body[s] || 0 });
+
         const public_id = `shop/stock/${product.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
         const result = image_url || image_file ? await cloud.uploader.upload(image_url || image_file, { public_id }) : null;
         if (result) product.image = result.secure_url;
@@ -66,6 +67,8 @@ router.post('/stock/edit', isAuthed, async (req, res) => {
             item.qty = Math.min(item.qty, stock_qty);
             return item;
         });
+
+        res.locals.sizes.forEach(s => { product.stock_qty_per_size[s] = product.size_required ? req.body[s] || 0 : null });
 
         const saved = await product.save();
         const public_id = `shop/stock/${saved.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
@@ -99,6 +102,8 @@ router.post("/stock/remove", isAuthed, async (req, res) => {
 router.post("/cart/add", async (req, res) => {
     const product = await Product.findById(req.body.id).catch(e => null);
     if (!product || product.stock_qty < 1) return res.status(404).send("Item currently not in stock");
+    if (product.size_required && product.stock_qty_per_size[req.body.size] < 1) return res.status(400).send("Item size unavailable / out of stock");
+
     const { id, name, price, image, info, stock_qty } = product;
     const currentItems = req.session.cart.filter(item => item.id === id);
     const currentItem = currentItems.find(item => item.size === req.body.size);
@@ -113,21 +118,26 @@ router.post("/cart/add", async (req, res) => {
 
 router.post("/cart/remove", (req, res) => {
     const cartItemIndex = req.session.cart.findIndex(item => item.id === req.body.id && item.size === req.body.size);
-    if (cartItemIndex === -1) return res.status(400).send("The selected item is not found in your cart");
+    if (cartItemIndex === -1) return res.status(404).send("The selected item is not found in your cart");
+
     req.session.cart.splice(cartItemIndex, 1);
     var total = req.session.cart.reduce((sum, p) => sum + (p.price * p.qty), 0);
-    total = req.session.converted_price(total).toFixed(2).replace(number_separator_regx, ",");
+    total = req.session.converted_price(total).toFixed(2).replace(res.locals.number_separator_regx, ",");
     res.send({ total, quantity: 0, cart_empty: !req.session.cart.length });
 });
 
-router.post("/cart/increment", (req, res) => {
-    const { id, quantity, size } = req.body;
-    if (isNaN(parseInt(quantity)) || parseInt(quantity) < 1) return res.status(400).send("Invalid value for quantity");
+router.post("/cart/increment", async (req, res) => {
+    const { id, quantity: qty, size, number_separator_regx } = { ...req.body, ...res.locals };
+    const quantity = parseInt(qty);
+    if (isNaN(quantity) || quantity < 1) return res.status(400).send("Invalid value for quantity");
+
     const currentItems = req.session.cart.filter(item => item.id === id);
     const currentItem = currentItems.find(item => item.size === size);
-    if (!currentItem) return res.status(400).send("The selected item is not found in your cart");
-    const newQuantity = Math.max(1, parseInt(quantity));
-    currentItem.qty = Math.min(newQuantity, currentItem.stock_qty);
+    if (!currentItem) return res.status(404).send("The selected item is not found in your cart");
+
+    const { size_required, stock_qty_per_size } = await Product.findById(id).catch(e => null);
+    const newQuantity = Math.max(1, quantity);
+    currentItem.qty = Math.min(newQuantity, size_required ? stock_qty_per_size[size] : currentItem.stock_qty);
     const totalCount = currentItems.reduce((sum, x) => sum + x.qty, 0);
     if (totalCount > currentItem.stock_qty) currentItem.qty -= totalCount - currentItem.stock_qty;
     var total = req.session.cart.reduce((sum, p) => sum + (p.price * p.qty), 0);
@@ -135,14 +145,19 @@ router.post("/cart/increment", (req, res) => {
     res.send({ total, quantity: currentItem.qty });
 });
 
-router.post("/cart/change-size", (req, res) => {
+router.post("/cart/change-size", async (req, res) => {
     const { id, size, prev_size } = req.body;
     if (!res.locals.sizes.includes(size)) return res.status(400).send("Invalid size selected");
+
+    const product = await Product.findById(id).then(p => p.size_required ? p : null).catch(e => null);
+    if (!product || product.stock_qty_per_size[size] < 1) return res.status(404).send("Item size unavailable / out of stock");
+
     const i = req.session.cart.findIndex(item => item.id === id && item.size === prev_size);
-    if (i === -1) return res.status(400).send("The selected item is not found in your cart");
+    if (i === -1) return res.status(404).send("The selected item is not found in your cart");
+
     const found = req.session.cart.findIndex(item => item.id === id && item.size === size);
-    req.session.cart[i].size = found === -1 ? size : req.session.cart[i].size;
-    if (found === -1) return res.send({ size });
+    if (found === -1) { req.session.cart[i].size = size; return res.send({ size }) }
+
     req.session.cart[found].qty = Math.min(req.session.cart[found].qty + req.session.cart[i].qty, req.session.cart[found].stock_qty);
     req.session.cart.splice(i, 1);
     res.send({ size, refresh: true });
@@ -213,18 +228,19 @@ router.get("/checkout/payment/complete", async (req, res) => {
         const { customer, payment_intent: pi } = await Stripe.checkout.sessions.retrieve(req.session.checkout_session_id, { expand: ["customer", "payment_intent"] });
         if (pi.status !== "succeeded") return res.status(400).render('error', { html: `Payment status:<h2>${pi.status.replace(/_/g, " ").replace(/^./, m => m.toUpperCase())}</h2>` });
 
-        const products = await Product.find();
         const price_total = req.session.cart.reduce((sum, p) => sum + (p.price * p.qty), 0);
 
-        if (production) await Promise.all(req.session.cart.map(item => {
-            const product = products.find(p => p.id === item.id);
-            if (!product) return null;
-            product.stock_qty -= item.qty;
-            if (product.stock_qty < 0) product.stock_qty = 0;
-            return product.save();
-        }));
+        if (production) await (async function update_stock(cart) {
+            const item = cart[0];
+            const product = await Product.findById(item?.id).catch(e => null);
+            if (!item || !product) return !item || await update_stock(cart.slice(1));
 
-        req.session.cart = [];
+            product.size_required ? product.stock_qty_per_size[item.size] -= item.qty : product.stock_qty -= item.qty;
+            await product.save();
+            await update_stock(cart.slice(1));
+        })(req.session.cart);
+
+        req.session.cart = res.locals.cart = [];
         req.session.checkout_session_id = undefined;
 
         const { line1, line2, city, postal_code, state, country } = customer.shipping.address;
@@ -241,8 +257,8 @@ router.get("/checkout/payment/complete", async (req, res) => {
             `- Name: ${customer.name}\n- Email: ${customer.email}\n` +
             `- Address:\n\t${line1},${line2 ? "\n\t"+line2+"," : ""}\n\t${city}, ${country},` + (state ? ` ${state},` : "") + `\n\t${postal_code}\n\n` +
             `- Date of purchase: ${new Date().toDateString()}\n\n` +
-            `- Total amount: £ ${(pi.amount / 100).toFixed(2).replace(number_separator_regx, ",")}` +
-            (req.session.currency_code !== "GBP" ? ` (${req.session.currency_symbol} ${req.session.converted_price(price_total).toFixed(2).replace(number_separator_regx, ",")})` : "") +
+            `- Total amount: £ ${(pi.amount / 100).toFixed(2).replace(res.locals.number_separator_regx, ",")}` +
+            (req.session.currency_code !== "GBP" ? ` (${req.session.currency_symbol} ${req.session.converted_price(price_total).toFixed(2).replace(res.locals.number_separator_regx, ",")})` : "") +
             `\n\nAnd finally, a copy of their receipt:\n${pi.charges.data[0].receipt_url}`;
             transporter.setRecipient({ email: "info@thecs.co" }).sendMail({ subject, message }, err => {
                 if (err) { console.error(err); if (res.statusCode !== 500) res.status(500) }

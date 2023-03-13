@@ -60,8 +60,8 @@ app.use(async (req, res, next) => {
     res.locals.platforms = platforms;
     res.locals.sizes = sizes;
     res.locals.delivery_est_units = delivery_est_units;
-    res.locals.number_separator_regx = /\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g;
     res.locals.product_categories = product_categories;
+    res.locals.number_separator_regx = /\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g;
     if (req.originalUrl === "/shop/checkout/payment/complete") return next();
     req.session.checkout_session_id && await Stripe.checkout.sessions.expire(req.session.checkout_session_id).catch(e => null);
     req.session.checkout_session_id = undefined;

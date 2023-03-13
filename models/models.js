@@ -83,10 +83,20 @@ module.exports.Product = model('Product', (() => {
         image: String,
         info: String,
         stock_qty: { type: Number, min: [0, "No negative values allowed for stock quantity"] },
+        stock_qty_per_size: sizes.reduce((p, v) => ({ ...p, [v]: { type: Number, min: [0, "No negative values allowed for stock quantity"], default: null } }), {}),
         category: { type: String, enum: product_categories }
     });
 
     schema.virtual("size_required").get((val, vt, doc) => doc.category === "clothing");
+
+    schema.pre("save", function() {
+        if (this.size_required) {
+            for (const s of sizes) this.stock_qty_per_size[s] = Math.max(0, this.stock_qty_per_size[s]) || 0;
+            this.stock_qty = Object.values(this.stock_qty_per_size).reduce((p, v) => p + v)
+        }
+        this.stock_qty = Math.max(0, this.stock_qty);
+    });
+
     return schema;
 })());
 

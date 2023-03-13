@@ -67,7 +67,7 @@
             var errMsg = (files.length > 1 ? "one or more images" : "image") + " not found/valid";
             async.each(files, function(file, cb) {
                 var reader = new FileReader();
-                reader.onerror = function(e) { cb(`${e.type}: ${errMsg}`) };
+                reader.onerror = function(e) { cb(Error(`${e.type}: ${errMsg}`)) };
                 reader.onload = function(e) {
                     var result = e.target.result;
                     var media = result.includes("image") ? new Image() : document.createElement("video");
@@ -91,9 +91,8 @@
             $thumb_choice.find("input").off("change").end().empty().hide();
             $form.find(".headline-image-data").empty();
             if (!files || !files.length) return;
-            var $submitInput = $form.children("input:submit");
+            var $submitInput = $form.children("input:submit").attr("disabled", true);
             var label = "<label>CHOOSE ARTICLE THUMBNAIL</label>";
-            $submitInput.attr("disabled", true);
             $thumb_choice.show().append(label);
             readDataURLs(files, function(err, urls) {
                 $submitInput.attr("disabled", false);
@@ -135,16 +134,16 @@
                 var $container = $(this).closest(".file-upload-container");
                 var $textInput = $container.find("input:text");
                 var filesPresent = files && files.length;
-                var $file_label = $container.find(".custom-file-label");
-                var initial_label_value = $file_label.data("initial-value") || $file_label.text();
-                $file_label.data("initial-value", initial_label_value).text(initial_label_value);
+                var $fileLabel = $container.find(".custom-file-label");
+                var initialLabelValue = $fileLabel.data("initial-value") || $fileLabel.text();
+                $fileLabel.data("initial-value", initialLabelValue).text(initialLabelValue);
                 $textInput.val(filesPresent ? "N/A" : "").attr("disabled", false).next(":hidden").remove();
                 if (!filesPresent) return this;
                 var $submitBtn = $(this).closest("form").children("input:submit").attr("disabled", true);
                 readDataURLs(files, function(err, urls) {
                     $submitBtn.attr("disabled", false);
                     if (err) return alert(err.message);
-                    $file_label.text(files[0].name);
+                    $fileLabel.text(files[0].name);
                     $textInput.val("N/A").attr("disabled", true).after($("<input>").attr({ type: "hidden", name: "textbody_media", value: urls[0] }));
                 });
             }).end().find(".clear-uploads").click(function(e) {
@@ -162,26 +161,25 @@
 
         $(":input[id*=all_platforms]").change(function() {
             $(this).closest("form").find(".link-item").not(":first").remove()
-                   .end().find(":input[type=url]").val("").attr({ required: !this.checked })
-                   .end().find(":input").attr({ disabled: this.checked })
+                   .end().find(":input").val("").attr({ disabled: this.checked })
         });
 
         $(".file-upload-container").find("input:file").change(function() {
             var files = this.files;
             var $container = $(this).closest(".file-upload-container");
-            var $image_data = $container.find(":hidden").val("");
-            var $image_url = $container.find("input[type=url]").attr("disabled", false).val("");
-            var $file_label = $container.find(".custom-file-label");
-            var initial_label_value = $file_label.data("initial-value") || $file_label.text();
-            $file_label.data("initial-value", initial_label_value).text(initial_label_value);
+            var $imageData = $container.find(":hidden").val("");
+            var $imageUrl = $container.find("input[type=url]").attr("disabled", false).val("");
+            var $fileLabel = $container.find(".custom-file-label");
+            var initialLabelValue = $fileLabel.data("initial-value") || $fileLabel.text();
+            $fileLabel.data("initial-value", initialLabelValue).text(initialLabelValue);
             if (!files || !files.length) return;
             var $submitBtn = $(this).closest("form").children("input:submit").attr("disabled", true);
             readDataURLs(files, function(err, urls) {
                 $submitBtn.attr("disabled", false);
                 if (err) return alert(err.message);
-                $image_data.val(urls[0]);
-                $image_url.attr("disabled", true).val(files[0].name);
-                $file_label.text(files[0].name);
+                $imageData.val(urls[0]);
+                $imageUrl.attr("disabled", true).val(files[0].name);
+                $fileLabel.text(files[0].name);
             });
         }).end().find("input:text").change(function() {
             var $container = $(this).closest(".file-upload-container");
@@ -198,13 +196,10 @@
             e.preventDefault();
             var $form = $(this).closest("form");
             var $item = $(this).closest(".input-item");
-            switch (true) {
-                case this.className.includes("add"):
-                    $item.clone(true).find(":input").not("button").val("").end().end().insertAfter($item);
-                    break;
-                case this.className.includes("remove"):
-                    $form.find(".input-item").length > 1 && $item.remove();
-                    break;
+            if ($(this).hasClass("add")) {
+                $item.clone(true).find(":input").not("button").val("").end().end().insertAfter($item);
+            } else if ($(this).hasClass("remove")) {
+                $form.find(".input-item").length > 1 && $item.remove();
             }
         });
 
@@ -240,9 +235,8 @@
                     })
                 }
                 $form.find(".headline-image-data").empty();
-                $form.find("#textbody_edit").val(result.textbody).keyup().end().find(".textbody_media input:text").each(function(i) {
-                    this.value = result.textbody_media[i];
-                });
+                $form.find("#textbody_edit").val(result.textbody).keyup();
+                $form.find(".textbody_media input:text").each(function(i) { this.value = result.textbody_media[i] });
 
                 $form.find("#artwork_url_edit").val(result.artwork);
                 $form.find("#title_edit").val(result.title);
@@ -277,7 +271,10 @@
                 $form.find("#price_edit").val(!isNaN(result.price) ? parseFloat(result.price) / 100 : "");
                 $form.find("#stock_qty_edit").val(result.stock_qty);
                 $form.find("#product_info_edit").val(result.info);
-                $form.find("#product_category_" + result.category + "_edit").prop("checked", true);
+                $form.find("#product_category_" + result.category + "_edit").prop("checked", true).change();
+                <%- JSON.stringify(sizes) %>.forEach(size => {
+                    $form.find(`#size_${size}_edit`).val(result.stock_qty_per_size ? result.stock_qty_per_size[size] : "");
+                });
 
                 $form.find("#shipping_method_name_edit").val(result.name);
                 $form.find("#shipping_fee_edit").val(!isNaN(result.fee) ? parseFloat(result.fee) / 100 : "");
@@ -349,7 +346,7 @@
 
             $.post(form.action, data, function(result) {
                 showMessage(result);
-                $(form).find(":input:checked, :input:checked + span, :input:checked + span + br").slideUp(function() {
+                $(form).find(":input:checked").closest(".input-group").slideUp(function() {
                     $(this).remove();
                     data.forEach(function(field) { $("option[value="+ field.value +"]").remove() });
                 });
@@ -410,6 +407,12 @@
 
         $("#mail-alert-box #toggle-display").click(function() {
             $("#mail-alert-box").hasClass("visible") && $("#mail-alert-box").toggleClass("hidden");
+        });
+
+        $("input[name=category]").change(function() {
+            var $form = $(this).closest("form");
+            $form.find("fieldset.stock-qty").attr({ disabled: this.value === "clothing", hidden: this.value === "clothing" });
+            $form.find("fieldset.stock-qty-per-size").attr({ disabled: this.value !== "clothing", hidden: this.value !== "clothing" });
         });
     </script>
 <%- include ('partials/footer') -%>

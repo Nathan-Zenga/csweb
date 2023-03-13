@@ -30,7 +30,7 @@
                             <span><%= converted_price(item.price).toFixed(2).replace(number_separator_regx, ","); %></span>
                         </p>
                         <div class="description">
-                            <p><span><%= item.info %></span></p>
+                            <p><span><%- item.info?.trim() || '&emsp;' %></span></p>
                             <a class="expand-toggler">
                                 <span class="expand-label">See more</span>
                                 <span class="collapse-label">See less</span>
@@ -42,7 +42,7 @@
                             <select class="custom-select size" name="size" <%- item.size_required ? "required" : "disabled" %>>
                                 <option value=""><%- item.size_required ? "Select size" : "N/A" %></option>
                                 <%_ item.size_required && sizes.forEach(size => { _%>
-                                <option value="<%= size %>"><%= size %></option>
+                                <option value="<%= size %>"<%- !item.stock_qty_per_size[size] ? " disabled" : "" %>><%= size %></option>
                                 <%_ }) _%>
                             </select>
                             <input type="hidden" name="id" value="<%= item._id %>">
