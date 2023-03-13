@@ -954,20 +954,21 @@ article.preview .read-more-link {
 
 #fx-select-container {
     text-align: right;
+    margin-bottom: 5em;
 }
 
 #fx-select-info {
+    position: relative;
     display: inline-block;
-    margin-right: .75em;
+    top: 4px;
+    right: 15px;
     font-size: 1.5em;
-    -webkit-transform: translateY(-3px);
-    transform: translateY(-3px);
 }
 
 #fx-select {
     font-weight: 600;
     max-width: 300px;
-    margin-bottom: 5em;
+    margin-bottom: 0;
 }
 
 @media (min-width: 576px) {
