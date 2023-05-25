@@ -87,14 +87,14 @@
         $("#headline_images, #headline_images_change").change(function() {
             var $form = $(this).closest("form");
             var files = this.files;
-            var $thumb_choice = $form.find(".headline-image-thumb-choice");
-            $thumb_choice.find("input").off("change").end().empty().hide();
+            var $thumbChoice = $form.find(".headline-image-thumb-choice");
+            $thumbChoice.find("input").off("change").end().empty().hide();
             $form.find(".headline-image-data").empty();
             if (!files || !files.length) return;
             var $submitInput = $form.children("input:submit");
             var label = "<label>CHOOSE ARTICLE THUMBNAIL</label>";
             $submitInput.attr("disabled", true);
-            $thumb_choice.show().append(label);
+            $thumbChoice.show().append(label);
             readDataURLs(files, function(err, urls) {
                 $submitInput.attr("disabled", false);
                 if (err) return alert(err.message);
@@ -103,17 +103,17 @@
                     var $input = $("<input>").attr({ type: "radio", name, value: url, required: true });
                     var $img = $("<img>").attr({ src: url });
                     $form.find(".headline-image-data").append( $("<input>").attr({ type: "hidden", name: "headline_images" }).val(url) );
-                    $thumb_choice.append($input.add($img));
+                    $thumbChoice.append($input.add($img));
                 }
             });
         });
 
         $("#textbody, #textbody_edit").keyup(function() {
             var textbody = this;
-            var $tbm_container = $(this).closest("form").find(".textbody_media");
+            var $tbmContainer = $(this).closest("form").find(".textbody_media");
             var spots = textbody.value.match(/^x$/gim) || [];
-            var current_values = $tbm_container.find("input:text").map(function() { return this.value }).get();
-            if ($tbm_container.html()) $tbm_container.empty();
+            var current_values = $tbmContainer.find("input:text").map(function() { return this.value }).get();
+            if ($tbmContainer.html()) $tbmContainer.empty();
             if (!spots.length) return;
             spots.forEach(function(spot, i) {
                 $('<div class="file-upload-container">' +
@@ -127,28 +127,28 @@
                         '</div>' +
                     '</div>' +
                     '<input type="text" name="textbody_media" placeholder="...or enter media URL or embed code" required>' +
-                '</div>').appendTo($tbm_container);
+                '</div>').appendTo($tbmContainer);
             });
 
-            $tbm_container.find("input:file").change(function() {
+            $tbmContainer.find("input:file").change(function() {
                 var files = this.files;
                 var $container = $(this).closest(".file-upload-container");
                 var $textInput = $container.find("input:text");
                 var filesPresent = files && files.length;
-                var $file_label = $container.find(".custom-file-label");
-                var initial_label_value = $file_label.data("initial-value") || $file_label.text();
-                $file_label.data("initial-value", initial_label_value).text(initial_label_value);
+                var $fileLabel = $container.find(".custom-file-label");
+                var initialLabelValue = $fileLabel.data("initial-value") || $fileLabel.text();
+                $fileLabel.data("initial-value", initialLabelValue).text(initialLabelValue);
                 $textInput.val(filesPresent ? "N/A" : "").attr("disabled", false).next(":hidden").remove();
                 if (!filesPresent) return this;
                 var $submitBtn = $(this).closest("form").children("input:submit").attr("disabled", true);
                 readDataURLs(files, function(err, urls) {
                     $submitBtn.attr("disabled", false);
                     if (err) return alert(err.message);
-                    $file_label.text(files[0].name);
+                    $fileLabel.text(files[0].name);
                     $textInput.val("N/A").attr("disabled", true).after($("<input>").attr({ type: "hidden", name: "textbody_media", value: urls[0] }));
                 });
             }).end().find(".clear-uploads").click(function(e) {
-                e.preventDefault(); $tbm_container.find(":file#"+this.dataset.id).val("").change()
+                e.preventDefault(); $tbmContainer.find(":file#"+this.dataset.id).val("").change()
             }).end().find("input:text").change(function() {
                 var $container = $(this).closest(".file-upload-container");
                 $container.find("input:file").attr("required", !this.value.trim());
@@ -169,19 +169,19 @@
         $(".file-upload-container").find("input:file").change(function() {
             var files = this.files;
             var $container = $(this).closest(".file-upload-container");
-            var $image_data = $container.find(":hidden").val("");
-            var $image_url = $container.find("input[type=url]").attr("disabled", false).val("");
-            var $file_label = $container.find(".custom-file-label");
-            var initial_label_value = $file_label.data("initial-value") || $file_label.text();
-            $file_label.data("initial-value", initial_label_value).text(initial_label_value);
+            var $imageData = $container.find(":hidden").val("");
+            var $imageUrl = $container.find("input[type=url]").attr("disabled", false).val("");
+            var $fileLabel = $container.find(".custom-file-label");
+            var initialLabelValue = $fileLabel.data("initial-value") || $fileLabel.text();
+            $fileLabel.data("initial-value", initialLabelValue).text(initialLabelValue);
             if (!files || !files.length) return;
             var $submitBtn = $(this).closest("form").children("input:submit").attr("disabled", true);
             readDataURLs(files, function(err, urls) {
                 $submitBtn.attr("disabled", false);
                 if (err) return alert(err.message);
-                $image_data.val(urls[0]);
-                $image_url.attr("disabled", true).val(files[0].name);
-                $file_label.text(files[0].name);
+                $imageData.val(urls[0]);
+                $imageUrl.attr("disabled", true).val(files[0].name);
+                $fileLabel.text(files[0].name);
             });
         }).end().find("input:text").change(function() {
             var $container = $(this).closest(".file-upload-container");
@@ -228,15 +228,15 @@
                 });
 
                 $form.find("#headline_edit").val(result.headline);
-                var $thumb_choice = $form.find(".headline-image-thumb-choice");
+                var $thumbChoice = $form.find(".headline-image-thumb-choice");
                 var images = result.headline_images;
-                $thumb_choice.find("input").off("change").end().empty().hide();
+                $thumbChoice.find("input").off("change").end().empty().hide();
                 if (images && images.length) {
-                    $thumb_choice.show().append("<label>CHOOSE ARTICLE THUMBNAIL</label>");
+                    $thumbChoice.show().append("<label>CHOOSE ARTICLE THUMBNAIL</label>");
                     images.forEach(function(image) {
                         var $input = $("<input>").attr({ type: "radio", name: "headline_image_thumb", value: image });
                         var $img = $("<img>").attr({ src: image });
-                        $thumb_choice.append($input.add($img));
+                        $thumbChoice.append($input.add($img));
                     })
                 }
                 $form.find(".headline-image-data").empty();
@@ -361,11 +361,11 @@
         });
 
         $(".filter-search-input").on("input", function(e) {
-            var $items = $(e.target).closest("form").find(".list-item");
+            var $items = $(e.target).closest("form").find(".list-item").find("input[type=checkbox]").removeAttr("disabled").prop("checked", false).end();
             !e.target.value ? $items.show() : $items.hide().filter(function() {
                 var regex = new RegExp("\\b" + e.target.value.replace(/\W/g, function(m) { return "\\" + m }), "gi");
                 return regex.test($(this).find("label").text())
-            }).show();
+            }).show().end().filter(":hidden").find("input[type=checkbox]").attr("disabled", true);
         });
 
         $(window).on("load", function() {
@@ -379,7 +379,8 @@
             $(".nav.nav-pills a").on("shown.bs.tab", function() {
                 var $a = $(".nav.nav-pills:visible a.active[data-toggle='pill']");
                 $a = $(".section-dropdown-options select:visible").add($a);
-                document.cookie = "active_tab_hrefs=" + JSON.stringify($a.map(function() { return $(this).attr("href") || "val-"+$(this).val() }).get()) + "; path="+ location.pathname +";";
+                var hrefs = $a.get().map(function(e) { return $(e).attr("href") || "val-"+$(e).val() });
+                document.cookie = "active_tab_hrefs=" + JSON.stringify(hrefs) + "; path="+ location.pathname +";";
             });
         });
 

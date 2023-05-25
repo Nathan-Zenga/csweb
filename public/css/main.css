@@ -1151,6 +1151,8 @@ body:not(#cart-page, #admin-page) #cart-icon.visible {
     padding: 20px 20px 20px 55px;
     min-height: 61px;
     z-index: 50;
+    -webkit-transition: .5s transform, .5s padding-left;
+    transition: .5s transform, .5s padding-left;
 }
 
 #admin-page #mail-alert-box.visible {

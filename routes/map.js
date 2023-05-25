@@ -38,11 +38,10 @@ router.post('/location/edit', isAuthed, async (req, res) => {
         if (city_edit)           doc.city = city_edit;
         if (country_edit)        doc.country = country_edit;
         if (postcode_edit)       doc.postcode = postcode_edit;
-        const saved = await doc.save();
         const result = await geocoder.geocode(address);
-        saved.latitude = result[0].latitude;
-        saved.longitude = result[0].longitude;
-        await saved.save(); res.send("Location updated");
+        doc.latitude = result[0].latitude;
+        doc.longitude = result[0].longitude;
+        await doc.save(); res.send("Location updated");
     } catch (err) { res.status(500).send(err.message) }
 });
 
