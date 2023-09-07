@@ -173,11 +173,14 @@ router.post("/checkout/payment/create", async (req, res) => {
             payment_intent_data: { description: "CS Store Purchase" },
             line_items: cart.map(item => ({
                 price_data: {
-                    product_data: { name: item.name + (item.size ? ` - size ${item.size}` : ""), images: item.image ? [item.image] : undefined },
+                    product_data: {
+                        name: item.name + (item.size ? ` - size ${item.size}` : ""),
+                        description: item.info || undefined,
+                        images: item.image ? [item.image] : undefined
+                    },
                     unit_amount: parseInt(item.price),
                     currency: "gbp"
                 },
-                description: item.info || undefined,
                 quantity: item.qty
             })),
             shipping_options: shipping_methods.map(method => ({
@@ -210,11 +213,12 @@ router.post("/checkout/payment/create", async (req, res) => {
 router.get("/checkout/payment/complete", async (req, res) => {
     if (!req.session.cart.length) return res.status(400).render('error', { html: "Unable to complete checkout - session expired" });
     try {
-        const { customer, payment_intent: pi } = await Stripe.checkout.sessions.retrieve(req.session.checkout_session_id, { expand: ["customer", "payment_intent"] });
+        const { customer, payment_intent: pi } = await Stripe.checkout.sessions.retrieve(req.session.checkout_session_id, { expand: ["customer", "payment_intent.latest_charge"] });
         if (pi.status !== "succeeded") return res.status(400).render('error', { html: `Payment status:<h2>${pi.status.replace(/_/g, " ").replace(/^./, m => m.toUpperCase())}</h2>` });
 
         const products = await Product.find();
         const price_total = req.session.cart.reduce((sum, p) => sum + (p.price * p.qty), 0);
+        const { receipt_url } = pi.latest_charge;
 
         if (production) await Promise.all(req.session.cart.map(item => {
             const product = products.find(p => p.id === item.id);
@@ -231,8 +235,7 @@ router.get("/checkout/payment/complete", async (req, res) => {
         const transporter = new MailTransporter();
         const subject = "Purchase Nofication: Payment Successful";
         const message = `Hi ${customer.name},\n\n` +
-        "Your payment was successful. Please see below for your purchase receipt:\n\n" +
-        `${pi.charges.data[0].receipt_url}\n\n` +
+        `Your payment was successful. Please see below for your purchase receipt:\n\n${receipt_url}\n\n` +
         "Thank you for shopping with us!\n\n- CS";
         transporter.setRecipient({ email: customer.email }).sendMail({ subject, message }, err => {
             if (err) console.error(err), res.status(500);
@@ -243,7 +246,7 @@ router.get("/checkout/payment/complete", async (req, res) => {
             `- Date of purchase: ${new Date().toDateString()}\n\n` +
             `- Total amount: £ ${(pi.amount / 100).toFixed(2).replace(number_separator_regx, ",")}` +
             (req.session.currency_code !== "GBP" ? ` (${req.session.currency_symbol} ${req.session.converted_price(price_total).toFixed(2).replace(number_separator_regx, ",")})` : "") +
-            `\n\nAnd finally, a copy of their receipt:\n${pi.charges.data[0].receipt_url}`;
+            `\n\nAnd finally, a copy of their receipt:\n${receipt_url}`;
             transporter.setRecipient({ email: "info@thecs.co" }).sendMail({ subject, message }, err => {
                 if (err) { console.error(err); if (res.statusCode !== 500) res.status(500) }
                 res.render('checkout-success')
