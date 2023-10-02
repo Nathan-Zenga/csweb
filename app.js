@@ -7,9 +7,7 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const MemoryStore = require('memorystore')(session);
 const passport = require('passport');
-const production = process.env.NODE_ENV === "production";
-if (!production) require('dotenv').config();
-const { STRIPE_SK, CSDB, PORT } = process.env;
+const { STRIPE_SK, CSDB, PORT, NODE_ENV } = process.env;
 const Stripe = new (require('stripe').Stripe)(STRIPE_SK);
 const { Homepage_content, MailTest } = require('./models/models');
 const MailTransporter = require('./modules/MailTransporter');
@@ -17,6 +15,7 @@ const currencies = require('./modules/currencies');
 const socketio = require('./modules/socket.io');
 const visitor = require('./modules/visitor-info');
 const { platforms, sizes, delivery_est_units, product_categories } = require('./config/constants');
+const production = NODE_ENV === "production";
 
 mongoose.connect(CSDB).then(() => { console.log("Connected to DB") });
 

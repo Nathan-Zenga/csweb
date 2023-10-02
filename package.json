@@ -5,6 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "node app",
+    "start:dev": "node -r dotenv/config app",
+    "dev": "nodemon -x \"npm run start:dev\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
