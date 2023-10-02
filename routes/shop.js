@@ -41,7 +41,7 @@ router.post("/stock/add", isAuthed, async (req, res) => {
     const { name, price, stock_qty, info, category, image_file, image_url } = req.body;
     try {
         const product = new Product({ name, price, stock_qty, info, category });
-        const public_id = `shop/stock/${product.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
+        const public_id = `shop/stock/${product.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>+]/g, "_");
         const result = image_url || image_file ? await cloud.uploader.upload(image_url || image_file, { public_id }) : null;
         if (result) product.image = result.secure_url;
         await product.save(); res.send("Product saved in stock");
@@ -54,7 +54,7 @@ router.post('/stock/edit', isAuthed, async (req, res) => {
         const product = await Product.findById(product_id);
         if (!product) return res.status(404).send("Product not found");
 
-        const prev_p_id = `shop/stock/${product.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
+        const prev_p_id = `shop/stock/${product.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>+]/g, "_");
         if (name) product.name = name;
         if (price) product.price = price;
         if (info) product.info = info;
@@ -68,7 +68,7 @@ router.post('/stock/edit', isAuthed, async (req, res) => {
         });
 
         const saved = await product.save();
-        const public_id = `shop/stock/${saved.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
+        const public_id = `shop/stock/${saved.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>+]/g, "_");
         if (image_url || image_file) await cloud.api.delete_resources([prev_p_id]);
         const result = image_url || image_file ? await cloud.uploader.upload(image_url || image_file, { public_id }) : null;
         if (result) saved.image = result.secure_url;
@@ -86,7 +86,7 @@ router.post("/stock/remove", isAuthed, async (req, res) => {
         await each(products, (item, cb) => {
             Product.deleteOne({ _id : item.id }, (err, result) => {
                 if (err || !result.deletedCount) return cb(err || Error("Product(s) not found"));
-                const p_id = `shop/stock/${item.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
+                const p_id = `shop/stock/${item.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>+]/g, "_");
                 cloud.api.delete_resources([p_id], () => cb());
             })
         });

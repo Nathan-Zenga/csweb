@@ -36,7 +36,7 @@ router.post('/homepage/content', isAuthed, async (req, res) => {
 
 router.post('/homepage/image/save', isAuthed, async (req, res) => {
     const { filename, image, index } = req.body;
-    const public_id = `homepage/images/${filename.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
+    const public_id = `homepage/images/${filename.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>+]/g, "_");
     try {
         const result = await cloud.uploader.upload(image, { public_id });
         const { length } = await Homepage_image.find();

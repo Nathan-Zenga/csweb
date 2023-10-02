@@ -18,7 +18,7 @@ router.post('/project/new', isAuthed, async (req, res) => {
     project.links = link_names.map((name, i) => ({ name, url: link_urls[i] }));
 
     try {
-        const public_id = `discography/${project.id}/${project.title.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
+        const public_id = `discography/${project.id}/${project.title.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>+]/g, "_");
         const result = artwork_file ? await cloud.uploader.upload(artwork_file, { public_id }) : null;
         if (result) project.artwork = result.secure_url;
         await project.save(); res.send("Project saved");
@@ -53,7 +53,7 @@ router.post('/project/edit', isAuthed, async (req, res) => {
         project.all_platforms = !!all_platforms;
 
         if (artwork_file) await cloud.api.delete_resources_by_prefix("discography/"+project.id);
-        const public_id = `discography/${project.id}/${project.title.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
+        const public_id = `discography/${project.id}/${project.title.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>+]/g, "_");
         const result = artwork_file ? await cloud.uploader.upload(artwork_file, { public_id }) : null;
         if (result) project.artwork = result.secure_url;
         await project.save(); res.send("Project updated");

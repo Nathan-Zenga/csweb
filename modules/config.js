@@ -79,7 +79,7 @@ module.exports.saveMedia = async (body, doc, cb) => {
                     console.log("Youtube link stored as iframe...");
                     callback2();
                 } else if (img || av) {
-                    const public_id = `article/${doc.id}/${field}${parseInt(i)+1}`.replace(/[ ?&#\\%<>]/g, "_");
+                    const public_id = `article/${doc.id}/${field}${parseInt(i)+1}`.replace(/[ ?&#\\%<>+]/g, "_");
                     cloud.uploader.upload(mediaStr, { public_id, resource_type: img ? "image" : "video" }, (err, result) => {
                         if (err) return callback2(err);
                         if (body.headline_image_thumb === mediaStr) doc.headline_image_thumb = result.secure_url;

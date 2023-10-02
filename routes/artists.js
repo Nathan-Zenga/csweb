@@ -18,7 +18,7 @@ router.post('/new', isAuthed, async (req, res) => {
     artist.socials = social_media_names.map((name, i) => ({ name, url: social_media_urls[i] }));
 
     try {
-        const public_id = `artists/${artist.id}/${artist.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
+        const public_id = `artists/${artist.id}/${artist.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>+]/g, "_");
         const result = profile_image ? await cloud.uploader.upload(profile_image, { public_id }) : null;
         if (result) artist.profile_image = result.secure_url;
         await artist.save(); res.send(`Done${result ? ", profile picture saved" : ""}`)
@@ -39,7 +39,7 @@ router.post('/edit', isAuthed, async (req, res) => {
         artist.socials = social_media_names.map((name, i) => ({ name, url: social_media_urls[i] }));
 
         if (profile_image) await cloud.api.delete_resources_by_prefix(`artists/${artist.id}`);
-        const public_id = `artists/${artist.id}/${artist.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>]/g, "_");
+        const public_id = `artists/${artist.id}/${artist.name.replace(/ /g, "-")}`.replace(/[ ?&#\\%<>+]/g, "_");
         const result = profile_image ? await cloud.uploader.upload(profile_image, { public_id }) : null;
         if (result) artist.profile_image = result.secure_url;
         await artist.save(); res.send(`Artist updated successfully: ${artist.name}`);

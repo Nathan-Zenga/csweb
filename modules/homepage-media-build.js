@@ -30,7 +30,7 @@ const homepage_media_uploader = async () => {
 
                 stream.on("error", err => { console.error(err.message); cb() });
                 stream.on("finish", async () => {
-                    const filename = info.videoDetails.title.replace(/\p{Extended_Pictographic}|[ ?&#\\%<>]/gu, "_");
+                    const filename = info.videoDetails.title.replace(/\p{Extended_Pictographic}|[ ?&#\\%<>+]/gu, "_");
                     const public_id = "homepage/videos/" + filename;
                     const result = await cloud.uploader.upload(file, { public_id, resource_type: "video" });
                     await Homepage_image.create({ p_id: result.public_id, url: result.secure_url, index: i });
