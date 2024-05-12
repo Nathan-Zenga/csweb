@@ -101,19 +101,6 @@ module.exports.Admin = model('Admin', (() => {
     return schema;
 })());
 
-module.exports.MailTest = model('MailTest', (() => {
-    const schema = new Schema({
-        last_sent_date: { type: Date, default: new Date(0) },
-        email: { type: String, default: process.env.TEST_EMAIL },
-        subject: { type: String, default: "Re: CS test email" },
-        message: { type: String, default: "This is a test email" }
-    });
-
-    const two_weeks = 1000 * 60 * 60 * 24 * 14;
-    schema.virtual("due").get((val, vt, doc) => Date.now() >= doc.last_sent_date.getTime() + two_weeks);
-    return schema;
-})(), "mail_test");
-
 module.exports.Shipping_method = model('Shipping_method', (() => {
     const schema = new Schema({
         name: { type: String, required: true },

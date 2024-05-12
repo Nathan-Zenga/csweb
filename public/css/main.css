@@ -811,6 +811,7 @@ article.preview .read-more-link {
     .artist-bio .text {
         max-height: 400px;
         overflow: auto;
+        z-index: 5;
     }
 
     .artist-bio .text p {

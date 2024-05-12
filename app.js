@@ -7,17 +7,21 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const MemoryStore = require('memorystore')(session);
 const passport = require('passport');
-const { STRIPE_SK, CSDB, PORT, NODE_ENV } = process.env;
+const { STRIPE_SK, CSDB, PORT, NODE_ENV, CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = process.env;
 const Stripe = new (require('stripe').Stripe)(STRIPE_SK);
-const { Homepage_content, MailTest } = require('./models/models');
+const { Homepage_content } = require('./models/models');
 const MailTransporter = require('./modules/MailTransporter');
 const currencies = require('./modules/currencies');
 const socketio = require('./modules/socket.io');
 const visitor = require('./modules/visitor-info');
+const { OAuth2 } = (require("googleapis")).google.auth;
 const { platforms, sizes, delivery_est_units, product_categories } = require('./config/constants');
+const { v2: cloud } = require('cloudinary');
 const production = NODE_ENV === "production";
 
-mongoose.connect(CSDB).then(() => { console.log("Connected to DB") });
+cloud.config({ cloud_name: CLOUDINARY_CLOUD_NAME, api_key: CLOUDINARY_API_KEY, api_secret: CLOUDINARY_API_SECRET });
+
+mongoose.set({ strictQuery: true }).connect(CSDB).then(() => { console.log("Connected to DB") });
 
 // View Engine
 app.set('view engine', 'ejs');
@@ -85,16 +89,15 @@ app.post("*", (req, res) => res.status(400).send("Sorry, your request currently 
 const server = app.listen(PORT, () => {
     console.log(`Server started${!production ? " on port " + PORT : ""}`);
 
-    if (production) try {
-        setInterval(async () => {
-            const test = await MailTest.findOne() || new MailTest();
-            const { email, subject, message, due } = test;
-            if (!due) return;
-            await new MailTransporter({ email }).sendMail({ subject, message });
-            test.last_sent_date = Date.now();
-            await test.save();
-        }, 1000 * 60 * 10);
-    } catch (err) { console.error(err.message) }
+    if (production) setInterval(async () => {
+        try {
+            const { OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, OAUTH_REFRESH_TOKEN } = process.env;
+            const oauth2Client = new OAuth2( OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET, "https://developers.google.com/oauthplayground" );
+            oauth2Client.setCredentials({ refresh_token: OAUTH_REFRESH_TOKEN });
+            const response = await oauth2Client.getAccessToken();
+            if (!response.token) throw Error("Null token");
+        } catch (err) { console.error(err.message) }
+    }, 1000 * 60 * 60 * 24 * 7);
 });
 
 socketio(server);
